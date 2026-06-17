@@ -1,0 +1,41 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "bazaar_android (Android)",
+      "cwd": "apps/bazaar_android",
+      "request": "launch",
+      "type": "dart",
+    },
+    {
+      "name": "bazaar_ios (iOS)",
+      "cwd": "apps/bazaar_ios",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "bazaar_windows (Windows)",
+      "cwd": "apps/bazaar_windows",
+      "request": "launch",
+      "type": "dart",
+    },
+    {
+      "name": "bazaar_linux (Linux)",
+      "cwd": "apps/bazaar_linux",
+      "request": "launch",
+      "type": "dart",
+    },
+    {
+      "name": "bazaar_web (Chrome)",
+      "cwd": "apps/bazaar_web",
+      "request": "launch",
+      "type": "dart",
+    },
+    {
+      "name": "bazaar_macos (macOS)",
+      "cwd": "apps/bazaar_macos",
+      "request": "launch",
+      "type": "dart",
+    }
+  ]
+}

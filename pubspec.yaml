@@ -1,0 +1,67 @@
+name: flutter_bazaar
+description: Flutter Bazaar monorepo managed by Melos.
+publish_to: none
+
+environment:
+  sdk: ^3.12.2
+  flutter: ">=3.27.0"
+
+workspace:
+  - apps/bazaar_android
+  - apps/bazaar_ios
+  - apps/bazaar_windows
+  - apps/bazaar_linux
+  - apps/bazaar_web
+  - apps/bazaar_macos
+  - packages/core
+
+dev_dependencies:
+  melos: ^7.0.0
+
+melos:
+  scripts:
+    analyze:
+      run: melos exec -- dart analyze .
+      description: Run static analysis on all packages.
+    test:
+      run: melos exec -- flutter test
+      description: Run tests in all packages.
+    format:
+      run: melos exec -- dart format .
+      description: Format Dart code in all packages.
+    run:android:
+      run: melos exec --scope="bazaar_android" -- flutter run -d android
+      description: Run bazaar_android on Android.
+    run:ios:
+      run: melos exec --scope="bazaar_ios" -- flutter run -d ios
+      description: Run bazaar_ios on iOS.
+    run:windows:
+      run: melos exec --scope="bazaar_windows" -- flutter run -d windows
+      description: Run bazaar_windows on Windows.
+    run:linux:
+      run: melos exec --scope="bazaar_linux" -- flutter run -d linux
+      description: Run bazaar_linux on Linux.
+    run:web:
+      run: melos exec --scope="bazaar_web" -- flutter run -d chrome
+      description: Run bazaar_web on Chrome.
+    run:macos:
+      run: melos exec --scope="bazaar_macos" -- flutter run -d macos
+      description: Run bazaar_macos on macOS.
+    build:android:
+      run: melos exec --scope="bazaar_android" -- flutter build apk
+      description: Build bazaar_android for Android.
+    build:ios:
+      run: melos exec --scope="bazaar_ios" -- flutter build ios
+      description: Build bazaar_ios for iOS.
+    build:windows:
+      run: melos exec --scope="bazaar_windows" -- flutter build windows
+      description: Build bazaar_windows for Windows.
+    build:linux:
+      run: melos exec --scope="bazaar_linux" -- flutter build linux
+      description: Build bazaar_linux for Linux.
+    build:web:
+      run: melos exec --scope="bazaar_web" -- flutter build web
+      description: Build bazaar_web for Web.
+    build:macos:
+      run: melos exec --scope="bazaar_macos" -- flutter build macos
+      description: Build bazaar_macos for macOS.
