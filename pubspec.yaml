@@ -7,13 +7,14 @@ environment:
   flutter: ">=3.27.0"
 
 workspace:
-  - apps/bazaar_android
-  - apps/bazaar_ios
-  - apps/bazaar_windows
-  - apps/bazaar_linux
-  - apps/bazaar_web
-  - apps/bazaar_macos
+  - apps/BarrelLock/BarrelLock_android
+  - apps/BarrelLock/BarrelLock_ios
+  - apps/BarrelLock/BarrelLock_windows
+  - apps/BarrelLock/BarrelLock_linux
+  - apps/BarrelLock/BarrelLock_web
+  - apps/BarrelLock/BarrelLock_macos
   - packages/core
+  - packages/fast_navigator
 
 dev_dependencies:
   melos: ^7.0.0
@@ -30,38 +31,38 @@ melos:
       run: melos exec -- dart format .
       description: Format Dart code in all packages.
     run:android:
-      run: melos exec --scope="bazaar_android" -- flutter run -d android
-      description: Run bazaar_android on Android.
+      run: melos exec --scope="barrel_lock_android" -- flutter run -d android
+      description: Run BarrelLock Android app.
     run:ios:
-      run: melos exec --scope="bazaar_ios" -- flutter run -d ios
-      description: Run bazaar_ios on iOS.
+      run: melos exec --scope="barrel_lock_ios" -- flutter run -d ios
+      description: Run BarrelLock iOS app.
     run:windows:
-      run: melos exec --scope="bazaar_windows" -- flutter run -d windows
-      description: Run bazaar_windows on Windows.
+      run: melos exec --scope="barrel_lock_windows" -- flutter run -d windows
+      description: Run BarrelLock Windows app.
     run:linux:
-      run: melos exec --scope="bazaar_linux" -- flutter run -d linux
-      description: Run bazaar_linux on Linux.
+      run: melos exec --scope="barrel_lock_linux" -- flutter run -d linux
+      description: Run BarrelLock Linux app.
     run:web:
-      run: melos exec --scope="bazaar_web" -- flutter run -d chrome
-      description: Run bazaar_web on Chrome.
+      run: melos exec --scope="barrel_lock_web" -- flutter run -d chrome
+      description: Run BarrelLock Web app.
     run:macos:
-      run: melos exec --scope="bazaar_macos" -- flutter run -d macos
-      description: Run bazaar_macos on macOS.
+      run: melos exec --scope="barrel_lock_macos" -- flutter run -d macos
+      description: Run BarrelLock macOS app.
     build:android:
-      run: melos exec --scope="bazaar_android" -- flutter build apk
-      description: Build bazaar_android for Android.
+      run: melos exec --scope="barrel_lock_android" -- flutter build apk
+      description: Build BarrelLock Android app.
     build:ios:
-      run: melos exec --scope="bazaar_ios" -- flutter build ios
-      description: Build bazaar_ios for iOS.
+      run: melos exec --scope="barrel_lock_ios" -- flutter build ios
+      description: Build BarrelLock iOS app.
     build:windows:
-      run: melos exec --scope="bazaar_windows" -- flutter build windows
-      description: Build bazaar_windows for Windows.
+      run: melos exec --scope="barrel_lock_windows" -- flutter build windows
+      description: Build BarrelLock Windows app.
     build:linux:
-      run: melos exec --scope="bazaar_linux" -- flutter build linux
-      description: Build bazaar_linux for Linux.
+      run: melos exec --scope="barrel_lock_linux" -- flutter build linux
+      description: Build BarrelLock Linux app.
     build:web:
-      run: melos exec --scope="bazaar_web" -- flutter build web
-      description: Build bazaar_web for Web.
+      run: melos exec --scope="barrel_lock_web" -- flutter build web
+      description: Build BarrelLock Web app.
     build:macos:
-      run: melos exec --scope="bazaar_macos" -- flutter build macos
-      description: Build bazaar_macos for macOS.
+      run: melos exec --scope="barrel_lock_macos" -- flutter build macos
+      description: Build BarrelLock macOS app.

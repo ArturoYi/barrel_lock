@@ -7,15 +7,16 @@
 ```text
 flutter_bazaar/
 ├── apps/
-│   ├── bazaar_android/  # Android 应用
-│   ├── bazaar_ios/      # iOS 应用
-│   ├── bazaar_windows/  # Windows 应用
-│   ├── bazaar_linux/    # Linux 应用
-│   ├── bazaar_web/      # Web 应用
-│   └── bazaar_macos/    # macOS 应用
+│   └── BarrelLock/              # BarrelLock 应用
+│       ├── BarrelLock_android/  # Android 应用
+│       ├── BarrelLock_ios/      # iOS 应用
+│       ├── BarrelLock_windows/  # Windows 应用
+│       ├── BarrelLock_linux/    # Linux 应用
+│       ├── BarrelLock_web/      # Web 应用
+│       └── BarrelLock_macos/    # macOS 应用
 ├── packages/
-│   └── core/            # 共享核心库
-├── pubspec.yaml         # 工作区根配置
+│   └── core/                    # 共享核心库
+├── pubspec.yaml                 # 工作区根配置
 └── pubspec.lock
 ```
 
@@ -40,7 +41,7 @@ melos bootstrap
 # 运行指定平台应用（示例：macOS）
 melos run run:macos
 # 或
-cd apps/bazaar_macos && fvm flutter run -d macos
+cd apps/BarrelLock/BarrelLock_macos && fvm flutter run -d macos
 ```
 
 ## 常用命令
