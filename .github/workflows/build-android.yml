@@ -1,0 +1,104 @@
+name: Build Android
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Build track'
+        required: true
+        type: choice
+        default: release
+        options:
+          - release
+          - debug
+
+concurrency:
+  group: build-android-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: 3.44.2
+  MELOS_VERSION: ^8.0.0
+
+jobs:
+  build-android:
+    name: Build Android (APK + AAB)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+
+      - name: Install Melos
+        run: dart pub global activate melos ${{ env.MELOS_VERSION }}
+
+      - name: Add melos to PATH
+        run: echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
+
+      - name: Cache pub
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            .dart_tool/
+          key: pub-android-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            pub-android-${{ runner.os }}-
+
+      - name: Bootstrap workspace
+        run: melos bootstrap
+
+      - name: Build APK (release)
+        run: melos run build:android
+
+      - name: Build AAB (release)
+        run: melos run build:android:bundle
+
+      - name: Collect build outputs
+        run: |
+          mkdir -p melos_outputs
+          melos exec --scope=barrel_lock_android --order-dependents -- \
+            cp -r build/app/outputs/flutter-apk melos_outputs/android-apk || true
+          melos exec --scope=barrel_lock_android -- \
+            cp -r build/app/outputs/bundle/release melos_outputs/android-aab || true
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: melos_outputs/android-apk/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: melos_outputs/android-aab/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Attach APK to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            melos_outputs/android-apk/**/*.apk
+            melos_outputs/android-aab/**/*.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -4,11 +4,13 @@
 
 # Melos
 .melos_tool/
+melos_outputs/
 
 # Dart & Flutter
 .dart_tool/
 .packages
 build/
+coverage/
 *.iml
 .idea/
 
@@ -25,3 +27,7 @@ Thumbs.db
 .vscode/*
 !.vscode/settings.json
 !.vscode/launch.json
+
+# Local env overrides
+.melos_overrides.yaml
+

@@ -17,52 +17,160 @@ workspace:
   - packages/fast_navigator
 
 dev_dependencies:
-  melos: ^7.0.0
+  melos: ^8.0.0
+  flutter_lints: ^6.0.0
 
+# Melos 8.0.0 + Dart pub workspaces 管理方式:
+# - 所有 melos 配置(包含 scripts / ide / command / sdkPath)都在 pubspec.yaml 的 melos: 块内。
+# - 根 pubspec.yaml 用 workspace: 列出子包,各子包 pubspec.yaml 用 resolution: workspace 引用。
+# - 不再需要单独的 melos.yaml 文件。
 melos:
+  # SDK 路径:与 .fvmrc 锁定 Flutter 版本协同,保证全团队一致。
+  # 可通过 MELOS_SDK_PATH 环境变量或 --sdk-path 命令行选项覆盖。
+  sdkPath: .fvm/versions/3.44.2
+
+  # 为 IntelliJ/Android Studio 生成 Run/Debug 配置,自动收录每个子包的 main 入口。
+  ide:
+    intellij: true
+
+  # 调整子命令行为:bootstrap 阶段不并发 pub get(由 CI/开发者按需手动触发,更快可控)。
+  command:
+    bootstrap:
+      runPubGetInParallel: false
+
   scripts:
+    # ── 质量门禁 ────────────────────────────────────────────
     analyze:
-      run: melos exec -- dart analyze .
-      description: Run static analysis on all packages.
-    test:
-      run: melos exec -- flutter test
-      description: Run tests in all packages.
+      description: Run `dart analyze` across all packages.
+      exec:
+        command: dart analyze .
+        concurrency: 1
+
+    analyze:fix:
+      description: Auto-apply Dart analyzer suggestions.
+      exec:
+        command: dart fix --apply .
+        concurrency: 1
+
     format:
-      run: melos exec -- dart format .
       description: Format Dart code in all packages.
+      exec:
+        command: dart format .
+        concurrency: 1
+
+    format:check:
+      description: Verify formatting without modifying files (CI-friendly).
+      exec:
+        command: dart format --output=none --set-exit-if-changed .
+        concurrency: 1
+
+    test:
+      description: Run `flutter test` in every package that has a test/ directory.
+      exec:
+        command: flutter test --no-pub --reporter=expanded
+        concurrency: 1
+        dirExists: test
+
+    test:coverage:
+      description: Run tests and collect coverage data into coverage/.
+      exec:
+        command: flutter test --no-pub --coverage
+        concurrency: 1
+        dirExists: test
+
+    # ── 聚合门禁(供 CI 一键调用,只在工作区根执行一次) ─────
+    ci:
+      description: "Aggregate quality gate: format check -> analyze -> test."
+      run: melos run format:check && melos run analyze && melos run test
+
+    # ── BarrelLock App:运行 ──────────────────────────────────
     run:android:
-      run: melos exec --scope="barrel_lock_android" -- flutter run -d android
       description: Run BarrelLock Android app.
+      exec:
+        command: flutter run -d android
+        scope: barrel_lock_android
+
     run:ios:
-      run: melos exec --scope="barrel_lock_ios" -- flutter run -d ios
       description: Run BarrelLock iOS app.
-    run:windows:
-      run: melos exec --scope="barrel_lock_windows" -- flutter run -d windows
-      description: Run BarrelLock Windows app.
-    run:linux:
-      run: melos exec --scope="barrel_lock_linux" -- flutter run -d linux
-      description: Run BarrelLock Linux app.
-    run:web:
-      run: melos exec --scope="barrel_lock_web" -- flutter run -d chrome
-      description: Run BarrelLock Web app.
+      exec:
+        command: flutter run -d ios
+        scope: barrel_lock_ios
+
     run:macos:
-      run: melos exec --scope="barrel_lock_macos" -- flutter run -d macos
       description: Run BarrelLock macOS app.
+      exec:
+        command: flutter run -d macos
+        scope: barrel_lock_macos
+
+    run:windows:
+      description: Run BarrelLock Windows app.
+      exec:
+        command: flutter run -d windows
+        scope: barrel_lock_windows
+
+    run:linux:
+      description: Run BarrelLock Linux app.
+      exec:
+        command: flutter run -d linux
+        scope: barrel_lock_linux
+
+    run:web:
+      description: Run BarrelLock Web app.
+      exec:
+        command: flutter run -d chrome
+        scope: barrel_lock_web
+
+    # ── BarrelLock App:构建(产物统一到 melos_outputs/) ─────
     build:android:
-      run: melos exec --scope="barrel_lock_android" -- flutter build apk
-      description: Build BarrelLock Android app.
+      description: Build release APK for BarrelLock Android.
+      exec:
+        command: flutter build apk --release
+        scope: barrel_lock_android
+        orderDependents: true
+
+    build:android:bundle:
+      description: Build release AAB for BarrelLock Android (Play Store).
+      exec:
+        command: flutter build appbundle --release
+        scope: barrel_lock_android
+
     build:ios:
-      run: melos exec --scope="barrel_lock_ios" -- flutter build ios
-      description: Build BarrelLock iOS app.
-    build:windows:
-      run: melos exec --scope="barrel_lock_windows" -- flutter build windows
-      description: Build BarrelLock Windows app.
-    build:linux:
-      run: melos exec --scope="barrel_lock_linux" -- flutter build linux
-      description: Build BarrelLock Linux app.
-    build:web:
-      run: melos exec --scope="barrel_lock_web" -- flutter build web
-      description: Build BarrelLock Web app.
+      description: Build BarrelLock iOS (no codesign).
+      exec:
+        command: flutter build ios --release --no-codesign
+        scope: barrel_lock_ios
+
     build:macos:
-      run: melos exec --scope="barrel_lock_macos" -- flutter build macos
-      description: Build BarrelLock macOS app.
+      description: Build BarrelLock macOS release.
+      exec:
+        command: flutter build macos --release
+        scope: barrel_lock_macos
+
+    build:windows:
+      description: Build BarrelLock Windows release.
+      exec:
+        command: flutter build windows --release
+        scope: barrel_lock_windows
+
+    build:linux:
+      description: Build BarrelLock Linux release.
+      exec:
+        command: flutter build linux --release
+        scope: barrel_lock_linux
+
+    build:web:
+      description: Build BarrelLock Web release.
+      exec:
+        command: flutter build web --release
+        scope: barrel_lock_web
+
+    # ── 清理 ─────────────────────────────────────────────────
+    clean:
+      description: Run `flutter clean` in every package.
+      exec:
+        command: flutter clean
+        concurrency: 1
+
+    clean:full:
+      description: "Aggressive clean: flutter clean + remove build outputs and .dart_tool."
+      run: melos exec -- flutter clean && rm -rf build/ melos_outputs/ .dart_tool/
