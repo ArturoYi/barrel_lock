@@ -27,7 +27,7 @@ dev_dependencies:
 melos:
   # SDK 路径:与 .fvmrc 锁定 Flutter 版本协同,保证全团队一致。
   # 可通过 MELOS_SDK_PATH 环境变量或 --sdk-path 命令行选项覆盖。
-  sdkPath: .fvm/versions/3.44.2
+  # sdkPath: .fvm/versions/3.44.2  # 适配github action环境，直接删掉
 
   # 为 IntelliJ/Android Studio 生成 Run/Debug 配置,自动收录每个子包的 main 入口。
   ide:
