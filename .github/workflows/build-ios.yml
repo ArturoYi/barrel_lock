@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Ruby (for CocoaPods)
         uses: ruby/setup-ruby@v1
@@ -42,7 +42,7 @@ jobs:
         run: echo "$HOME/.pub-cache/bin" >> "$GITHUB_PATH"
 
       - name: Cache pub
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.pub-cache
@@ -65,7 +65,7 @@ jobs:
             cp -r build/ios/iphoneos melos_outputs/ios/ || true
 
       - name: Upload iOS app
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ios-app
           path: melos_outputs/ios/
