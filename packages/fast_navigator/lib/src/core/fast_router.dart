@@ -1,15 +1,42 @@
+import 'package:flutter/widgets.dart';
+import '../domain/navigation_state.dart';
+import '../domain/route_registry.dart';
+import 'fast_route_information_parser.dart';
+import 'fast_router_delegate.dart';
+
 /// Navigator 2.0 顶层路由容器（Router 组装层）。
 ///
 /// 职责：
-/// - 组合 [FastRouterDelegate]、[FastRouteInformationParser]、[BackButtonDispatcher]
+/// - 组合 [FastRouterDelegate]、[FastRouteInformationParser]
 /// - 产出 `RouterConfig<NavigationState>` 供 `MaterialApp.router` 接入
-/// - 初始化 [RouteRegistry] 并绑定 [FastNavigator] 门面
 ///
-/// 设计原则：
-/// - 本层只做组装，不持有业务状态
-/// - 是 App 接入路由的唯一入口工厂
-///
-/// 依赖：domain 层、facade 层
-///
-/// 状态：待实现（M1）
-library;
+/// 状态：已实现（M1）
+class FastRouter {
+  final RouteRegistry registry;
+  late final FastRouteInformationParser parser;
+  late final FastRouterDelegate delegate;
+
+  FastRouter({
+    required this.registry,
+    String initialLocation = '/',
+  }) {
+    parser = FastRouteInformationParser(registry: registry);
+    
+    // 初始化时，根据 initialLocation 构建初始导航栈
+    final initialUri = Uri.parse(initialLocation);
+    final initialMatch = registry.matchLocation(initialUri);
+    final initialState = NavigationState(matches: [initialMatch]);
+
+    delegate = FastRouterDelegate(initialState: initialState);
+  }
+
+  /// 获取供 MaterialApp.router 使用的 RouterConfig
+  RouterConfig<NavigationState> get routerConfig => RouterConfig<NavigationState>(
+        routerDelegate: delegate,
+        routeInformationParser: parser,
+        routeInformationProvider: PlatformRouteInformationProvider(
+          initialRouteInformation: RouteInformation(uri: delegate.state.location),
+        ),
+        backButtonDispatcher: RootBackButtonDispatcher(),
+      );
+}
