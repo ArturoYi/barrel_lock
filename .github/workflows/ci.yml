@@ -46,8 +46,10 @@ jobs:
           restore-keys: |
             pub-${{ runner.os }}-
 
-      - name: Bootstrap workspace
-        run: melos bootstrap
+      - name: Install workspace dependencies
+        # pub workspaces 模式下,根目录跑一次 `dart pub get` 即可解析所有子包;
+        # 用 `melos bootstrap` 会并发触发 `flutter pub get`,导致 startup lock 冲突。
+        run: dart pub get
 
       - name: Aggregate quality gate
         run: melos run ci

@@ -25,58 +25,82 @@ dev_dependencies:
 # - 根 pubspec.yaml 用 workspace: 列出子包,各子包 pubspec.yaml 用 resolution: workspace 引用。
 # - 不再需要单独的 melos.yaml 文件。
 melos:
-  # SDK 路径:与 .fvmrc 锁定 Flutter 版本协同,保证全团队一致。
-  # 可通过 MELOS_SDK_PATH 环境变量或 --sdk-path 命令行选项覆盖。
-  # sdkPath: .fvm/versions/3.44.2  # 适配github action环境，直接删掉
+  # SDK 路径由各环境自行提供:
+  #   - 本地:FVM 把当前版本软链进 PATH(fvm use)
+  #   - CI:subosito/flutter-action 自动安装 Flutter 到 PATH
+  # 也可通过 MELOS_SDK_PATH 环境变量或 --sdk-path 命令行参数显式覆盖。
 
   # 为 IntelliJ/Android Studio 生成 Run/Debug 配置,自动收录每个子包的 main 入口。
   ide:
     intellij: true
 
-  # 调整子命令行为:bootstrap 阶段不并发 pub get(由 CI/开发者按需手动触发,更快可控)。
+  # CI 与本地统一使用 `dart pub get`(pub workspaces 自动给所有子包解析),
+  # 不再调用 melos bootstrap(它会并发 flutter pub get,触发 startup lock 冲突)。
   command:
     bootstrap:
       runPubGetInParallel: false
 
   scripts:
     # ── 质量门禁 ────────────────────────────────────────────
+    # 使用 `lib test` 而非 `.`,避免在 library 包上找不到 lib/main.dart。
     analyze:
       description: Run `dart analyze` across all packages.
       exec:
-        command: dart analyze .
+        command: dart analyze lib test
         concurrency: 1
 
     analyze:fix:
       description: Auto-apply Dart analyzer suggestions.
       exec:
-        command: dart fix --apply .
+        command: dart fix --apply lib test
         concurrency: 1
 
     format:
       description: Format Dart code in all packages.
       exec:
-        command: dart format .
+        command: dart format lib test
         concurrency: 1
 
     format:check:
       description: Verify formatting without modifying files (CI-friendly).
       exec:
-        command: dart format --output=none --set-exit-if-changed .
+        command: dart format --output=none --set-exit-if-changed lib test
         concurrency: 1
 
-    test:
-      description: Run `flutter test` in every package that has a test/ directory.
+    # 纯 Dart / Flutter 库测试(core / fast_navigator 等),用 dart test 即可。
+    test:dart:
+      description: Run `dart test` for pure Dart and Flutter library packages.
       exec:
-        command: flutter test --no-pub --reporter=expanded
+        command: dart test --reporter=expanded
         concurrency: 1
         dirExists: test
+        scope:
+          - core
+          - fast_navigator
+
+    # Flutter 应用平台壳的 smoke test。
+    # 用 dart test 而不是 flutter test,避免跨平台编译(尤其是 web)失败。
+    test:apps:
+      description: Run smoke tests for BarrelLock platform shells.
+      exec:
+        command: dart test --reporter=expanded
+        concurrency: 1
+        dirExists: test
+        scope:
+          - barrel_lock_android
+          - barrel_lock_ios
+          - barrel_lock_macos
+          - barrel_lock_windows
+          - barrel_lock_linux
+          - barrel_lock_web
+
+    test:
+      description: Aggregate test runner (dart libs + app shells).
+      run: melos run test:dart && melos run test:apps
 
     test:coverage:
       description: Run tests and collect coverage data into coverage/.
-      exec:
-        command: flutter test --no-pub --coverage
-        concurrency: 1
-        dirExists: test
+      run: melos run test:dart
 
     # ── 聚合门禁(供 CI 一键调用,只在工作区根执行一次) ─────
     ci:
