@@ -3,11 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('core public API', () {
-    test('appName 暴露正确常量', () {
+    test('appName exposes the correct constant', () {
       expect(appName, 'Flutter Bazaar');
     });
 
-    test('greeting 拼接 appName 生成欢迎语', () {
+    test('greeting joins appName into the welcome message', () {
       expect(greeting(), 'Welcome to Flutter Bazaar');
       expect(greeting(), contains(appName));
     });

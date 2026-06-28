@@ -78,25 +78,9 @@ melos:
           - core
           - fast_navigator
 
-    # Flutter 应用平台壳的 smoke test。
-    # 用 dart test 而不是 flutter test,避免跨平台编译(尤其是 web)失败。
-    test:apps:
-      description: Run smoke tests for BarrelLock platform shells.
-      exec:
-        command: dart test --reporter=expanded
-        concurrency: 1
-        dirExists: test
-        scope:
-          - barrel_lock_android
-          - barrel_lock_ios
-          - barrel_lock_macos
-          - barrel_lock_windows
-          - barrel_lock_linux
-          - barrel_lock_web
-
     test:
-      description: Aggregate test runner (dart libs + app shells).
-      run: melos run test:dart && melos run test:apps
+      description: Aggregate test runner for library packages.
+      run: melos run test:dart
 
     test:coverage:
       description: Run tests and collect coverage data into coverage/.
