@@ -1,11 +1,11 @@
 import '../params/route_parameters.dart';
-import 'route_config.dart';
 import 'route_match.dart';
+import 'routes/routes.dart';
 
 /// 路由表注册与匹配引擎（RouteRegistry）。
 ///
 /// 职责：
-/// - 注册 / 查询 [RouteConfig] 路由定义
+/// - 注册 / 查询 [FastBaseRoute] 路由树（当前匹配仅支持 [FastRoute]）
 /// - `match(location)`：最长前缀匹配，支持 `:param` 动态路径段
 /// - `unknown(location)`：404 兜底匹配，永不 throw
 /// - `findByName(name)`：按路由名反查配置
@@ -14,36 +14,41 @@ import 'route_match.dart';
 /// - 匹配逻辑与渲染、栈管理解耦
 /// - 为 Parser（URL→State）和 FastNavigator（API→State）共用
 ///
-/// 依赖：route_config、route_match
+/// 依赖：routes、route_match
 ///
 /// 状态：已实现（M1）
 class RouteRegistry {
-  final Map<String, RouteConfig> _routesByName = {};
-  final List<RouteConfig> _routes = [];
+  final Map<String, FastBaseRoute> _routesByName = {};
+  final List<FastRoute> _leafRoutes = [];
 
-  /// 404 兜底路由构建器
-  RouteConfig? unknownRoute;
+  /// 404 兜底路由构建器（始终为叶子页）
+  FastRoute? unknownRoute;
 
   RouteRegistry({
-    List<RouteConfig> routes = const [],
+    List<FastBaseRoute> routes = const [],
     this.unknownRoute,
   }) {
-    routes.forEach(addRoute);
+    for (final route in routes) {
+      addRoute(route);
+    }
   }
 
-  /// 注册新路由
-  void addRoute(RouteConfig route) {
+  /// 注册路由树节点
+  void addRoute(FastBaseRoute route) {
     if (_routesByName.containsKey(route.name)) {
       throw ArgumentError('Route with name "${route.name}" already exists.');
     }
     _routesByName[route.name] = route;
-    _routes.add(route);
-    // 可选：在这里如果需要按长路径优先排序以支持更准确匹配
-    _routes.sort((a, b) => b.path.length.compareTo(a.path.length));
+
+    switch (route) {
+      case FastRoute leafRoute:
+        _leafRoutes.add(leafRoute);
+        _leafRoutes.sort((a, b) => b.path.length.compareTo(a.path.length));
+    }
   }
 
   /// 根据路由名称查找配置
-  RouteConfig? findByName(String name) {
+  FastBaseRoute? findByName(String name) {
     return _routesByName[name];
   }
 
@@ -52,7 +57,7 @@ class RouteRegistry {
   RouteMatch matchLocation(Uri location, {Object? extra}) {
     final pathSegments = location.pathSegments;
 
-    for (final route in _routes) {
+    for (final route in _leafRoutes) {
       final routeSegments = Uri.parse(route.path).pathSegments;
       
       // 检查路径段数量是否匹配（这里是精确匹配，未实现子路由嵌套匹配）

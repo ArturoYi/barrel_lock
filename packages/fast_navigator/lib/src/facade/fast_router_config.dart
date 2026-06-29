@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import '../core/fast_router.dart';
 import '../domain/navigation_state.dart';
-import '../domain/route_config.dart';
+import '../domain/routes/routes.dart';
 import '../domain/route_registry.dart';
 import 'fast_navigator.dart';
 
@@ -24,8 +24,8 @@ class FastRouterConfig {
   /// [navigationThrottleMs] 导航节流窗口（毫秒）。
   /// 首次点击立即执行，窗口期内重复点击全部丢弃；为 0（默认）时不节流。
   factory FastRouterConfig({
-    required List<RouteConfig> routes,
-    RouteConfig? unknownRoute,
+    required List<FastBaseRoute> routes,
+    FastRoute? unknownRoute,
     String initialLocation = '/',
     int navigationThrottleMs = 0,
   }) {

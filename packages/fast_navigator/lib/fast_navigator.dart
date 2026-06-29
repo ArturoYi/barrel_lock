@@ -9,7 +9,7 @@ export 'src/facade/fast_router_config.dart';
 // 领域模型
 export 'src/domain/duplicate_route_exception.dart';
 export 'src/domain/launch_mode.dart';
-export 'src/domain/route_config.dart';
+export 'src/domain/routes/routes.dart';
 export 'src/domain/route_match.dart';
 export 'src/domain/route_middleware.dart';
 

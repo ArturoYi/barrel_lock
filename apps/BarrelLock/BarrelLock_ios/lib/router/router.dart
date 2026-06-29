@@ -17,7 +17,7 @@ abstract final class AppRoutes {
 
 /// 应用路由管理单例。
 ///
-/// - 集中注册 [RouteConfig] 路由表
+/// - 集中注册 [FastBaseRoute] 路由表
 /// - 产出 [routerConfig] 供 [MaterialApp.router] 接入
 /// - 初始化后可通过 [AppRouter.push] 等静态方法无 Context 跳转
 class AppRouter {
@@ -44,7 +44,7 @@ class AppRouter {
     _fastRouterConfig = FastRouterConfig(
       initialLocation: AppRoutes.homePath,
       routes: _buildRoutes(),
-      unknownRoute: RouteConfig(
+      unknownRoute: FastRoute(
         name: 'unknown',
         path: '/404',
         builder: (context, match) => const _UnknownRoutePage(),
@@ -53,19 +53,19 @@ class AppRouter {
     _initialized = true;
   }
 
-  List<RouteConfig> _buildRoutes() {
+  List<FastBaseRoute> _buildRoutes() {
     return [
-      RouteConfig(
+      FastRoute(
         name: AppRoutes.home,
         path: AppRoutes.homePath,
         builder: (context, match) => const HomePage(),
       ),
-      RouteConfig(
+      FastRoute(
         name: AppRoutes.detail,
         path: AppRoutes.detailPath,
         builder: (context, match) => const DetailPage(),
       ),
-      RouteConfig(
+      FastRoute(
         name: AppRoutes.settings,
         path: AppRoutes.settingsPath,
         builder: (context, match) => const SettingsPage(),

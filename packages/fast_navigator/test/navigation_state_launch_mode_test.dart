@@ -10,7 +10,7 @@ RouteMatch _match({
   Object? extra,
   String? uniqueId,
 }) {
-  final route = RouteConfig(
+  final route = FastRoute(
     name: name,
     path: path.contains(':') ? path.replaceAll(RegExp(r'/\d+'), '/:id') : path,
     builder: (_, __) => const SizedBox.shrink(),

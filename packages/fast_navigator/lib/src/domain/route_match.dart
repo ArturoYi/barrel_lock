@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import '../params/route_parameters.dart';
-import 'route_config.dart';
+import 'routes/routes.dart';
 
 /// 单次路由匹配结果（RouteMatch，参数持久绑定单元）。
 ///
@@ -18,8 +18,8 @@ import 'route_config.dart';
 /// 状态：已实现（M1）
 @immutable
 class RouteMatch {
-  /// 匹配到的路由配置定义
-  final RouteConfig route;
+  /// 匹配到的叶子页路由定义
+  final FastRoute route;
 
   /// 实际匹配的路径（带参数）
   final String path;
@@ -57,7 +57,7 @@ class RouteMatch {
   }
 
   RouteMatch copyWith({
-    RouteConfig? route,
+    FastRoute? route,
     String? path,
     RouteParameters? parameters,
     String? key,
