@@ -59,7 +59,15 @@ class FastRouterDelegate extends RouterDelegate<NavigationState>
   /// AppBar 的返回按钮或者系统手势返回时触发
   void _onDidRemovePage(Page<Object?> page) {
     if (page is FastPage) {
-      final newMatches = _state.matches.where((m) => m != page.match).toList();
+      final removedKey = page.match.key;
+      var removed = false;
+      final newMatches = _state.matches.where((m) {
+        if (!removed && m.key == removedKey) {
+          removed = true;
+          return false;
+        }
+        return true;
+      }).toList();
       updateState(NavigationState(matches: List.unmodifiable(newMatches)));
     } else if (_state.matches.isNotEmpty) {
       updateState(_state.pop());

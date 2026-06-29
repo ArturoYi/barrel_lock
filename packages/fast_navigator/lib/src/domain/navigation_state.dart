@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'duplicate_route_exception.dart';
+import 'launch_mode.dart';
 import 'route_match.dart';
 
 /// 不可变导航状态（NavigationState，SSOT 唯一真相源）。
@@ -19,9 +21,7 @@ class NavigationState {
   /// 当前路由栈列表（不可变），最底部的在索引 0，栈顶在最后一个。
   final List<RouteMatch> matches;
 
-  const NavigationState({
-    required this.matches,
-  });
+  const NavigationState({required this.matches});
 
   /// 获取当前栈顶位置的 URI。如果栈为空，则返回 /
   Uri get location {
@@ -35,9 +35,84 @@ class NavigationState {
   /// 判断当前是否为空栈
   bool get isEmpty => matches.isEmpty;
 
-  /// 添加一个新页面到栈顶（Push）
-  NavigationState push(RouteMatch match) {
+  /// Push 路由入栈。
+  ///
+  /// [launchMode] 控制相同路由重复入栈时的行为，默认 [LaunchMode.standard]。
+  NavigationState push(
+    RouteMatch match, {
+    LaunchMode launchMode = LaunchMode.standard,
+  }) {
+    final existingIndex = _findLastIndexByIdentity(match.identity);
+
+    switch (launchMode) {
+      case LaunchMode.standard:
+        if (existingIndex != -1) {
+          throw DuplicateRouteException(
+            identity: match.identity,
+            index: existingIndex,
+          );
+        }
+        return _append(match);
+
+      case LaunchMode.singleTop:
+        if (existingIndex == matches.length - 1) {
+          return _replaceMatchAt(existingIndex, match);
+        }
+        return _append(_ensureUniqueKey(match));
+
+      case LaunchMode.singleTask:
+        if (existingIndex != -1) {
+          final reused = matches[existingIndex].copyWith(
+            parameters: match.parameters,
+          );
+          final newMatches = [...matches.take(existingIndex), reused];
+          return NavigationState(matches: List.unmodifiable(newMatches));
+        }
+        return _append(match);
+
+      case LaunchMode.multipleTop:
+        if (existingIndex != -1) {
+          return _append(_withUniqueKey(match));
+        }
+        return _append(match);
+    }
+  }
+
+  /// 无条件追加到栈顶（内部 primitive，不处理 LaunchMode 策略）。
+  NavigationState _append(RouteMatch match) {
     return NavigationState(matches: List.unmodifiable([...matches, match]));
+  }
+
+  int _findLastIndexByIdentity(String identity) {
+    for (var i = matches.length - 1; i >= 0; i--) {
+      if (matches[i].identity == identity) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  NavigationState _replaceMatchAt(int index, RouteMatch match) {
+    final newMatches = List<RouteMatch>.from(matches);
+    newMatches[index] = matches[index].copyWith(parameters: match.parameters);
+    return NavigationState(matches: List.unmodifiable(newMatches));
+  }
+
+  RouteMatch _ensureUniqueKey(RouteMatch match) {
+    if (matches.any((m) => m.key == match.key)) {
+      return _withUniqueKey(match);
+    }
+    return match;
+  }
+
+  RouteMatch _withUniqueKey(RouteMatch match) {
+    return match.copyWith(
+      key: RouteMatch.generateKey(
+        match.route.name,
+        match.path,
+        uniqueId: '${matches.length}',
+      ),
+    );
   }
 
   /// 弹出栈顶页面（Pop）

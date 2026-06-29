@@ -47,6 +47,9 @@ class RouteMatch {
     );
   }
 
+  /// 路由逻辑身份（不含 uniqueId），用于判断是否为同一目标路由。
+  String get identity => generateKey(route.name, path);
+
   /// 构建标准的 Page Key
   /// 例如：RouteMatch.generateKey('user_detail', '/user/42')
   static String generateKey(String name, String path, {String? uniqueId}) {

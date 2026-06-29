@@ -20,10 +20,14 @@ class FastRouterConfig {
   FastRouterConfig._(this.routerConfig);
 
   /// 初始化 FastRouter 的核心入口
+  ///
+  /// [navigationThrottleMs] 导航节流窗口（毫秒）。
+  /// 首次点击立即执行，窗口期内重复点击全部丢弃；为 0（默认）时不节流。
   factory FastRouterConfig({
     required List<RouteConfig> routes,
     RouteConfig? unknownRoute,
     String initialLocation = '/',
+    int navigationThrottleMs = 0,
   }) {
     final registry = RouteRegistry(
       routes: routes,
@@ -36,7 +40,11 @@ class FastRouterConfig {
     );
 
     // 绑定全局单例门面，方便无 Context 跳转
-    FastNavigator.bind(router.delegate, router.registry);
+    FastNavigator.bind(
+      router.delegate,
+      router.registry,
+      navigationThrottleMs: navigationThrottleMs,
+    );
 
     return FastRouterConfig._(router.routerConfig);
   }
