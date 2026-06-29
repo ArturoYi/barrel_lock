@@ -2,7 +2,11 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const BazaarApp());
+  runApp(
+    const ProviderScope(
+      child: BazaarApp(),
+    ),
+  );
 }
 
 class BazaarApp extends StatelessWidget {

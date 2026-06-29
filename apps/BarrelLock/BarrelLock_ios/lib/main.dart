@@ -1,10 +1,13 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-
 import 'router/router.dart';
 
 void main() {
-  runApp(const BazaarApp());
+  runApp(
+    const ProviderScope(
+      child: BazaarApp(),
+    ),
+  );
 }
 
 class BazaarApp extends StatelessWidget {
