@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../domain/route_match.dart';
+import '../domain/match/route_match.dart';
 
 /// Navigator 2.0 最小页面单元（FastPage，替代 Route）。
 ///

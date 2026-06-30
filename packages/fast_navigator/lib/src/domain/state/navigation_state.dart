@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
+import '../match/route_match.dart';
 import 'duplicate_route_exception.dart';
 import 'launch_mode.dart';
-import 'route_match.dart';
 
 /// 不可变导航状态（NavigationState，SSOT 唯一真相源）。
 ///

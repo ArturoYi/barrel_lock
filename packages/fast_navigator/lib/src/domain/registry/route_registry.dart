@@ -1,6 +1,6 @@
-import '../params/route_parameters.dart';
-import 'route_match.dart';
-import 'routes/routes.dart';
+import '../match/route_match.dart';
+import '../match/route_parameters.dart';
+import '../route/routes.dart';
 
 /// 路由表注册与匹配引擎（RouteRegistry）。
 ///

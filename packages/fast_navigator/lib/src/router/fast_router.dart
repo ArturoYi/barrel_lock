@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import '../domain/navigation_state.dart';
-import '../domain/route_registry.dart';
+import '../domain/registry/route_registry.dart';
+import '../domain/state/navigation_state.dart';
 import 'fast_route_information_parser.dart';
 import 'fast_router_delegate.dart';
 

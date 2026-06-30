@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
-import '../core/fast_router.dart';
-import '../domain/navigation_state.dart';
-import '../domain/routes/routes.dart';
-import '../domain/route_registry.dart';
+import '../domain/registry/route_registry.dart';
+import '../domain/route/routes.dart';
+import '../domain/state/navigation_state.dart';
+import '../router/fast_router.dart';
 import 'fast_navigator.dart';
 
 /// MaterialApp.router 一键接入配置（FastRouterConfig）。

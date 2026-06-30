@@ -1,7 +1,7 @@
-import '../core/fast_router_delegate.dart';
-import '../domain/launch_mode.dart';
-import '../domain/route_registry.dart';
-import '../utils/navigation_throttle.dart';
+import '../domain/registry/route_registry.dart';
+import '../domain/state/launch_mode.dart';
+import '../internal/navigation_throttle.dart';
+import '../router/fast_router_delegate.dart';
 
 /// 全场景路由跳转门面 API（FastNavigator）。
 ///
@@ -10,7 +10,7 @@ import '../utils/navigation_throttle.dart';
 /// - 无 Context 全局调用（通过 bind 注入 RouterDelegate）
 /// - 内部只做：registry.match → NavigationState 变换 → delegate.setState
 ///
-/// 依赖：core 层、domain 层
+/// 依赖：router 层、domain 层
 ///
 /// 状态：已实现（M1 基础 API，M2 全量 API）
 class FastNavigator {

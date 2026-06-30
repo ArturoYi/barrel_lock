@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import '../domain/navigation_state.dart';
-import '../page/fast_page.dart';
+import '../domain/state/navigation_state.dart';
+import 'fast_page.dart';
 
 /// Navigator 2.0 页面栈管理者（RouterDelegate，核心中的核心）。
 ///

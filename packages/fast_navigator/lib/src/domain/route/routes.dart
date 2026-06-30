@@ -4,11 +4,10 @@
 /// 与子类型（FastRoute、StatefulShellRoute 等）分文件存放且同属一个库。
 library;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import '../route_match.dart';
-import '../route_middleware.dart';
+import '../match/route_match.dart';
+import '../middleware/route_middleware.dart';
 
 part 'fast_base_route.dart';
 part 'fast_route.dart';

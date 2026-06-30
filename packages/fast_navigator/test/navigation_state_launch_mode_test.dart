@@ -1,5 +1,5 @@
 import 'package:fast_navigator/fast_navigator.dart';
-import 'package:fast_navigator/src/domain/navigation_state.dart';
+import 'package:fast_navigator/src/domain/state/navigation_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

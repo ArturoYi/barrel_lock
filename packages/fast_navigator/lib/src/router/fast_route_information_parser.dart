@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
-import '../domain/navigation_state.dart';
-import '../domain/route_registry.dart';
+import '../domain/registry/route_registry.dart';
+import '../domain/state/navigation_state.dart';
 
 /// Navigator 2.0 URL / 路径解析器（RouteInformationParser）。
 ///

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../params/route_parameters.dart';
-import 'routes/routes.dart';
+import 'route_parameters.dart';
+import '../route/routes.dart';
 
 /// 单次路由匹配结果（RouteMatch，参数持久绑定单元）。
 ///

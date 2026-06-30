@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'navigation_state.dart';
+import '../state/navigation_state.dart';
 
 /// 路由拦截结果，可定义更复杂的行为。通常我们使用新 State 表示重定向，null 表示放行。
 typedef MiddlewareResult = FutureOr<NavigationState?>;
