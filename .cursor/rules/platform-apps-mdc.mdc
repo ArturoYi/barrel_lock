@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+---
+
+---
+description: 多平台 App 结构规范
+globs: "apps/**"
+alwaysApply: false
+---
+
+# 平台拆分约定
+
+- 每个平台是独立 Flutter 工程（BarrelLock_android / _ios / _macos …）
+- 共享：`core`、`fast_navigator` 及未来 feature package
+- 各平台 `lib/main.dart` 结构一致：ProviderScope → MaterialApp.router → AppRouter.routerConfig
+- 新增页面：先在 packages 抽共享 UI（若可复用），否则各平台 `lib/pages/` 保持同名
+- 禁止在 app 层直接改 fast_navigator 内部实现

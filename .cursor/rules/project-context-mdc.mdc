@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+
+---
+description: Flutter Bazaar monorepo 全局上下文
+alwaysApply: true
+---
+
+# 项目约束
+
+- Monorepo：Melos 8 + Dart pub workspaces，根 `pubspec.yaml` 的 `workspace:` 需手动登记新包
+- 子包 `pubspec.yaml` 必须含 `resolution: workspace`
+- 路由：只用 `fast_navigator`，禁止 go_router / auto_route
+- 状态管理：Riverpod 3.x，通过 `package:core/core.dart` 引入
+- Flutter 版本：FVM 锁定 3.44.2，命令优先 `fvm flutter` / `melos run`
+- 质量门禁：`melos run ci`（format:check → analyze → test）
+- 新增共享逻辑放 `packages/`，业务 UI 在各平台 app 的 `lib/`
+- 注释与文档可用中文；代码标识符用英文

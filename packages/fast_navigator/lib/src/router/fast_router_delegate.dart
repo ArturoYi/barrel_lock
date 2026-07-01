@@ -1,28 +1,29 @@
 import 'package:flutter/widgets.dart';
 import '../domain/state/navigation_state.dart';
-import 'fast_page.dart';
+import '../page/page_factory.dart';
 
 /// Navigator 2.0 页面栈管理者（RouterDelegate，核心中的核心）。
 ///
 /// 职责：
 /// - 持有唯一可变源 [NavigationState]（通过不可变替换更新）
-/// - `build()` 将 `matches` 映射为 `List<Page>` 驱动 [Navigator]
+/// - `build()` 通过 [PageFactory] 将 `matches` 映射为 `List<Page>` 驱动 [Navigator]
 /// - 实现 `popRoute()` 兼容系统返回（物理键 / 手势 / Web 后退）
 /// - 混入 [PopNavigatorRouterDelegateMixin] 绑定 navigatorKey
 /// - 提供 `setNewRoutePath` 接收 Parser 传入的新状态
 ///
-/// 状态：已实现（M1）
+/// 状态：已实现（M1 + M2 过渡）
 class FastRouterDelegate extends RouterDelegate<NavigationState>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin<NavigationState> {
-  
   @override
   final GlobalKey<NavigatorState> navigatorKey;
-  
+
   NavigationState _state;
+  final PageFactory _pageFactory;
 
   FastRouterDelegate({
     NavigationState? initialState,
     GlobalKey<NavigatorState>? navigatorKey,
+    this._pageFactory = const PageFactory(),
   })  : navigatorKey = navigatorKey ?? GlobalKey<NavigatorState>(),
         _state = initialState ?? const NavigationState(matches: []);
 
@@ -58,8 +59,8 @@ class FastRouterDelegate extends RouterDelegate<NavigationState>
 
   /// AppBar 的返回按钮或者系统手势返回时触发
   void _onDidRemovePage(Page<Object?> page) {
-    if (page is FastPage) {
-      final removedKey = page.match.key;
+    final removedKey = _pageKeyOf(page);
+    if (removedKey != null) {
       var removed = false;
       final newMatches = _state.matches.where((m) {
         if (!removed && m.key == removedKey) {
@@ -74,13 +75,24 @@ class FastRouterDelegate extends RouterDelegate<NavigationState>
     }
   }
 
+  /// 从 Page.key 提取 match.key（所有 Page 经 [PageFactory] 统一设置 ValueKey）。
+  String? _pageKeyOf(Page<Object?> page) {
+    final key = page.key;
+    if (key is ValueKey<String>) {
+      return key.value;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_state.isEmpty) {
       return const SizedBox.shrink(); // 或全局加载页
     }
 
-    final pages = _state.matches.map((match) => FastPage(match: match)).toList();
+    final pages = _state.matches
+        .map((match) => _pageFactory.build(context: context, match: match))
+        .toList();
 
     return Navigator(
       key: navigatorKey,

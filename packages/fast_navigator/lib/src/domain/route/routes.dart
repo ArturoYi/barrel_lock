@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 
 import '../match/route_match.dart';
 import '../middleware/route_middleware.dart';
+import '../transition/page_transition.dart';
 
 part 'fast_base_route.dart';
 part 'fast_route.dart';

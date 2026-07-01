@@ -20,4 +20,8 @@ export 'src/domain/match/route_parameters.dart';
 // 领域模型 — 中间件
 export 'src/domain/middleware/route_middleware.dart';
 
+// 领域模型 — 过渡策略
+export 'src/domain/transition/page_transition.dart';
+export 'src/page/app_type_detector.dart';
+
 // (router / internal 层对业务隐藏，按需再暴露)

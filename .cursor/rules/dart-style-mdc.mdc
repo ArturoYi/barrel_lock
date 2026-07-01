@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+
+---
+description: Dart/Flutter 代码风格
+globs: "**/*.dart"
+alwaysApply: false
+---
+
+# 风格
+
+- 遵循 `flutter_lints` ^6.0.0，提交前 `melos run format`
+- Widget 构造函数加 `const`，使用 `super.key`
+- 优先 `final class` / `sealed class`（Dart 3）
+- 文件名 snake_case，类名 PascalCase
+- 最小 diff：不重构无关代码，不加无意义注释
+- 平台差异：用 `packages/` 抽象，避免在 6 个 app 里复制粘贴同一逻辑

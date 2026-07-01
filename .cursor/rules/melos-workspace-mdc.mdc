@@ -1,0 +1,21 @@
+---
+alwaysApply: true
+---
+
+---
+description: Melos workspace 包管理规范
+globs: "**/pubspec.yaml"
+alwaysApply: false
+---
+
+# 新增/修改包
+
+1. 新包 `pubspec.yaml` 加 `resolution: workspace`
+2. 根 `pubspec.yaml` 的 `workspace:` 列表追加路径（Melos 8 不自动 glob 扫描）
+3. 根目录执行 `dart pub get`（不要用 `melos bootstrap`，会并发触发 startup lock）
+4. 包间依赖用 `path:` 或 workspace 解析，禁止写死版本号引用本地包
+
+# 常用命令
+
+- `melos run analyze` / `format` / `test` / `ci`
+- 运行 macOS：`melos run run:macos`

@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+
+---
+description: fast_navigator 路由框架规范
+globs: "packages/fast_navigator/**,**/router/**,**/pages/**"
+alwaysApply: false
+---
+
+# 路由约定
+
+- 业务层：`AppRoutes` 常量 + `AppRouter` 单例，参考 BarrelLock_android/lib/router/router.dart
+- 页面跳转：优先 `AppRouter.push` / `pushNamed`，不用 Navigator 1.0 的 `pushNamed`
+- `NavigationState` 不可变：栈操作必须返回新实例，禁止 mutate `matches`
+- `RouteMatch.extra` 不参与 Page Key
+- 新增路由：注册 `FastRoute(name, path, builder)`，builder 签名 `(context, match) => Widget`
+- Shell / Middleware 见 packages/fast_navigator/README.md

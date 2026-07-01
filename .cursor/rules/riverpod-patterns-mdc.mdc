@@ -1,0 +1,18 @@
+---
+alwaysApply: true
+---
+
+---
+description: Riverpod 状态管理规范
+globs: "**/*.dart"
+alwaysApply: false
+---
+
+# Riverpod 3.x
+
+- 入口：`ProviderScope` 包裹根 Widget（见 main.dart）
+- import：`package:core/core.dart`（统一 re-export）
+- 优先 `@riverpod` 代码生成或 `Notifier`/`AsyncNotifier`，避免 legacy `StateProvider` 滥用
+- Widget 读状态：`ref.watch`；回调/事件：`ref.read`
+- Provider 定义与业务逻辑放 `lib/providers/` 或 feature 目录，不放 Widget 文件内
+- 不在 `build()` 里 `ref.read` 触发副作用

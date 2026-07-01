@@ -1,6 +1,9 @@
 import 'package:flutter/widgets.dart';
 import '../domain/registry/route_registry.dart';
 import '../domain/state/navigation_state.dart';
+import '../domain/transition/page_transition.dart';
+import '../page/app_type_detector.dart';
+import '../page/page_factory.dart';
 import 'fast_route_information_parser.dart';
 import 'fast_router_delegate.dart';
 
@@ -19,15 +22,23 @@ class FastRouter {
   FastRouter({
     required this.registry,
     String initialLocation = '/',
+    PageTransition defaultTransition = const PlatformAdaptiveTransition(),
+    AppType? appType,
   }) {
     parser = FastRouteInformationParser(registry: registry);
-    
+
     // 初始化时，根据 initialLocation 构建初始导航栈
     final initialUri = Uri.parse(initialLocation);
     final initialMatch = registry.matchLocation(initialUri);
     final initialState = NavigationState(matches: [initialMatch]);
 
-    delegate = FastRouterDelegate(initialState: initialState);
+    delegate = FastRouterDelegate(
+      initialState: initialState,
+      pageFactory: PageFactory(
+        defaultTransition: defaultTransition,
+        appTypeOverride: appType,
+      ),
+    );
   }
 
   /// 获取供 MaterialApp.router 使用的 RouterConfig
