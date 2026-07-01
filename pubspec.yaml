@@ -13,6 +13,7 @@ workspace:
   - apps/BarrelLock/BarrelLock_linux
   - apps/BarrelLock/BarrelLock_web
   - apps/BarrelLock/BarrelLock_macos
+  - packages/app_fonts
   - packages/core
   - packages/fast_navigator
 

@@ -9,6 +9,8 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  app_fonts:
+    path: ../app_fonts
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.3.2

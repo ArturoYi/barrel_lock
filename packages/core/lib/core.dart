@@ -1,5 +1,6 @@
 library;
 
+export 'package:app_fonts/app_fonts.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 
 export 'app_info.dart';
@@ -13,6 +14,8 @@ export 'theme/domain/app_theme_mode.dart';
 export 'theme/domain/theme_settings.dart';
 export 'theme/presentation/app_color_scheme_x.dart';
 export 'theme/presentation/app_theme.dart';
+export 'theme/presentation/app_typography.dart';
+export 'theme/presentation/app_typography_x.dart';
 export 'theme/presentation/theme_notifier.dart';
 export 'theme/presentation/theme_setting_tile.dart';
 export 'theme/presentation/themed_app.dart';
