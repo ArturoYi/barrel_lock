@@ -20,8 +20,6 @@ abstract final class AppTheme {
     required AppColorScheme scheme,
     required Brightness brightness,
   }) {
-    // 先构建 ColorScheme，再传入 AppTypography —— 颜色语义由 M3 规范驱动，
-    // 避免在排版 factory 中硬编码 Colors.black87 / Colors.white。
     final colorScheme = ColorScheme.fromSeed(
       seedColor: scheme.seedColor,
       brightness: brightness,
@@ -32,7 +30,7 @@ abstract final class AppTheme {
       colorScheme: colorScheme,
       useMaterial3: true,
       fontFamily: AppFonts.notoSansSC,
-      // textTheme 已由 material2021 + dense merge 注入 onSurface 颜色，无需二次 apply。
+      // textTheme 仅含 M3 几何；文字色由 colorScheme 与组件主题 / DefaultTextStyle 注入。
       textTheme: typography.toTextTheme(),
       extensions: [typography],
     );
