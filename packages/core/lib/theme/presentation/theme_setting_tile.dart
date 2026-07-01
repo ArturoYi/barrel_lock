@@ -1,0 +1,58 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../domain/app_color_scheme.dart';
+import '../domain/app_theme_mode.dart';
+import 'app_color_scheme_x.dart';
+import 'theme_notifier.dart';
+
+class ThemeSettingTile extends ConsumerWidget {
+  const ThemeSettingTile({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(themeSettingsProvider);
+    final notifier = ref.read(themeSettingsProvider.notifier);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('主题模式', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          SegmentedButton<AppThemeMode>(
+            segments: const [
+              ButtonSegment(
+                value: AppThemeMode.system,
+                label: Text('跟随系统'),
+              ),
+              ButtonSegment(value: AppThemeMode.light, label: Text('浅色')),
+              ButtonSegment(value: AppThemeMode.dark, label: Text('深色')),
+            ],
+            selected: {settings.mode},
+            onSelectionChanged: (selected) {
+              notifier.setMode(selected.first);
+            },
+          ),
+          const SizedBox(height: 24),
+          Text('主题色', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final scheme in AppColorScheme.values)
+                ChoiceChip(
+                  label: Text(scheme.displayName),
+                  selected: settings.colorScheme == scheme,
+                  avatar: CircleAvatar(backgroundColor: scheme.seedColor),
+                  onSelected: (_) => notifier.setColorScheme(scheme),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'router/router.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SPStorage.init();
+
   runApp(
     const ProviderScope(
       child: BazaarApp(),
@@ -16,13 +19,6 @@ class BazaarApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: appName,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      routerConfig: AppRouter.routerConfig,
-    );
+    return ThemedApp.router(routerConfig: AppRouter.routerConfig);
   }
 }
