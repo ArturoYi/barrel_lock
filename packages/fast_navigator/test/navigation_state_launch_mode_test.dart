@@ -13,7 +13,7 @@ RouteMatch _match({
   final route = FastRoute(
     name: name,
     path: path.contains(':') ? path.replaceAll(RegExp(r'/\d+'), '/:id') : path,
-    builder: (_, __) => const SizedBox.shrink(),
+    builder: (_, _) => const SizedBox.shrink(),
   );
   return RouteMatch(
     route: route,

@@ -45,7 +45,7 @@ final class AppTypography extends ThemeExtension<AppTypography> {
   /// 基于官方 M3 Typography 构建应用默认排版（仅几何，不含颜色）。
   ///
   /// [colorScheme] 保留供 [AppTheme] 调用对齐；几何层不依赖其颜色语义。
-  /// [fontFamily] 默认 [AppFonts.notoSansSC]；
+  /// [fontFamily] 默认 [AppFontFamily.notoSansSC]；
   /// [platform] 影响 [Typography.material2021] 的平台分支，几何数值不受影响。
   factory AppTypography.standard({
     required ColorScheme colorScheme,

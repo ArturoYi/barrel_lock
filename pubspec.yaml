@@ -15,7 +15,9 @@ workspace:
   - apps/BarrelLock/BarrelLock_macos
   - packages/app_fonts
   - packages/core
+  - packages/fast_loading
   - packages/fast_navigator
+  - packages/fast_toast
 
 dev_dependencies:
   melos: ^8.0.0
@@ -79,8 +81,11 @@ melos:
       packageFilters:
         dirExists: test
         scope:
+          - "*app_fonts*"
           - "*core*"
+          - "*fast_loading*"
           - "*fast_navigator*"
+          - "*fast_toast*"
 
     test:
       description: Aggregate test runner for library packages.

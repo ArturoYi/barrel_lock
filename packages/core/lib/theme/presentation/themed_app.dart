@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:fast_loading/fast_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -56,7 +56,8 @@ class _ThemedAppState extends ConsumerState<ThemedApp> with WidgetsBindingObserv
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: settings.mode.toFlutter,
-        routerConfig: routerConfig,
+        routerConfig: withLoadingRouteGuard(routerConfig),
+        builder: _overlayBuilder,
       );
     }
 
@@ -66,6 +67,13 @@ class _ThemedAppState extends ConsumerState<ThemedApp> with WidgetsBindingObserv
       darkTheme: darkTheme,
       themeMode: settings.mode.toFlutter,
       home: widget._home,
+      builder: _overlayBuilder,
+    );
+  }
+
+  Widget _overlayBuilder(BuildContext context, Widget? child) {
+    return FastLoadingOverlay(
+      child: child ?? const SizedBox.shrink(),
     );
   }
 }
