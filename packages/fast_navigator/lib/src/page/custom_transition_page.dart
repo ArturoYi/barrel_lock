@@ -37,8 +37,7 @@ class CustomTransitionPage extends Page<void> {
 }
 
 class _CustomTransitionPageRoute extends PageRoute<void> {
-  _CustomTransitionPageRoute(CustomTransitionPage page)
-      : super(settings: page);
+  _CustomTransitionPageRoute(CustomTransitionPage page) : super(settings: page);
 
   CustomTransitionPage get _page => settings as CustomTransitionPage;
 
@@ -71,12 +70,11 @@ class _CustomTransitionPageRoute extends PageRoute<void> {
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
-  ) =>
-      Semantics(
-        scopesRoute: true,
-        explicitChildNodes: true,
-        child: _page.child,
-      );
+  ) => Semantics(
+    scopesRoute: true,
+    explicitChildNodes: true,
+    child: _page.child,
+  );
 
   @override
   Widget buildTransitions(
@@ -84,11 +82,5 @@ class _CustomTransitionPageRoute extends PageRoute<void> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
     Widget child,
-  ) =>
-      _page.transitionsBuilder(
-        context,
-        animation,
-        secondaryAnimation,
-        child,
-      );
+  ) => _page.transitionsBuilder(context, animation, secondaryAnimation, child);
 }

@@ -44,7 +44,9 @@ class FastNavigator {
 
   void _checkInitialized() {
     if (_delegate == null || _registry == null) {
-      throw StateError('FastNavigator has not been initialized. Please ensure FastRouterConfig is created first.');
+      throw StateError(
+        'FastNavigator has not been initialized. Please ensure FastRouterConfig is created first.',
+      );
     }
   }
 
@@ -88,14 +90,8 @@ class FastNavigator {
     Object? extra,
     LaunchMode launchMode = LaunchMode.standard,
   }) {
-    final match = _registry!.matchLocation(
-      Uri.parse(location),
-      extra: extra,
-    );
-    final newState = _delegate!.state.push(
-      match,
-      launchMode: launchMode,
-    );
+    final match = _registry!.matchLocation(Uri.parse(location), extra: extra);
+    final newState = _delegate!.state.push(match, launchMode: launchMode);
     _delegate!.updateState(newState);
   }
 
@@ -112,7 +108,10 @@ class FastNavigator {
   static void replace(String location, {Object? extra}) {
     _instance._checkInitialized();
     _instance._runIfAllowed(() {
-      final match = _instance._registry!.matchLocation(Uri.parse(location), extra: extra);
+      final match = _instance._registry!.matchLocation(
+        Uri.parse(location),
+        extra: extra,
+      );
       final newState = _instance._delegate!.state.replace(match);
       _instance._delegate!.updateState(newState);
     });
@@ -122,7 +121,10 @@ class FastNavigator {
   static void go(String location, {Object? extra}) {
     _instance._checkInitialized();
     _instance._runIfAllowed(() {
-      final match = _instance._registry!.matchLocation(Uri.parse(location), extra: extra);
+      final match = _instance._registry!.matchLocation(
+        Uri.parse(location),
+        extra: extra,
+      );
       final newState = _instance._delegate!.state.go([match]);
       _instance._delegate!.updateState(newState);
     });
@@ -132,7 +134,9 @@ class FastNavigator {
   static void popUntil(bool Function(String routeName) predicate) {
     _instance._checkInitialized();
     _instance._runIfAllowed(() {
-      final newState = _instance._delegate!.state.popUntil((match) => predicate(match.route.name));
+      final newState = _instance._delegate!.state.popUntil(
+        (match) => predicate(match.route.name),
+      );
       _instance._delegate!.updateState(newState);
     });
   }

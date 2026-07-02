@@ -41,7 +41,9 @@ void main() {
   });
 
   group('AppTheme', () {
-    testWidgets('wires NotoSansSC on textTheme and AppTypography extension', (tester) async {
+    testWidgets('wires NotoSansSC on textTheme and AppTypography extension', (
+      tester,
+    ) async {
       late ThemeData theme;
       late AppTypography typography;
 

@@ -2,11 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// App 类型枚举，决定 [PlatformAdaptiveTransition] 解析目标。
-enum AppType {
-  material,
-  cupertino,
-  widgets,
-}
+enum AppType { material, cupertino, widgets }
 
 /// 探测 Widget 树中的 App 根组件类型。
 ///

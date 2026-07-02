@@ -7,7 +7,10 @@ final class LoadingSurfaceSpec {
   const LoadingSurfaceSpec({
     this.elevation = 8,
     this.borderRadius = 16,
-    this.contentPadding = const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+    this.contentPadding = const EdgeInsets.symmetric(
+      horizontal: 28,
+      vertical: 24,
+    ),
     this.shadowColor = Colors.black26,
   });
 

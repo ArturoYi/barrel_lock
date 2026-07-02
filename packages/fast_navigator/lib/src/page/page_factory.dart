@@ -34,19 +34,26 @@ class PageFactory {
     final child = match.route.builder(context, match);
 
     return switch (transition) {
-      PlatformAdaptiveTransition() =>
-        _buildPlatformAdaptive(context, match, child),
-      MaterialTransition() =>
-        MaterialPageAdapter.build(match: match, child: child),
-      CupertinoTransition() =>
-        CupertinoPageAdapter.build(match: match, child: child),
+      PlatformAdaptiveTransition() => _buildPlatformAdaptive(
+        context,
+        match,
+        child,
+      ),
+      MaterialTransition() => MaterialPageAdapter.build(
+        match: match,
+        child: child,
+      ),
+      CupertinoTransition() => CupertinoPageAdapter.build(
+        match: match,
+        child: child,
+      ),
       NoTransition() => NoTransitionPage(
-          match: match,
-          key: ValueKey(match.key),
-          name: match.route.name,
-          arguments: match.parameters,
-          child: child,
-        ),
+        match: match,
+        key: ValueKey(match.key),
+        name: match.route.name,
+        arguments: match.parameters,
+        child: child,
+      ),
       CustomTransition(
         :final transitionsBuilder,
         :final transitionDuration,
@@ -77,17 +84,18 @@ class PageFactory {
     Widget child,
   ) {
     return switch (AppTypeDetector.detect(context, override: appTypeOverride)) {
-      AppType.material =>
-        MaterialPageAdapter.build(match: match, child: child),
-      AppType.cupertino =>
-        CupertinoPageAdapter.build(match: match, child: child),
+      AppType.material => MaterialPageAdapter.build(match: match, child: child),
+      AppType.cupertino => CupertinoPageAdapter.build(
+        match: match,
+        child: child,
+      ),
       AppType.widgets => NoTransitionPage(
-          match: match,
-          key: ValueKey(match.key),
-          name: match.route.name,
-          arguments: match.parameters,
-          child: child,
-        ),
+        match: match,
+        key: ValueKey(match.key),
+        name: match.route.name,
+        arguments: match.parameters,
+        child: child,
+      ),
     };
   }
 }

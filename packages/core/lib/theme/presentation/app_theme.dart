@@ -6,15 +6,11 @@ import 'app_color_scheme_x.dart';
 import 'app_typography.dart';
 
 abstract final class AppTheme {
-  static ThemeData light(AppColorScheme scheme) => _build(
-    scheme: scheme,
-    brightness: Brightness.light,
-  );
+  static ThemeData light(AppColorScheme scheme) =>
+      _build(scheme: scheme, brightness: Brightness.light);
 
-  static ThemeData dark(AppColorScheme scheme) => _build(
-    scheme: scheme,
-    brightness: Brightness.dark,
-  );
+  static ThemeData dark(AppColorScheme scheme) =>
+      _build(scheme: scheme, brightness: Brightness.dark);
 
   static ThemeData _build({
     required AppColorScheme scheme,

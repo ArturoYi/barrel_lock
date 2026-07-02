@@ -13,9 +13,7 @@ void main() {
   Widget buildApp({required Widget home}) {
     return MaterialApp(
       builder: (context, child) {
-        return FastLoadingOverlay(
-          child: child ?? const SizedBox.shrink(),
-        );
+        return FastLoadingOverlay(child: child ?? const SizedBox.shrink());
       },
       home: home,
     );
@@ -24,9 +22,7 @@ void main() {
   group('FastLoadingOverlay', () {
     testWidgets('shows and hides loading through overlay', (tester) async {
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 
@@ -47,9 +43,7 @@ void main() {
 
     testWidgets('concurrent show keeps single overlay entry', (tester) async {
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 
@@ -71,15 +65,15 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
-    testWidgets('show before overlay mount appears after attach', (tester) async {
+    testWidgets('show before overlay mount appears after attach', (
+      tester,
+    ) async {
       FastLoading.show(message: 'early');
       expect(FastLoading.refCount, 1);
       expect(find.text('early'), findsNothing);
 
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 
@@ -88,9 +82,7 @@ void main() {
 
     testWidgets('run auto dismisses after future completes', (tester) async {
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 
@@ -106,11 +98,11 @@ void main() {
       expect(FastLoading.isShowing, isFalse);
     });
 
-    testWidgets('dismissOnBarrierTap closes loading when tapping barrier', (tester) async {
+    testWidgets('dismissOnBarrierTap closes loading when tapping barrier', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 
@@ -132,11 +124,11 @@ void main() {
       expect(FastLoading.isShowing, isFalse);
     });
 
-    testWidgets('dismissOnBarrierTap false ignores barrier tap', (tester) async {
+    testWidgets('dismissOnBarrierTap false ignores barrier tap', (
+      tester,
+    ) async {
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 
@@ -158,9 +150,7 @@ void main() {
 
     testWidgets('dismiss with success shows result then hides', (tester) async {
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 
@@ -177,7 +167,10 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
       FastLoading.dismiss(result: LoadingDismissResult.success, message: '成功');
-      expect(LoadingController.instance.displayPhase, LoadingDisplayPhase.success);
+      expect(
+        LoadingController.instance.displayPhase,
+        LoadingDisplayPhase.success,
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 200));
 
@@ -192,7 +185,9 @@ void main() {
       expect(FastLoading.isShowing, isFalse);
     });
 
-    testWidgets('intercepting false allows taps to pass through', (tester) async {
+    testWidgets('intercepting false allows taps to pass through', (
+      tester,
+    ) async {
       var tapped = false;
 
       await tester.pumpWidget(
@@ -229,9 +224,7 @@ void main() {
 
     testWidgets('detach cancels result phase timer', (tester) async {
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 
@@ -249,9 +242,7 @@ void main() {
 
     testWidgets('dismissAll removes overlay immediately', (tester) async {
       await tester.pumpWidget(
-        buildApp(
-          home: const Scaffold(body: Text('content')),
-        ),
+        buildApp(home: const Scaffold(body: Text('content'))),
       );
       await tester.pump();
 

@@ -42,11 +42,14 @@ class FastRouter {
   }
 
   /// 获取供 MaterialApp.router 使用的 RouterConfig
-  RouterConfig<NavigationState> get routerConfig => RouterConfig<NavigationState>(
+  RouterConfig<NavigationState> get routerConfig =>
+      RouterConfig<NavigationState>(
         routerDelegate: delegate,
         routeInformationParser: parser,
         routeInformationProvider: PlatformRouteInformationProvider(
-          initialRouteInformation: RouteInformation(uri: delegate.state.location),
+          initialRouteInformation: RouteInformation(
+            uri: delegate.state.location,
+          ),
         ),
         backButtonDispatcher: RootBackButtonDispatcher(),
       );

@@ -74,30 +74,29 @@ void main() {
       expect(controller.isShowing, isFalse);
     });
 
-    test('dismiss with success without custom widget shows built-in result', () async {
-      controller.show(
-        config: const LoadingConfig(message: 'loading'),
-      );
+    test(
+      'dismiss with success without custom widget shows built-in result',
+      () async {
+        controller.show(config: const LoadingConfig(message: 'loading'));
 
-      controller.dismiss(result: LoadingDismissResult.success);
+        controller.dismiss(result: LoadingDismissResult.success);
 
-      expect(controller.refCount, 0);
-      expect(controller.isShowing, isTrue);
-      expect(controller.displayPhase, LoadingDisplayPhase.success);
-      expect(controller.resultWidget, isNull);
+        expect(controller.refCount, 0);
+        expect(controller.isShowing, isTrue);
+        expect(controller.displayPhase, LoadingDisplayPhase.success);
+        expect(controller.resultWidget, isNull);
 
-      await Future<void>.delayed(const Duration(seconds: 1));
+        await Future<void>.delayed(const Duration(seconds: 1));
 
-      expect(controller.isShowing, isFalse);
-      expect(controller.displayPhase, LoadingDisplayPhase.loading);
-    });
+        expect(controller.isShowing, isFalse);
+        expect(controller.displayPhase, LoadingDisplayPhase.loading);
+      },
+    );
 
     test('dismiss with success and widget keeps showing until timer', () async {
       controller.show(
         config: LoadingConfig(
-          style: LoadingStyle(
-            successWidget: const Icon(Icons.check),
-          ),
+          style: LoadingStyle(successWidget: const Icon(Icons.check)),
         ),
       );
 
@@ -116,10 +115,7 @@ void main() {
     test('dismiss resultMessage is stored for result phase', () {
       controller.show();
 
-      controller.dismiss(
-        result: LoadingDismissResult.success,
-        message: '完成',
-      );
+      controller.dismiss(result: LoadingDismissResult.success, message: '完成');
 
       expect(controller.resultMessage, '完成');
     });
@@ -153,9 +149,7 @@ void main() {
     test('dismiss resultWidget overrides style widget', () {
       controller.show(
         config: const LoadingConfig(
-          style: LoadingStyle(
-            successWidget: Text('style'),
-          ),
+          style: LoadingStyle(successWidget: Text('style')),
         ),
       );
 

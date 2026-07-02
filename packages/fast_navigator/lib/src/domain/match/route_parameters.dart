@@ -69,7 +69,8 @@ class RouteParameters {
   }
 
   @override
-  int get hashCode => pathParams.hashCode ^ queryParams.hashCode ^ extra.hashCode;
+  int get hashCode =>
+      pathParams.hashCode ^ queryParams.hashCode ^ extra.hashCode;
 
   @override
   String toString() {

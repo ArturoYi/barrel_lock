@@ -25,13 +25,13 @@ class LoadingBodyWidget extends StatelessWidget {
 
     return switch (displayPhase) {
       LoadingDisplayPhase.loading => _buildLoadingBody(context, style),
-      LoadingDisplayPhase.success || LoadingDisplayPhase.error =>
-        _buildDefaultBody(
-          context,
-          style,
-          indicator: resultWidget ?? _buildBuiltInResultIcon(context, style),
-          message: resultMessage,
-        ),
+      LoadingDisplayPhase.success ||
+      LoadingDisplayPhase.error => _buildDefaultBody(
+        context,
+        style,
+        indicator: resultWidget ?? _buildBuiltInResultIcon(context, style),
+        message: resultMessage,
+      ),
     };
   }
 
@@ -58,10 +58,7 @@ class LoadingBodyWidget extends StatelessWidget {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [
-        indicator,
-        ?messageWidget,
-      ],
+      children: [indicator, ?messageWidget],
     );
   }
 
@@ -106,18 +103,15 @@ class LoadingBodyWidget extends StatelessWidget {
     }
 
     final spec = style.indicatorSpec;
-    final textStyle = spec.textStyle ??
+    final textStyle =
+        spec.textStyle ??
         Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface,
-            );
+          color: Theme.of(context).colorScheme.onSurface,
+        );
 
     return Padding(
       padding: EdgeInsets.only(top: spec.messageSpacing),
-      child: Text(
-        message,
-        textAlign: TextAlign.center,
-        style: textStyle,
-      ),
+      child: Text(message, textAlign: TextAlign.center, style: textStyle),
     );
   }
 }

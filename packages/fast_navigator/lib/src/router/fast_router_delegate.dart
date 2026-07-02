@@ -24,8 +24,8 @@ class FastRouterDelegate extends RouterDelegate<NavigationState>
     NavigationState? initialState,
     GlobalKey<NavigatorState>? navigatorKey,
     this._pageFactory = const PageFactory(),
-  })  : navigatorKey = navigatorKey ?? GlobalKey<NavigatorState>(),
-        _state = initialState ?? const NavigationState(matches: []);
+  }) : navigatorKey = navigatorKey ?? GlobalKey<NavigatorState>(),
+       _state = initialState ?? const NavigationState(matches: []);
 
   /// 获取当前导航状态的不可变拷贝
   NavigationState get state => _state;

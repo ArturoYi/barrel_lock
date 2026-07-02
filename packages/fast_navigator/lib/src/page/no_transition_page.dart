@@ -14,16 +14,15 @@ class NoTransitionPage extends CustomTransitionPage {
     super.arguments,
     super.restorationId,
   }) : super(
-          transitionsBuilder: _transitionsBuilder,
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        );
+         transitionsBuilder: _transitionsBuilder,
+         transitionDuration: Duration.zero,
+         reverseTransitionDuration: Duration.zero,
+       );
 
   static Widget _transitionsBuilder(
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
     Widget child,
-  ) =>
-      child;
+  ) => child;
 }

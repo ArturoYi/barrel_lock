@@ -24,10 +24,7 @@ class RouteRegistry {
   /// 404 兜底路由构建器（始终为叶子页）
   FastRoute? unknownRoute;
 
-  RouteRegistry({
-    List<FastBaseRoute> routes = const [],
-    this.unknownRoute,
-  }) {
+  RouteRegistry({List<FastBaseRoute> routes = const [], this.unknownRoute}) {
     for (final route in routes) {
       addRoute(route);
     }
@@ -59,7 +56,7 @@ class RouteRegistry {
 
     for (final route in _leafRoutes) {
       final routeSegments = Uri.parse(route.path).pathSegments;
-      
+
       // 检查路径段数量是否匹配（这里是精确匹配，未实现子路由嵌套匹配）
       if (routeSegments.length != pathSegments.length) continue;
 
@@ -108,6 +105,8 @@ class RouteRegistry {
       );
     }
 
-    throw StateError('No route found for ${location.path} and no unknownRoute provided.');
+    throw StateError(
+      'No route found for ${location.path} and no unknownRoute provided.',
+    );
   }
 }

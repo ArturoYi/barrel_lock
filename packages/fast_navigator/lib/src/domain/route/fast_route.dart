@@ -1,7 +1,8 @@
 part of 'routes.dart';
 
 /// 路由页面构建器签名
-typedef RoutePageBuilder = Widget Function(BuildContext context, RouteMatch match);
+typedef RoutePageBuilder =
+    Widget Function(BuildContext context, RouteMatch match);
 
 /// 叶子页路由（FastRoute）。
 ///

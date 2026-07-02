@@ -127,7 +127,8 @@ final class LoadingController extends ChangeNotifier {
     String? message,
   }) async {
     show(
-      config: config ?? (message != null ? LoadingConfig(message: message) : null),
+      config:
+          config ?? (message != null ? LoadingConfig(message: message) : null),
     );
     try {
       return await task();

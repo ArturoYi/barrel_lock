@@ -36,10 +36,7 @@ class FastRouterConfig {
     AppType? appType,
     int navigationThrottleMs = 0,
   }) {
-    final registry = RouteRegistry(
-      routes: routes,
-      unknownRoute: unknownRoute,
-    );
+    final registry = RouteRegistry(routes: routes, unknownRoute: unknownRoute);
 
     final router = FastRouter(
       registry: registry,

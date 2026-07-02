@@ -13,7 +13,8 @@ class ThemedApp extends ConsumerStatefulWidget {
     required RouterConfig<Object> this._routerConfig,
   }) : _home = null;
 
-  const ThemedApp({super.key, required Widget this._home}) : _routerConfig = null;
+  const ThemedApp({super.key, required Widget this._home})
+    : _routerConfig = null;
 
   final RouterConfig<Object>? _routerConfig;
   final Widget? _home;
@@ -22,7 +23,8 @@ class ThemedApp extends ConsumerStatefulWidget {
   ConsumerState<ThemedApp> createState() => _ThemedAppState();
 }
 
-class _ThemedAppState extends ConsumerState<ThemedApp> with WidgetsBindingObserver {
+class _ThemedAppState extends ConsumerState<ThemedApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -72,8 +74,6 @@ class _ThemedAppState extends ConsumerState<ThemedApp> with WidgetsBindingObserv
   }
 
   Widget _overlayBuilder(BuildContext context, Widget? child) {
-    return FastLoadingOverlay(
-      child: child ?? const SizedBox.shrink(),
-    );
+    return FastLoadingOverlay(child: child ?? const SizedBox.shrink());
   }
 }

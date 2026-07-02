@@ -7,11 +7,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SPStorage.init();
 
-  runApp(
-    const ProviderScope(
-      child: BazaarApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: BazaarApp()));
 }
 
 class BazaarApp extends StatelessWidget {

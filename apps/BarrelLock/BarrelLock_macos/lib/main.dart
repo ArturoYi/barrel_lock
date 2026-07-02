@@ -5,11 +5,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SPStorage.init();
 
-  runApp(
-    const ProviderScope(
-      child: BazaarApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: BazaarApp()));
 }
 
 class BazaarApp extends StatelessWidget {
@@ -35,10 +31,7 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              greeting(),
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            Text(greeting(), style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 32),
             const ThemeSettingTile(),
           ],

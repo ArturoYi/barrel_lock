@@ -10,10 +10,7 @@ class DetailPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('详情页')),
       body: Center(
-        child: FilledButton(
-          onPressed: AppRouter.pop,
-          child: const Text('返回'),
-        ),
+        child: FilledButton(onPressed: AppRouter.pop, child: const Text('返回')),
       ),
     );
   }

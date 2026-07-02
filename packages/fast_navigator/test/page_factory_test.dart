@@ -32,17 +32,18 @@ void main() {
   }
 
   group('PageFactory', () {
-    testWidgets('PlatformAdaptive + MaterialApp → MaterialPage', (tester) async {
+    testWidgets('PlatformAdaptive + MaterialApp → MaterialPage', (
+      tester,
+    ) async {
       late Page<Object?> page;
 
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
             builder: (context) {
-              page = const PageFactory(appTypeOverride: AppType.material).build(
-                context: context,
-                match: matchFor(homeRoute),
-              );
+              page = const PageFactory(
+                appTypeOverride: AppType.material,
+              ).build(context: context, match: matchFor(homeRoute));
               return const SizedBox.shrink();
             },
           ),
@@ -53,17 +54,18 @@ void main() {
       expect(page.key, ValueKey('home:/'));
     });
 
-    testWidgets('PlatformAdaptive + CupertinoApp → CupertinoPage', (tester) async {
+    testWidgets('PlatformAdaptive + CupertinoApp → CupertinoPage', (
+      tester,
+    ) async {
       late Page<Object?> page;
 
       await tester.pumpWidget(
         CupertinoApp(
           home: Builder(
             builder: (context) {
-              page = const PageFactory(appTypeOverride: AppType.cupertino).build(
-                context: context,
-                match: matchFor(homeRoute),
-              );
+              page = const PageFactory(
+                appTypeOverride: AppType.cupertino,
+              ).build(context: context, match: matchFor(homeRoute));
               return const SizedBox.shrink();
             },
           ),
@@ -73,17 +75,18 @@ void main() {
       expect(page.runtimeType.toString(), contains('CupertinoPage'));
     });
 
-    testWidgets('PlatformAdaptive + AppType.widgets → NoTransitionPage', (tester) async {
+    testWidgets('PlatformAdaptive + AppType.widgets → NoTransitionPage', (
+      tester,
+    ) async {
       late Page<Object?> page;
 
       await tester.pumpWidget(
         MaterialApp(
           home: Builder(
             builder: (context) {
-              page = const PageFactory(appTypeOverride: AppType.widgets).build(
-                context: context,
-                match: matchFor(homeRoute),
-              );
+              page = const PageFactory(
+                appTypeOverride: AppType.widgets,
+              ).build(context: context, match: matchFor(homeRoute));
               return const SizedBox.shrink();
             },
           ),
@@ -100,12 +103,11 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (context) {
-              page = const PageFactory(
-                defaultTransition: MaterialTransition(),
-              ).build(
-                context: context,
-                match: matchFor(splashRoute, path: '/splash'),
-              );
+              page = const PageFactory(defaultTransition: MaterialTransition())
+                  .build(
+                    context: context,
+                    match: matchFor(splashRoute, path: '/splash'),
+                  );
               return const SizedBox.shrink();
             },
           ),
@@ -119,9 +121,7 @@ void main() {
       const customRoute = FastRoute(
         name: 'fade',
         path: '/fade',
-        transition: CustomTransition(
-          transitionsBuilder: _fadeTransition,
-        ),
+        transition: CustomTransition(transitionsBuilder: _fadeTransition),
         builder: _placeholderBuilder,
       );
 

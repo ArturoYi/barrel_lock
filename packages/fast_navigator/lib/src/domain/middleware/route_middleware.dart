@@ -23,21 +23,31 @@ abstract class RouteMiddleware {
   ///
   /// [currentState] 跳转前的导航状态
   /// [targetState] 目标导航状态（意图跳转的 state）
-  /// 
+  ///
   /// 返回：
   /// - `null`：允许当前跳转继续（放行）
   /// - `NavigationState`：中断当前跳转，重定向到新的状态
-  MiddlewareResult handle(NavigationState currentState, NavigationState targetState);
+  MiddlewareResult handle(
+    NavigationState currentState,
+    NavigationState targetState,
+  );
 }
 
 /// 简易闭包风格中间件
 class FunctionalRouteMiddleware extends RouteMiddleware {
-  final MiddlewareResult Function(NavigationState current, NavigationState target) _handler;
+  final MiddlewareResult Function(
+    NavigationState current,
+    NavigationState target,
+  )
+  _handler;
 
   FunctionalRouteMiddleware(this._handler);
 
   @override
-  MiddlewareResult handle(NavigationState currentState, NavigationState targetState) {
+  MiddlewareResult handle(
+    NavigationState currentState,
+    NavigationState targetState,
+  ) {
     return _handler(currentState, targetState);
   }
 }

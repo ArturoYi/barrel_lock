@@ -23,10 +23,7 @@ class ThemeSettingTile extends ConsumerWidget {
           const SizedBox(height: 12),
           SegmentedButton<AppThemeMode>(
             segments: const [
-              ButtonSegment(
-                value: AppThemeMode.system,
-                label: Text('跟随系统'),
-              ),
+              ButtonSegment(value: AppThemeMode.system, label: Text('跟随系统')),
               ButtonSegment(value: AppThemeMode.light, label: Text('浅色')),
               ButtonSegment(value: AppThemeMode.dark, label: Text('深色')),
             ],

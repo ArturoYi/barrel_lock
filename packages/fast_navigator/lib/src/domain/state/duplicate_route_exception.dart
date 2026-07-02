@@ -6,10 +6,7 @@ class DuplicateRouteException implements Exception {
   /// 目标路由在栈中的索引位置。
   final int index;
 
-  const DuplicateRouteException({
-    required this.identity,
-    required this.index,
-  });
+  const DuplicateRouteException({required this.identity, required this.index});
 
   @override
   String toString() {

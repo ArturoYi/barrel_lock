@@ -5,46 +5,33 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   Widget wrap(LoadingConfig config) {
     return MaterialApp(
-      home: Scaffold(
-        body: LoadingWidget(
-          config: config,
-        ),
-      ),
+      home: Scaffold(body: LoadingWidget(config: config)),
     );
   }
 
   group('LoadingWidget', () {
     testWidgets('default shows indicator without message', (tester) async {
-      await tester.pumpWidget(
-        wrap(const LoadingConfig()),
-      );
+      await tester.pumpWidget(wrap(const LoadingConfig()));
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.byType(Text), findsNothing);
     });
 
     testWidgets('default uses material elevated surface', (tester) async {
-      await tester.pumpWidget(
-        wrap(const LoadingConfig(message: '加载中')),
-      );
+      await tester.pumpWidget(wrap(const LoadingConfig(message: '加载中')));
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
       expect(find.text('加载中'), findsOneWidget);
 
       final materials = tester.widgetList<Material>(find.byType(Material));
-      expect(
-        materials.any((material) => material.elevation == 8),
-        isTrue,
-      );
+      expect(materials.any((material) => material.elevation == 8), isTrue);
     });
 
     testWidgets('loadingWidget overrides default content', (tester) async {
       await tester.pumpWidget(
         wrap(
           const LoadingConfig(
-            style: LoadingStyle(
-              loadingWidget: Text('custom'),
-            ),
+            style: LoadingStyle(loadingWidget: Text('custom')),
           ),
         ),
       );
@@ -53,13 +40,12 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsNothing);
 
       final materials = tester.widgetList<Material>(find.byType(Material));
-      expect(
-        materials.any((material) => material.elevation == 8),
-        isTrue,
-      );
+      expect(materials.any((material) => material.elevation == 8), isTrue);
     });
 
-    testWidgets('surfaceSpec controls elevation and border radius', (tester) async {
+    testWidgets('surfaceSpec controls elevation and border radius', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         wrap(
           LoadingConfig(
@@ -84,7 +70,9 @@ void main() {
       expect(material.borderRadius, BorderRadius.circular(24));
     });
 
-    testWidgets('indicatorSpec controls size stroke and message spacing', (tester) async {
+    testWidgets('indicatorSpec controls size stroke and message spacing', (
+      tester,
+    ) async {
       const customTextStyle = TextStyle(fontSize: 20, color: Colors.red);
 
       await tester.pumpWidget(
@@ -108,7 +96,9 @@ void main() {
       );
       expect(progress.strokeWidth, 5);
 
-      final indicatorBox = tester.getSize(find.byType(CircularProgressIndicator));
+      final indicatorBox = tester.getSize(
+        find.byType(CircularProgressIndicator),
+      );
       expect(indicatorBox.width, 48);
       expect(indicatorBox.height, 48);
 
@@ -129,7 +119,9 @@ void main() {
       expect(messagePadding.padding, const EdgeInsets.only(top: 24));
     });
 
-    testWidgets('result message is shown when passed externally', (tester) async {
+    testWidgets('result message is shown when passed externally', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -146,7 +138,9 @@ void main() {
       expect(find.text('提交成功'), findsOneWidget);
     });
 
-    testWidgets('custom result widget still shows result message', (tester) async {
+    testWidgets('custom result widget still shows result message', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -165,7 +159,9 @@ void main() {
       expect(find.byIcon(Icons.check_circle), findsNothing);
     });
 
-    testWidgets('without message does not reserve message spacing', (tester) async {
+    testWidgets('without message does not reserve message spacing', (
+      tester,
+    ) async {
       await tester.pumpWidget(wrap(const LoadingConfig()));
 
       expect(find.byType(Text), findsNothing);
@@ -239,11 +235,7 @@ void main() {
     testWidgets('result content uses material surface', (tester) async {
       await tester.pumpWidget(
         wrap(
-          const LoadingConfig(
-            style: LoadingStyle(
-              successWidget: Text('ok'),
-            ),
-          ),
+          const LoadingConfig(style: LoadingStyle(successWidget: Text('ok'))),
         ),
       );
 
@@ -262,10 +254,7 @@ void main() {
       expect(find.text('ok'), findsOneWidget);
 
       final materials = tester.widgetList<Material>(find.byType(Material));
-      expect(
-        materials.any((material) => material.elevation == 8),
-        isTrue,
-      );
+      expect(materials.any((material) => material.elevation == 8), isTrue);
     });
   });
 }

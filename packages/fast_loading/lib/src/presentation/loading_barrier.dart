@@ -46,10 +46,7 @@ class LoadingBarrier extends StatelessWidget {
     return Semantics(
       label: semanticsLabel,
       liveRegion: true,
-      child: Material(
-        type: MaterialType.transparency,
-        child: content,
-      ),
+      child: Material(type: MaterialType.transparency, child: content),
     );
   }
 }

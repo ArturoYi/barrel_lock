@@ -8,7 +8,7 @@ import '../core/loading_controller.dart';
 /// 若传入 [delegate]，Loading 未展示时委托给原有 dispatcher。
 final class LoadingRootBackButtonDispatcher extends RootBackButtonDispatcher {
   LoadingRootBackButtonDispatcher({BackButtonDispatcher? delegate})
-      : _delegate = delegate;
+    : _delegate = delegate;
 
   final BackButtonDispatcher? _delegate;
 

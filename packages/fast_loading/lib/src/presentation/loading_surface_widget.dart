@@ -16,7 +16,8 @@ class LoadingSurfaceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final spec = style.surfaceSpec;
-    final backgroundColor = style.backgroundColor ??
+    final backgroundColor =
+        style.backgroundColor ??
         Theme.of(context).colorScheme.surfaceContainerHighest;
 
     return Material(
@@ -24,10 +25,7 @@ class LoadingSurfaceWidget extends StatelessWidget {
       elevation: spec.elevation,
       shadowColor: spec.shadowColor,
       borderRadius: BorderRadius.circular(spec.borderRadius),
-      child: Padding(
-        padding: spec.contentPadding,
-        child: child,
-      ),
+      child: Padding(padding: spec.contentPadding, child: child),
     );
   }
 }

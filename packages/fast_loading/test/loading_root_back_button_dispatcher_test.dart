@@ -19,7 +19,9 @@ void main() {
     test('blocks system back when interceptRouteBack is true', () async {
       controller.show(config: const LoadingConfig(interceptRouteBack: true));
 
-      final handled = await dispatcher.invokeCallback(Future<bool>.value(false));
+      final handled = await dispatcher.invokeCallback(
+        Future<bool>.value(false),
+      );
 
       expect(handled, isTrue);
     });
@@ -27,7 +29,9 @@ void main() {
     test('allows system back when interceptRouteBack is false', () async {
       controller.show(config: const LoadingConfig(interceptRouteBack: false));
 
-      final handled = await dispatcher.invokeCallback(Future<bool>.value(false));
+      final handled = await dispatcher.invokeCallback(
+        Future<bool>.value(false),
+      );
 
       expect(handled, isFalse);
     });
@@ -36,7 +40,9 @@ void main() {
       controller.show(config: const LoadingConfig(interceptRouteBack: true));
       controller.dismiss();
 
-      final handled = await dispatcher.invokeCallback(Future<bool>.value(false));
+      final handled = await dispatcher.invokeCallback(
+        Future<bool>.value(false),
+      );
 
       expect(handled, isFalse);
     });
@@ -49,7 +55,9 @@ void main() {
       );
       dispatcher = LoadingRootBackButtonDispatcher(delegate: delegate);
 
-      final handled = await dispatcher.invokeCallback(Future<bool>.value(false));
+      final handled = await dispatcher.invokeCallback(
+        Future<bool>.value(false),
+      );
 
       expect(handled, isTrue);
       expect(delegateCalled, isTrue);
@@ -65,7 +73,9 @@ void main() {
 
       controller.show(config: const LoadingConfig(interceptRouteBack: true));
 
-      final handled = await dispatcher.invokeCallback(Future<bool>.value(false));
+      final handled = await dispatcher.invokeCallback(
+        Future<bool>.value(false),
+      );
 
       expect(handled, isTrue);
       expect(delegateCalled, isFalse);

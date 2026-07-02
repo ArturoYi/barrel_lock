@@ -4,10 +4,7 @@ import '../core/loading_controller.dart';
 
 /// 挂载到 [MaterialApp.builder]，为 [FastLoading] 提供根 Overlay。
 class FastLoadingOverlay extends StatefulWidget {
-  const FastLoadingOverlay({
-    super.key,
-    required this.child,
-  });
+  const FastLoadingOverlay({super.key, required this.child});
 
   final Widget child;
 

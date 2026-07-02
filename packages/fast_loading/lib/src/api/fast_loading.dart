@@ -15,12 +15,10 @@ abstract final class FastLoading {
   static int get refCount => _controller.refCount;
 
   /// 展示 Loading；重复调用仅增加引用计数，不叠加 UI。
-  static void show({
-    String? message,
-    LoadingConfig? config,
-  }) {
+  static void show({String? message, LoadingConfig? config}) {
     _controller.show(
-      config: config ?? (message != null ? LoadingConfig(message: message) : null),
+      config:
+          config ?? (message != null ? LoadingConfig(message: message) : null),
     );
   }
 
@@ -53,10 +51,6 @@ abstract final class FastLoading {
     String? message,
     LoadingConfig? config,
   }) {
-    return _controller.run(
-      task,
-      message: message,
-      config: config,
-    );
+    return _controller.run(task, message: message, config: config);
   }
 }

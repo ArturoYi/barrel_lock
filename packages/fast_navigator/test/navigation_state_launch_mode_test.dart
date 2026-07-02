@@ -42,10 +42,7 @@ void main() {
       final detail = _match(name: 'detail', path: '/detail');
       final state = NavigationState(matches: [detail]);
 
-      expect(
-        () => state.push(detail),
-        throwsA(isA<DuplicateRouteException>()),
-      );
+      expect(() => state.push(detail), throwsA(isA<DuplicateRouteException>()));
     });
 
     test('singleTop: updates params when target is stack top', () {
