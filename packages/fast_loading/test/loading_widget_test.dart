@@ -146,6 +146,25 @@ void main() {
       expect(find.text('提交成功'), findsOneWidget);
     });
 
+    testWidgets('custom result widget still shows result message', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: LoadingWidget(
+              config: const LoadingConfig(),
+              displayPhase: LoadingDisplayPhase.success,
+              resultWidget: const Icon(Icons.check, key: Key('custom-icon')),
+              resultMessage: '提交成功',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byKey(const Key('custom-icon')), findsOneWidget);
+      expect(find.text('提交成功'), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle), findsNothing);
+    });
+
     testWidgets('without message does not reserve message spacing', (tester) async {
       await tester.pumpWidget(wrap(const LoadingConfig()));
 

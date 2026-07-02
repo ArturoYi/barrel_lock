@@ -51,8 +51,14 @@ final class LoadingController extends ChangeNotifier {
   }
 
   /// 注销根 Overlay；移除 Entry 但保留 refCount，便于 remount 后恢复。
+  ///
+  /// 若仅剩结果态 timer（refCount 已为 0），一并取消，避免无 UI 时仍拦截返回。
   void detach() {
     _host.detach();
+    if (_refCount == 0 && _resultDismissTimer != null) {
+      _cancelResultDismiss();
+      notifyListeners();
+    }
   }
 
   /// 增加引用计数；首次展示时插入 OverlayEntry。
@@ -80,6 +86,9 @@ final class LoadingController extends ChangeNotifier {
     Duration resultDisplayDuration = _defaultResultDisplayDuration,
   }) {
     if (_refCount == 0) {
+      if (_resultDismissTimer != null) {
+        _finishResultDismiss();
+      }
       return;
     }
 

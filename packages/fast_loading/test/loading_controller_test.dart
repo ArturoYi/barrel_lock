@@ -124,6 +124,32 @@ void main() {
       expect(controller.resultMessage, '完成');
     });
 
+    test('dismiss during result phase closes immediately', () {
+      controller.show();
+
+      controller.dismiss(result: LoadingDismissResult.success);
+
+      expect(controller.isShowing, isTrue);
+      expect(controller.displayPhase, LoadingDisplayPhase.success);
+
+      controller.dismiss();
+
+      expect(controller.isShowing, isFalse);
+      expect(controller.displayPhase, LoadingDisplayPhase.loading);
+    });
+
+    test('detach cancels result phase when refCount is zero', () {
+      controller.show();
+      controller.dismiss(result: LoadingDismissResult.success);
+
+      expect(controller.isShowing, isTrue);
+
+      controller.detach();
+
+      expect(controller.isShowing, isFalse);
+      expect(controller.displayPhase, LoadingDisplayPhase.loading);
+    });
+
     test('dismiss resultWidget overrides style widget', () {
       controller.show(
         config: const LoadingConfig(

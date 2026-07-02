@@ -182,13 +182,68 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byKey(const Key('success-icon')), findsOneWidget);
-      expect(find.text('成功'), findsNothing);
+      expect(find.text('成功'), findsOneWidget);
       expect(find.byType(CircularProgressIndicator), findsNothing);
 
       await tester.pump(const Duration(seconds: 1));
       await tester.pump();
 
       expect(find.byKey(const Key('success-icon')), findsNothing);
+      expect(FastLoading.isShowing, isFalse);
+    });
+
+    testWidgets('intercepting false allows taps to pass through', (tester) async {
+      var tapped = false;
+
+      await tester.pumpWidget(
+        buildApp(
+          home: Scaffold(
+            body: Center(
+              child: ElevatedButton(
+                onPressed: () => tapped = true,
+                child: const Text('underlying'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      FastLoading.show(
+        config: const LoadingConfig(
+          message: 'visual only',
+          intercepting: false,
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+
+      expect(find.text('visual only'), findsOneWidget);
+
+      await tester.tap(find.text('underlying'));
+      await tester.pump();
+
+      expect(tapped, isTrue);
+      expect(FastLoading.isShowing, isTrue);
+    });
+
+    testWidgets('detach cancels result phase timer', (tester) async {
+      await tester.pumpWidget(
+        buildApp(
+          home: const Scaffold(body: Text('content')),
+        ),
+      );
+      await tester.pump();
+
+      FastLoading.show();
+      await tester.pump();
+
+      FastLoading.dismiss(result: LoadingDismissResult.success);
+      expect(FastLoading.isShowing, isTrue);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+
       expect(FastLoading.isShowing, isFalse);
     });
 

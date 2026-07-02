@@ -7,22 +7,19 @@ class DetailPage extends StatelessWidget {
   const DetailPage({super.key});
 
   Future<void> _demoShowDismiss() async {
-    FastLoading.show(message: '加载中…');
+    FastLoading.show();
     await Future<void>.delayed(const Duration(seconds: 2));
     FastLoading.dismiss();
   }
 
   Future<void> _demoRun() async {
-    await FastLoading.run(
-      () async {
-        await Future<void>.delayed(const Duration(seconds: 2));
-      },
-      message: 'FastLoading.run',
-    );
+    await FastLoading.run(() async {
+      await Future<void>.delayed(const Duration(seconds: 2));
+    });
   }
 
   Future<void> _demoRefCount() async {
-    FastLoading.show(message: '并发请求 A + B');
+    FastLoading.show();
     FastLoading.show();
     await Future<void>.delayed(const Duration(milliseconds: 1800));
     FastLoading.dismiss();
@@ -31,30 +28,21 @@ class DetailPage extends StatelessWidget {
   }
 
   Future<void> _demoDismissSuccess(BuildContext context) async {
-    FastLoading.show(message: '提交中…');
+    FastLoading.show();
     await Future<void>.delayed(const Duration(seconds: 2));
-    FastLoading.dismiss(
-      result: LoadingDismissResult.success,
-      message: '提交成功',
-    );
+    FastLoading.dismiss(result: LoadingDismissResult.success);
   }
 
   Future<void> _demoDismissError(BuildContext context) async {
-    FastLoading.show(message: '加载中…');
+    FastLoading.show();
     await Future<void>.delayed(const Duration(seconds: 2));
-    FastLoading.dismiss(
-      result: LoadingDismissResult.error,
-      message: '加载失败',
-    );
+    FastLoading.dismiss(result: LoadingDismissResult.error);
   }
 
   Future<void> _demoDismissInlineResult() async {
-    FastLoading.show(message: '处理中…');
+    FastLoading.show();
     await Future<void>.delayed(const Duration(seconds: 2));
-    FastLoading.dismiss(
-      result: LoadingDismissResult.success,
-      message: '完成',
-    );
+    FastLoading.dismiss(result: LoadingDismissResult.success);
   }
 
   @override

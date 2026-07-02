@@ -26,10 +26,10 @@ class LoadingBodyWidget extends StatelessWidget {
     return switch (displayPhase) {
       LoadingDisplayPhase.loading => _buildLoadingBody(context, style),
       LoadingDisplayPhase.success || LoadingDisplayPhase.error =>
-        resultWidget ?? _buildDefaultBody(
+        _buildDefaultBody(
           context,
           style,
-          indicator: _buildBuiltInResultIcon(context, style),
+          indicator: resultWidget ?? _buildBuiltInResultIcon(context, style),
           message: resultMessage,
         ),
     };
@@ -60,7 +60,7 @@ class LoadingBodyWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         indicator,
-        if (messageWidget != null) messageWidget,
+        ?messageWidget,
       ],
     );
   }

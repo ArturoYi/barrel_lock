@@ -37,7 +37,9 @@ class LoadingBarrier extends StatelessWidget {
       ],
     );
 
-    if (config.intercepting && onBarrierTap == null) {
+    if (!config.intercepting) {
+      content = IgnorePointer(child: content);
+    } else if (onBarrierTap == null) {
       content = AbsorbPointer(child: content);
     }
 

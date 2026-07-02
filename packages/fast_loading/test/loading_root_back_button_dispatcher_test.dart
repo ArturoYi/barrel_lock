@@ -1,5 +1,7 @@
 import 'package:fast_loading/fast_loading.dart';
 import 'package:fast_loading/src/core/loading_controller.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -38,5 +40,51 @@ void main() {
 
       expect(handled, isFalse);
     });
+
+    test('delegates to original dispatcher when loading is hidden', () async {
+      var delegateCalled = false;
+      final delegate = _RecordingBackButtonDispatcher(
+        onInvoke: () => delegateCalled = true,
+        result: true,
+      );
+      dispatcher = LoadingRootBackButtonDispatcher(delegate: delegate);
+
+      final handled = await dispatcher.invokeCallback(Future<bool>.value(false));
+
+      expect(handled, isTrue);
+      expect(delegateCalled, isTrue);
+    });
+
+    test('blocks before delegating when loading is showing', () async {
+      var delegateCalled = false;
+      final delegate = _RecordingBackButtonDispatcher(
+        onInvoke: () => delegateCalled = true,
+        result: false,
+      );
+      dispatcher = LoadingRootBackButtonDispatcher(delegate: delegate);
+
+      controller.show(config: const LoadingConfig(interceptRouteBack: true));
+
+      final handled = await dispatcher.invokeCallback(Future<bool>.value(false));
+
+      expect(handled, isTrue);
+      expect(delegateCalled, isFalse);
+    });
   });
+}
+
+final class _RecordingBackButtonDispatcher extends RootBackButtonDispatcher {
+  _RecordingBackButtonDispatcher({
+    required this.onInvoke,
+    required this.result,
+  });
+
+  final VoidCallback onInvoke;
+  final bool result;
+
+  @override
+  Future<bool> invokeCallback(Future<bool> defaultValue) {
+    onInvoke();
+    return SynchronousFuture(result);
+  }
 }
