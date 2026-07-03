@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../domain/toast_config.dart';
+import '../domain/toast_priority.dart';
 import '../domain/toast_request.dart';
 import '../domain/toast_style.dart';
 import '../domain/toast_type.dart';
@@ -54,15 +55,32 @@ final class ToastController extends ChangeNotifier {
     ToastConfig? config,
     ToastStyle? style,
   }) {
-    _queue.enqueue(
-      ToastRequest(
-        message: message,
-        type: type,
-        config: config ?? const ToastConfig(),
-        style: style,
-      ),
+    final request = ToastRequest(
+      message: message,
+      type: type,
+      config: config ?? const ToastConfig(),
+      style: style,
     );
+
+    if (request.config.priority == ToastPriority.high) {
+      _enqueueHighPriority(request);
+      return;
+    }
+
+    _queue.enqueue(request);
     _tryShowNext();
+  }
+
+  /// 高优：立即移除当前 Toast，插队队首并马上展示；其余 pending 保留。
+  void _enqueueHighPriority(ToastRequest request) {
+    if (_isShowing) {
+      _host.removeImmediately();
+      _current = null;
+      _isShowing = false;
+    }
+    _queue.enqueueFront(request);
+    _tryShowNext();
+    notifyListeners();
   }
 
   /// 手动关闭当前 Toast；退场结束后自动 dequeue 下一条。

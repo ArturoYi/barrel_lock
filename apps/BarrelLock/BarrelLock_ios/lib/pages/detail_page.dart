@@ -45,6 +45,35 @@ class DetailPage extends StatelessWidget {
     FastLoading.dismiss(result: LoadingDismissResult.success);
   }
 
+  void _demoToastTypes() {
+    FastToast.success('保存成功');
+    FastToast.error('网络异常');
+    FastToast.info('已复制到剪贴板');
+  }
+
+  void _demoToastQueue() {
+    FastToast.show('第一条');
+    FastToast.show('第二条');
+    FastToast.show('第三条');
+  }
+
+  Future<void> _demoToastAfterLoading() async {
+    FastLoading.show();
+    FastToast.show('Loading 期间入队，关闭后继续展示');
+    await Future<void>.delayed(const Duration(seconds: 2));
+    FastLoading.dismiss();
+  }
+
+  Future<void> _demoToastBypassLoading() async {
+    FastLoading.show();
+    FastToast.show(
+      'Loading 期间仍展示',
+      config: const ToastConfig(bypassLoadingPause: true),
+    );
+    await Future<void>.delayed(const Duration(seconds: 2));
+    FastLoading.dismiss();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,6 +110,28 @@ class DetailPage extends StatelessWidget {
             FilledButton(
               onPressed: _demoDismissInlineResult,
               child: const Text('dismiss 外部 message'),
+            ),
+            const SizedBox(height: 32),
+            const Text('FastToast'),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: _demoToastTypes,
+              child: const Text('success / error / info（串行）'),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: _demoToastQueue,
+              child: const Text('队列（三条依次展示）'),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: _demoToastAfterLoading,
+              child: const Text('Loading 期间入队，关闭后展示'),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: _demoToastBypassLoading,
+              child: const Text('Loading 期间 bypass 立即展示'),
             ),
             const SizedBox(height: 32),
             FilledButton(

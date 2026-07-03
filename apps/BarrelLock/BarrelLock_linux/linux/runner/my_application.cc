@@ -4,6 +4,10 @@
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
 #endif
+#if defined(__linux__)
+#include <limits.h>
+#include <unistd.h>
+#endif
 
 #include "flutter/generated_plugin_registrant.h"
 
@@ -13,6 +17,23 @@ struct _MyApplication {
 };
 
 G_DEFINE_TYPE(MyApplication, my_application, GTK_TYPE_APPLICATION)
+
+static GdkPixbuf* load_app_icon(void) {
+#if defined(__linux__)
+  char exe_path[PATH_MAX];
+  const auto len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
+  if (len <= 0) {
+    return nullptr;
+  }
+  exe_path[len] = '\0';
+  g_autofree gchar* bundle_dir = g_path_get_dirname(exe_path);
+  g_autofree gchar* icon_path =
+      g_build_filename(bundle_dir, "data", "app_icon.png", nullptr);
+  return gdk_pixbuf_new_from_file_at_scale(icon_path, 512, 512, TRUE, nullptr);
+#else
+  return nullptr;
+#endif
+}
 
 // Called when first Flutter frame received.
 static void first_frame_cb(MyApplication* self, FlView* view) {
@@ -50,6 +71,11 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   } else {
     gtk_window_set_title(window, "barrel_lock_linux");
+  }
+
+  g_autoptr(GdkPixbuf) icon = load_app_icon();
+  if (icon != nullptr) {
+    gtk_window_set_icon(window, icon);
   }
 
   gtk_window_set_default_size(window, 1280, 720);

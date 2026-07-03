@@ -1,5 +1,6 @@
 import 'package:fast_toast/fast_toast.dart';
 import 'package:fast_toast/src/core/toast_controller.dart';
+import 'package:fast_toast/src/core/toast_queue.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -23,6 +24,27 @@ void main() {
 
       expect(controller.pendingCount, 2);
       expect(controller.totalCount, 2);
+    });
+
+    test('drop-oldest caps pending at maxPending without overlay', () {
+      for (var i = 0; i < ToastQueue.maxPending + 1; i++) {
+        controller.enqueue(message: 'msg$i');
+      }
+
+      expect(controller.pendingCount, ToastQueue.maxPending);
+      expect(controller.totalCount, ToastQueue.maxPending);
+    });
+
+    test('high priority prepends without dropping other pending', () {
+      controller.enqueue(message: 'first');
+      controller.enqueue(message: 'second');
+      controller.enqueue(
+        message: 'urgent',
+        config: const ToastConfig(priority: ToastPriority.high),
+      );
+
+      expect(controller.pendingCount, 3);
+      expect(controller.current, isNull);
     });
 
     test('dismissAll clears queue and showing state', () {

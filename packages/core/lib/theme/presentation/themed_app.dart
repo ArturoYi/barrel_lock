@@ -1,4 +1,5 @@
 import 'package:fast_loading/fast_loading.dart';
+import 'package:fast_toast/fast_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -29,12 +30,21 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    FastToast.loadingPauseCheck = () => FastLoading.isShowing;
+    FastLoading.visibilityListenable.addListener(_resumeToastAfterLoading);
   }
 
   @override
   void dispose() {
+    FastLoading.visibilityListenable.removeListener(_resumeToastAfterLoading);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _resumeToastAfterLoading() {
+    if (!FastLoading.isShowing) {
+      FastToast.resume();
+    }
   }
 
   @override
@@ -74,6 +84,7 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
   }
 
   Widget _overlayBuilder(BuildContext context, Widget? child) {
-    return FastLoadingOverlay(child: child ?? const SizedBox.shrink());
+    final content = child ?? const SizedBox.shrink();
+    return FastLoadingOverlay(child: FastToastOverlay(child: content));
   }
 }

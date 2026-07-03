@@ -11,6 +11,9 @@ abstract final class FastLoading {
   /// 是否正在展示 Loading。
   static bool get isShowing => _controller.isShowing;
 
+  /// Loading 展示状态变化通知（供 fast_toast 等协作方监听）。
+  static Listenable get visibilityListenable => _controller;
+
   /// 当前引用计数。
   static int get refCount => _controller.refCount;
 

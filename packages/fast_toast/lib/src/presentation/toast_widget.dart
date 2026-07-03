@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../domain/toast_animation.dart';
 import '../domain/toast_position.dart';
 import '../domain/toast_request.dart';
 import '../domain/toast_style.dart';
+import 'toast_animator.dart';
 
 /// 单条 Toast 布局：图标 + 文案。
 class ToastWidget extends StatelessWidget {
@@ -72,30 +74,63 @@ class ToastOverlayContent extends StatefulWidget {
   State<ToastOverlayContent> createState() => _ToastOverlayContentState();
 }
 
-class _ToastOverlayContentState extends State<ToastOverlayContent> {
+class _ToastOverlayContentState extends State<ToastOverlayContent>
+    with SingleTickerProviderStateMixin {
+  static const _animationDuration = Duration(milliseconds: 200);
+
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
+  Animation<Offset>? _slide;
+
   Timer? _autoDismissTimer;
   bool _isDismissed = false;
 
   @override
   void initState() {
     super.initState();
+    final config = widget.request.config;
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: _animationDuration,
+    );
+
+    final curved = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeIn,
+    );
+    _opacity = curved;
+
+    if (config.animation == ToastAnimation.fadeSlide) {
+      _slide = Tween<Offset>(
+        begin: slideBeginFor(config.position),
+        end: Offset.zero,
+      ).animate(curved);
+    }
+
     widget.onRegisterDismiss(_dismiss);
-    _autoDismissTimer = Timer(widget.request.config.duration, _dismiss);
+    _controller.forward();
+    _autoDismissTimer = Timer(config.duration, _dismiss);
   }
 
   @override
   void dispose() {
     _autoDismissTimer?.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
-  void _dismiss() {
+  Future<void> _dismiss() async {
     if (_isDismissed || !mounted) {
       return;
     }
     _isDismissed = true;
     _autoDismissTimer?.cancel();
-    widget.onDismissed();
+    await _controller.reverse();
+    if (mounted) {
+      widget.onDismissed();
+    }
   }
 
   @override
@@ -127,8 +162,10 @@ class _ToastOverlayContentState extends State<ToastOverlayContent> {
             child: Semantics(
               liveRegion: true,
               label: widget.request.message,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: ToastAnimator(
+                animation: config.animation,
+                opacity: _opacity,
+                slide: _slide,
                 child: ToastWidget(
                   message: widget.request.message,
                   style: style,

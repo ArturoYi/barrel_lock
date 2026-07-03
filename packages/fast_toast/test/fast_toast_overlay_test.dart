@@ -50,6 +50,7 @@ void main() {
       expect(find.text('second'), findsNothing);
 
       await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 200));
       await tester.pump();
 
       expect(find.text('first'), findsNothing);
@@ -100,6 +101,8 @@ void main() {
 
       await tester.tap(find.text('tap me'));
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump();
 
       expect(find.text('tap me'), findsNothing);
     });
@@ -143,6 +146,119 @@ void main() {
 
       expect(FastToast.isShowing, isTrue);
       expect(find.text('urgent'), findsOneWidget);
+    });
+
+    testWidgets('drop-oldest keeps at most maxPending while idle', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildApp(home: const Scaffold(body: Text('content'))),
+      );
+      await tester.pump();
+
+      ToastController.loadingPauseCheck = () => true;
+      for (var i = 0; i < 6; i++) {
+        FastToast.show('msg$i');
+      }
+
+      expect(FastToast.pendingCount, 5);
+      expect(FastToast.isShowing, isFalse);
+
+      ToastController.loadingPauseCheck = () => false;
+      FastToast.resume();
+      await tester.pump();
+
+      expect(find.text('msg1'), findsOneWidget);
+      expect(find.text('msg0'), findsNothing);
+    });
+
+    testWidgets('high priority replaces current toast immediately', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildApp(home: const Scaffold(body: Text('content'))),
+      );
+      await tester.pump();
+
+      FastToast.show(
+        'current',
+        config: const ToastConfig(duration: Duration(seconds: 10)),
+      );
+      await tester.pump();
+
+      expect(find.text('current'), findsOneWidget);
+
+      FastToast.show(
+        'high',
+        config: const ToastConfig(
+          priority: ToastPriority.high,
+          duration: Duration(seconds: 10),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('current'), findsNothing);
+      expect(find.text('high'), findsOneWidget);
+      expect(FastToast.pendingCount, 0);
+    });
+
+    testWidgets('high priority plays before remaining FIFO queue', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildApp(home: const Scaffold(body: Text('content'))),
+      );
+      await tester.pump();
+
+      ToastController.loadingPauseCheck = () => true;
+      FastToast.show('queued-a');
+      FastToast.show('queued-b');
+      ToastController.loadingPauseCheck = () => false;
+
+      FastToast.show(
+        'high',
+        config: const ToastConfig(
+          priority: ToastPriority.high,
+          duration: Duration(milliseconds: 100),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.text('high'), findsOneWidget);
+      expect(find.text('queued-a'), findsNothing);
+      expect(find.text('queued-b'), findsNothing);
+
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pump();
+
+      expect(find.text('high'), findsNothing);
+      expect(find.text('queued-a'), findsOneWidget);
+    });
+
+    testWidgets('detach keeps pending queue for re-attach', (tester) async {
+      await tester.pumpWidget(
+        buildApp(home: const Scaffold(body: Text('content'))),
+      );
+      await tester.pump();
+
+      ToastController.loadingPauseCheck = () => true;
+      FastToast.show('after-detach');
+      expect(FastToast.pendingCount, 1);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+
+      expect(FastToast.pendingCount, 1);
+      expect(FastToast.isShowing, isFalse);
+
+      ToastController.loadingPauseCheck = () => false;
+      await tester.pumpWidget(
+        buildApp(home: const Scaffold(body: Text('content'))),
+      );
+      await tester.pump();
+
+      expect(find.text('after-detach'), findsOneWidget);
     });
   });
 }

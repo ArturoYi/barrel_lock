@@ -37,5 +37,37 @@ void main() {
       expect(queue.isEmpty, isTrue);
       expect(queue.dequeue(), isNull);
     });
+
+    test('drop-oldest when pending reaches maxPending', () {
+      for (var i = 0; i < ToastQueue.maxPending + 1; i++) {
+        queue.enqueue(ToastRequest(message: 'msg$i'));
+      }
+
+      expect(queue.length, ToastQueue.maxPending);
+      expect(queue.first?.message, 'msg1');
+      expect(queue.dequeue()?.message, 'msg1');
+      expect(queue.dequeue()?.message, 'msg2');
+      expect(queue.dequeue()?.message, 'msg3');
+      expect(queue.dequeue()?.message, 'msg4');
+      expect(queue.dequeue()?.message, 'msg5');
+      expect(queue.dequeue(), isNull);
+    });
+
+    test('enqueueFront inserts at head and trims tail beyond maxPending', () {
+      for (var i = 0; i < ToastQueue.maxPending; i++) {
+        queue.enqueue(ToastRequest(message: 'pending$i'));
+      }
+
+      queue.enqueueFront(const ToastRequest(message: 'high'));
+
+      expect(queue.length, ToastQueue.maxPending);
+      expect(queue.first?.message, 'high');
+      expect(queue.dequeue()?.message, 'high');
+      expect(queue.dequeue()?.message, 'pending0');
+      expect(queue.dequeue()?.message, 'pending1');
+      expect(queue.dequeue()?.message, 'pending2');
+      expect(queue.dequeue()?.message, 'pending3');
+      expect(queue.dequeue(), isNull);
+    });
   });
 }

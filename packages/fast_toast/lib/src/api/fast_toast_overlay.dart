@@ -21,6 +21,8 @@ class _FastToastOverlayState extends State<FastToastOverlay> {
     WidgetsBinding.instance.addPostFrameCallback(_attachOverlay);
   }
 
+  /// Overlay 宿主销毁时注销（如根 Widget 卸载、测试 tearDown、热重启重建树）。
+  /// [ToastController.detach] 会移除当前 Entry，但保留 pending 队列，待重新 attach 后继续展示。
   @override
   void dispose() {
     ToastController.instance.detach();

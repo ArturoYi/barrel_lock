@@ -13,6 +13,8 @@ dependencies:
     path: ../app_fonts
   fast_loading:
     path: ../fast_loading
+  fast_toast:
+    path: ../fast_toast
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.3.2
