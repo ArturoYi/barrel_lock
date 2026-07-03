@@ -15,15 +15,21 @@ final class ToastStyle {
   factory ToastStyle.success({TextStyle? textStyle}) {
     return ToastStyle(
       backgroundColor: const Color(0xE6222B45),
-      textStyle: textStyle ?? const TextStyle(color: Colors.white, fontSize: 14),
-      icon: const Icon(Icons.check_circle_outline, color: Color(0xFF4CAF50), size: 20),
+      textStyle:
+          textStyle ?? const TextStyle(color: Colors.white, fontSize: 14),
+      icon: const Icon(
+        Icons.check_circle_outline,
+        color: Color(0xFF4CAF50),
+        size: 20,
+      ),
     );
   }
 
   factory ToastStyle.error({TextStyle? textStyle}) {
     return ToastStyle(
       backgroundColor: const Color(0xE6222B45),
-      textStyle: textStyle ?? const TextStyle(color: Colors.white, fontSize: 14),
+      textStyle:
+          textStyle ?? const TextStyle(color: Colors.white, fontSize: 14),
       icon: const Icon(Icons.error_outline, color: Color(0xFFEF5350), size: 20),
     );
   }
@@ -31,7 +37,8 @@ final class ToastStyle {
   factory ToastStyle.info({TextStyle? textStyle}) {
     return ToastStyle(
       backgroundColor: const Color(0xE6222B45),
-      textStyle: textStyle ?? const TextStyle(color: Colors.white, fontSize: 14),
+      textStyle:
+          textStyle ?? const TextStyle(color: Colors.white, fontSize: 14),
       icon: const Icon(Icons.info_outline, color: Color(0xFF42A5F5), size: 20),
     );
   }
@@ -50,7 +57,8 @@ final class ToastStyle {
       ToastType.info => ToastStyle.info(textStyle: textStyle),
       ToastType.custom => ToastStyle(
         backgroundColor: const Color(0xE6222B45),
-        textStyle: textStyle ?? const TextStyle(color: Colors.white, fontSize: 14),
+        textStyle:
+            textStyle ?? const TextStyle(color: Colors.white, fontSize: 14),
       ),
     };
   }

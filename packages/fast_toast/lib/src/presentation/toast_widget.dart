@@ -24,10 +24,7 @@ class ToastWidget extends StatelessWidget {
     final content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (style.icon != null) ...[
-          style.icon!,
-          const SizedBox(width: 8),
-        ],
+        if (style.icon != null) ...[style.icon!, const SizedBox(width: 8)],
         Flexible(
           child: Text(
             message,
@@ -109,9 +106,7 @@ class _ToastOverlayContentState extends State<ToastOverlayContent> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        const Positioned.fill(
-          child: IgnorePointer(child: SizedBox.expand()),
-        ),
+        const Positioned.fill(child: IgnorePointer(child: SizedBox.expand())),
         Align(
           alignment: config.position.alignment,
           child: Padding(

@@ -22,7 +22,7 @@ Task Progress:
 - [ ] Step 4: dart pub get
 - [ ] Step 5: 创建 lib 入口与目录结构
 - [ ] Step 6: 在消费方添加依赖
-- [ ] Step 7: melos run analyze 验证
+- [ ] Step 7: melos run format + analyze 验证
 ```
 
 ### Step 1: 确定路径
@@ -118,8 +118,16 @@ dependencies:
 
 ```bash
 melos list                  # 确认新包可见
+melos run format            # 必须！否则 CI format:check 失败
 melos run analyze
 melos run test              # 若有 test 目录
+# 或一键：melos run ci
+```
+
+首次 clone 后可安装 pre-commit 钩子，提交前自动格式化：
+
+```bash
+./scripts/install-git-hooks.sh
 ```
 
 ## 常见错误
@@ -130,3 +138,4 @@ melos run test              # 若有 test 目录
 | resolution 冲突 | 子包加 `resolution: workspace` |
 | startup lock | 用 `dart pub get` 代替 `melos bootstrap` |
 | analyze 找不到 main | app 包需有 `lib/main.dart`；库包 analyze 整个目录 |
+| CI format:check 失败 | 新包未格式化 → `melos run format` 后重新提交 |

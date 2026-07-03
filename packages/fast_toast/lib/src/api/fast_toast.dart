@@ -39,40 +39,17 @@ abstract final class FastToast {
     ToastConfig? config,
     ToastStyle? style,
   }) {
-    show(
-      message,
-      type: ToastType.success,
-      config: config,
-      style: style,
-    );
+    show(message, type: ToastType.success, config: config, style: style);
   }
 
   /// 错误 Toast。
-  static void error(
-    String message, {
-    ToastConfig? config,
-    ToastStyle? style,
-  }) {
-    show(
-      message,
-      type: ToastType.error,
-      config: config,
-      style: style,
-    );
+  static void error(String message, {ToastConfig? config, ToastStyle? style}) {
+    show(message, type: ToastType.error, config: config, style: style);
   }
 
   /// 信息 Toast。
-  static void info(
-    String message, {
-    ToastConfig? config,
-    ToastStyle? style,
-  }) {
-    show(
-      message,
-      type: ToastType.info,
-      config: config,
-      style: style,
-    );
+  static void info(String message, {ToastConfig? config, ToastStyle? style}) {
+    show(message, type: ToastType.info, config: config, style: style);
   }
 
   /// 关闭当前 Toast。

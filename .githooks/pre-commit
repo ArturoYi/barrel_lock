@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Auto-format staged Dart files so CI format:check does not fail after adding packages.
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+if command -v fvm >/dev/null 2>&1; then
+  DART=(fvm dart)
+elif command -v dart >/dev/null 2>&1; then
+  DART=(dart)
+else
+  echo "pre-commit: dart not found (install Flutter or FVM)" >&2
+  exit 1
+fi
+
+changed=()
+while IFS= read -r file; do
+  [ -n "$file" ] && changed+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACM | grep '\.dart$' || true)
+
+if [ ${#changed[@]} -eq 0 ]; then
+  exit 0
+fi
+
+"${DART[@]}" format "${changed[@]}"
+git add -- "${changed[@]}"

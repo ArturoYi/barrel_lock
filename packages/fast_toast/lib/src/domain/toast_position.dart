@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Toast 垂直锚点。
-enum ToastPositionAnchor {
-  top,
-  center,
-  bottom,
-}
+enum ToastPositionAnchor { top, center, bottom }
 
 /// Toast 在屏幕上的位置与偏移。
 final class ToastPosition {

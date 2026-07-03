@@ -100,10 +100,7 @@ final class ToastController extends ChangeNotifier {
     _queue.dequeue();
     _current = next;
     _isShowing = true;
-    _host.show(
-      request: next,
-      onDismissed: _onCurrentDismissed,
-    );
+    _host.show(request: next, onDismissed: _onCurrentDismissed);
     notifyListeners();
   }
 

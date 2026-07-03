@@ -71,9 +71,7 @@ void main() {
       expect(find.text('early'), findsOneWidget);
     });
 
-    testWidgets('dismissAll removes visible toast immediately', (
-      tester,
-    ) async {
+    testWidgets('dismissAll removes visible toast immediately', (tester) async {
       await tester.pumpWidget(
         buildApp(home: const Scaffold(body: Text('content'))),
       );
@@ -97,10 +95,7 @@ void main() {
       );
       await tester.pump();
 
-      FastToast.show(
-        'tap me',
-        config: const ToastConfig(dismissible: true),
-      );
+      FastToast.show('tap me', config: const ToastConfig(dismissible: true));
       await tester.pump();
 
       await tester.tap(find.text('tap me'));
