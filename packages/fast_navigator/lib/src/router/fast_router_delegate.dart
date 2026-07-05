@@ -24,8 +24,12 @@ class FastRouterDelegate extends RouterDelegate<NavigationState>
     NavigationState? initialState,
     GlobalKey<NavigatorState>? navigatorKey,
     this._pageFactory = const PageFactory(),
+    this.observers = const [],
   }) : navigatorKey = navigatorKey ?? GlobalKey<NavigatorState>(),
        _state = initialState ?? const NavigationState(matches: []);
+
+  /// 注入 [Navigator] 的 [NavigatorObserver] 列表（如 [DialogRouteObserver]）。
+  final List<NavigatorObserver> observers;
 
   /// 获取当前导航状态的不可变拷贝
   NavigationState get state => _state;
@@ -97,6 +101,7 @@ class FastRouterDelegate extends RouterDelegate<NavigationState>
     return Navigator(
       key: navigatorKey,
       pages: pages,
+      observers: observers,
       onDidRemovePage: _onDidRemovePage,
     );
   }

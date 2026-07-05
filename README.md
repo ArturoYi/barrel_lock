@@ -21,6 +21,7 @@ flutter_bazaar/
 │   ├── barrel_lock/          # BarrelLock 共享业务 Feature（MVVM-C M/VM/C）
 │   ├── core/                 # 共享核心库（主题/偏好/路由/Riverpod 入口）
 │   ├── fast_navigator/       # 自研声明式路由引擎
+│   ├── fast_dialog/          # 全局 Dialog 弹窗栈
 │   ├── fast_loading/         # 全局 Loading 遮罩
 │   ├── fast_toast/           # 全局 Toast
 │   └── app_fonts/            # 字体资源

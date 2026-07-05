@@ -35,6 +35,7 @@ class FastRouterConfig {
     PageTransition defaultTransition = const PlatformAdaptiveTransition(),
     AppType? appType,
     int navigationThrottleMs = 0,
+    List<NavigatorObserver> navigatorObservers = const [],
   }) {
     final registry = RouteRegistry(routes: routes, unknownRoute: unknownRoute);
 
@@ -43,6 +44,7 @@ class FastRouterConfig {
       initialLocation: initialLocation,
       defaultTransition: defaultTransition,
       appType: appType,
+      navigatorObservers: navigatorObservers,
     );
 
     // 绑定全局单例门面，方便无 Context 跳转

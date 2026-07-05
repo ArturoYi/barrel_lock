@@ -1,3 +1,4 @@
+import 'package:fast_dialog/fast_dialog.dart';
 import 'package:fast_loading/fast_loading.dart';
 import 'package:fast_toast/fast_toast.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,10 @@ import '../domain/app_theme_mode.dart';
 import 'app_theme.dart';
 import 'theme_notifier.dart';
 
+/// BarrelLock 应用主题 + 全局 Overlay 容器。
+///
+/// [builder] 链挂载顺序（自底向上）：
+/// FastDialogOverlay → FastToastOverlay → FastLoadingOverlay
 class ThemedApp extends ConsumerStatefulWidget {
   const ThemedApp.router({
     super.key,
@@ -85,6 +90,9 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
 
   Widget _overlayBuilder(BuildContext context, Widget? child) {
     final content = child ?? const SizedBox.shrink();
-    return FastLoadingOverlay(child: FastToastOverlay(child: content));
+    // 层级（自底向上）：页面 → Dialog → Toast → Loading
+    return FastLoadingOverlay(
+      child: FastToastOverlay(child: FastDialogOverlay(child: content)),
+    );
   }
 }

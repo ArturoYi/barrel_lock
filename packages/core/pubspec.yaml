@@ -11,6 +11,8 @@ environment:
 dependencies:
   app_fonts:
     path: ../app_fonts
+  fast_dialog:
+    path: ../fast_dialog
   fast_loading:
     path: ../fast_loading
   fast_navigator:

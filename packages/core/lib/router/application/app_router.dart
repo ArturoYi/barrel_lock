@@ -1,3 +1,4 @@
+import 'package:fast_dialog/fast_dialog.dart';
 import 'package:fast_navigator/fast_navigator.dart';
 import 'package:flutter/widgets.dart';
 
@@ -66,6 +67,8 @@ final class AppRouter {
         path: '/404',
         builder: (context, match) => const UnknownRoutePage(),
       ),
+      // push 自动 bindRoute，pop 自动 dismissByRoute，防止页面残留弹窗。
+      navigatorObservers: [DialogRouteObserver.forManager()],
     );
     _initialized = true;
   }

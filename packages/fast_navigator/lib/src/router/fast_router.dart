@@ -24,6 +24,7 @@ class FastRouter {
     String initialLocation = '/',
     PageTransition defaultTransition = const PlatformAdaptiveTransition(),
     AppType? appType,
+    List<NavigatorObserver> navigatorObservers = const [],
   }) {
     parser = FastRouteInformationParser(registry: registry);
 
@@ -38,6 +39,7 @@ class FastRouter {
         defaultTransition: defaultTransition,
         appTypeOverride: appType,
       ),
+      observers: navigatorObservers,
     );
   }
 

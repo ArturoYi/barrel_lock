@@ -1,6 +1,7 @@
 library;
 
 export 'package:app_fonts/app_fonts.dart';
+export 'package:fast_dialog/fast_dialog.dart';
 export 'package:fast_loading/fast_loading.dart';
 export 'package:fast_toast/fast_toast.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';

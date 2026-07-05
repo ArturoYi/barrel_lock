@@ -17,6 +17,7 @@ workspace:
   - packages/barrel_lock
   - packages/core
   - packages/fast_loading
+  - packages/fast_dialog
   - packages/fast_navigator
   - packages/fast_toast
 
@@ -86,6 +87,7 @@ melos:
           - "barrel_lock"
           - "*core*"
           - "*fast_loading*"
+          - "*fast_dialog*"
           - "*fast_navigator*"
           - "*fast_toast*"
 
