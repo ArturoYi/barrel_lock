@@ -6,6 +6,7 @@ import 'app_type_detector.dart';
 import 'cupertino_page_adapter.dart';
 import 'custom_transition_page.dart';
 import 'material_page_adapter.dart';
+import 'fade_transition_page.dart';
 import 'no_transition_page.dart';
 
 /// 将 [RouteMatch] 解析为 Navigator 2.0 [Page] 的统一工厂。
@@ -13,7 +14,7 @@ import 'no_transition_page.dart';
 /// 解析链：
 /// 1. `match.route.transition`（路由级）
 /// 2. [defaultTransition]（全局级，默认 [PlatformAdaptiveTransition]）
-/// 3. 按策略产出 MaterialPage / CupertinoPage / NoTransitionPage / CustomTransitionPage
+/// 3. 按策略产出 MaterialPage / CupertinoPage / NoTransitionPage / FadeTransitionPage / CustomTransitionPage
 class PageFactory {
   const PageFactory({
     this.defaultTransition = const PlatformAdaptiveTransition(),
@@ -54,6 +55,19 @@ class PageFactory {
         arguments: match.parameters,
         child: child,
       ),
+      FadePageTransition(
+        :final transitionDuration,
+        :final reverseTransitionDuration,
+      ) =>
+        FadeTransitionPage(
+          match: match,
+          key: ValueKey(match.key),
+          name: match.route.name,
+          arguments: match.parameters,
+          child: child,
+          transitionDuration: transitionDuration,
+          reverseTransitionDuration: reverseTransitionDuration,
+        ),
       CustomTransition(
         :final transitionsBuilder,
         :final transitionDuration,

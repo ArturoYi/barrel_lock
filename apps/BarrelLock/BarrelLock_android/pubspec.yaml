@@ -12,8 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   core:
+  barrel_lock:
   cupertino_icons: ^1.0.8
-  fast_navigator:    # 新增这一行
 
 dev_dependencies:
   flutter_test:

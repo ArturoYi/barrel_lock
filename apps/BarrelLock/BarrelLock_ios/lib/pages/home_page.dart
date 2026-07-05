@@ -1,8 +1,6 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-import '../router/router.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -19,15 +17,15 @@ class HomePage extends StatelessWidget {
           children: [
             Text(greeting(), style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 32),
-            // 示例 1：路径跳转 — AppRouter.push(location)
+            // 示例 1：带参路径 — AppRoutes.detail(id: ...)
             FilledButton(
-              onPressed: () => AppRouter.push(AppRoutes.detailPath),
+              onPressed: () => AppRouter.push(AppRoutes.detail(id: 'demo')),
               child: Text('路径跳转 → 详情页', style: context.typography.titleLarge),
             ),
             const SizedBox(height: 12),
-            // 示例 2：命名跳转 — AppRouter.pushNamed(name)
+            // 示例 2：命名跳转 — AppRoutes.settings.name
             FilledButton(
-              onPressed: () => AppRouter.pushNamed(AppRoutes.settings),
+              onPressed: () => AppRouter.pushNamed(AppRoutes.settings.name),
               child: const Text('命名跳转 → 设置页'),
             ),
           ],

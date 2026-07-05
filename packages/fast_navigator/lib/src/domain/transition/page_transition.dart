@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 /// - [MaterialTransition] → [MaterialPage]
 /// - [CupertinoTransition] → [CupertinoPage]
 /// - [NoTransition] → 零时长无动画
+/// - [FadePageTransition] → 淡入淡出
 /// - [CustomTransition] → 用户自定义 [transitionsBuilder]
 sealed class PageTransition {
   const PageTransition();
@@ -30,6 +31,17 @@ final class CupertinoTransition extends PageTransition {
 /// 无过渡动画。
 final class NoTransition extends PageTransition {
   const NoTransition();
+}
+
+/// 淡入淡出过渡动画。
+final class FadePageTransition extends PageTransition {
+  const FadePageTransition({
+    this.transitionDuration = const Duration(milliseconds: 300),
+    this.reverseTransitionDuration = const Duration(milliseconds: 300),
+  });
+
+  final Duration transitionDuration;
+  final Duration reverseTransitionDuration;
 }
 
 /// 自定义过渡动画。

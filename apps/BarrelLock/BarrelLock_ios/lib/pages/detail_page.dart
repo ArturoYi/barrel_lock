@@ -1,10 +1,10 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-import '../router/router.dart';
-
 class DetailPage extends StatelessWidget {
-  const DetailPage({super.key});
+  const DetailPage({required this.id, super.key});
+
+  final String id;
 
   Future<void> _demoShowDismiss() async {
     FastLoading.show();
@@ -77,7 +77,7 @@ class DetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('详情页')),
+      appBar: AppBar(title: Text('详情页 · $id')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

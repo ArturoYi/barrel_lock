@@ -8,84 +8,80 @@ description: Adds a new page route using fast_navigator in BarrelLock apps. Use 
 ## 前置检查
 
 - 路由框架：`fast_navigator`（禁止 go_router / auto_route）
-- 参考实现：`apps/BarrelLock/BarrelLock_android/lib/router/router.dart`
-- 多平台 app 各自有 `lib/router/router.dart` 和 `lib/pages/`，优先改 android 作为模板，再同步到其他平台
+- **路由表 SSOT**：`packages/core/lib/router/`（[AppRoutes]、[AppRouter]、[AppRouteBuilders]）
+- **平台装配**：各 app 的 `lib/router/app_router_config.dart` 注入 Page Widget
+- 详细架构见 `packages/core/lib/router/README.md`
 
 ## 工作流
 
 ```
 Task Progress:
-- [ ] Step 1: 在 AppRoutes 添加 name + path 常量
-- [ ] Step 2: 创建 pages/<name>_page.dart
-- [ ] Step 3: 在 _buildRoutes() 注册 FastRoute
-- [ ] Step 4: （可选）添加 RouteMiddleware
-- [ ] Step 5: 在调用方添加跳转
-- [ ] Step 6: melos run analyze 验证
+- [ ] Step 1: 在 core AppRoutes 添加路由描述符
+- [ ] Step 2: 扩展 AppRouteBuilders + AppRouter._buildRoutes
+- [ ] Step 3: 各平台创建 pages/<name>_page.dart
+- [ ] Step 4: 各平台 app_router_config.dart 补 builder
+- [ ] Step 5: （可选）添加 RouteMiddleware
+- [ ] Step 6: 在调用方添加跳转
+- [ ] Step 7: melos run analyze 验证
 ```
 
-### Step 1: AppRoutes 常量
+### Step 1: AppRoutes 描述符
 
-在 `lib/router/router.dart` 的 `AppRoutes` 中追加：
+在 `packages/core/lib/router/domain/app_routes.dart` 追加：
+
+**无参路由**（属性访问）：
 
 ```dart
-static const profile = 'profile';
-static const profilePath = '/profile';
+static const profile = AppSimpleRoute(name: 'profile', path: '/profile');
 ```
 
-动态路径示例：`static const userDetailPath = '/user/:id';`
-
-### Step 2: 创建页面
-
-在 `lib/pages/<name>_page.dart`：
+**带参路由**（方法式调用）：在 `domain/` 新建类，参考 [DetailRoute]：
 
 ```dart
-import 'package:flutter/material.dart';
-import '../router/router.dart';
-
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
-      body: Center(
-        child: FilledButton(
-          onPressed: AppRouter.pop,
-          child: const Text('返回'),
-        ),
-      ),
-    );
-  }
+final class UserDetailRoute {
+  const UserDetailRoute();
+  String get name => 'userDetail';
+  String get path => '/user/:id';
+  String call({required String id}) => '/user/$id';
 }
 ```
 
-### Step 3: 注册 FastRoute
+### Step 2: 扩展 AppRouteBuilders
 
-在 `_buildRoutes()` 追加，并添加 import：
+`packages/core/lib/router/application/app_route_builders.dart` 追加字段；
+`app_router.dart` 的 `_buildRoutes` 注册对应 [FastRoute]。
+
+### Step 3: 创建页面
+
+各平台 `lib/pages/<name>_page.dart`（MVVM-C 见 mvvm-c 规则）：
 
 ```dart
-FastRoute(
-  name: AppRoutes.profile,
-  path: AppRoutes.profilePath,
-  builder: (context, match) => const ProfilePage(),
-),
+import 'package:core/core.dart';
+import 'package:flutter/material.dart';
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+  // ...
+}
+```
+
+### Step 4: 平台装配
+
+各平台 `lib/router/app_router_config.dart`：
+
+```dart
+profile: (_, __) => const ProfilePage(),
 ```
 
 带 path 参数：
 
 ```dart
-FastRoute(
-  name: AppRoutes.userDetail,
-  path: AppRoutes.userDetailPath,
-  builder: (context, match) {
-    final id = match.parameters.pathParams['id']!;
-    return UserDetailPage(id: id);
-  },
+userDetail: (_, match) => UserDetailPage(
+  id: match.parameters.pathParams['id']!,
 ),
 ```
 
-### Step 4: Middleware（可选）
+### Step 5: Middleware（可选）
 
 登录/权限拦截示例：
 
@@ -94,34 +90,33 @@ class AuthMiddleware extends RouteMiddleware {
   @override
   MiddlewareResult handle(NavigationState current, NavigationState target) {
     if (!isLoggedIn) {
-      return target.go(loginMatch); // 返回新 State 表示 redirect
+      return target.go(loginMatch);
     }
-    return null; // null = 放行
+    return null;
   }
 }
 ```
 
-挂载到 `FastRoute(middlewares: [AuthMiddleware()])` 或 `FastRouterConfig(globalMiddlewares: [...])`。
-
-### Step 5: 跳转
+### Step 6: 跳转
 
 ```dart
-// 路径跳转
-AppRouter.push(AppRoutes.profilePath);
+import 'package:core/core.dart';
 
-// 命名跳转
-AppRouter.pushNamed(AppRoutes.profile);
+// 无参
+AppRouter.push(AppRoutes.profile.path);
+AppRouter.pushNamed(AppRoutes.profile.name);
 
-// 带参数
+// 带参
+AppRouter.push(AppRoutes.detail(id: '42'));
 AppRouter.pushNamed(
-  AppRoutes.userDetail,
+  AppRoutes.detail.name,
   pathParams: {'id': '42'},
   queryParams: {'tab': 'info'},
-  extra: someObject, // 不参与 URL
+  extra: someObject,
 );
 ```
 
-### Step 6: 验证
+### Step 7: 验证
 
 ```bash
 melos run analyze
@@ -129,10 +124,12 @@ melos run analyze
 
 ## 禁止事项
 
+- 不在各平台重复定义 AppRoutes / AppRouter
 - 不用 `Navigator.of(context).push` / `pushNamed`
 - 不直接 mutate `NavigationState.matches`
 - 不把 `extra` 纳入 Page Key
 
 ## 多平台同步
 
-若其他平台（ios/macos/web 等）也有独立 `router.dart` 和 `pages/`，同步相同改动。长期应抽到共享 package，见 `extract-shared-feature` skill。
+- core 路由层改一次，六端 `app_router_config.dart` 同步补 builder
+- 页面 Widget 各平台独立，路径与 API 保持一致

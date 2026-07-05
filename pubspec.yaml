@@ -14,6 +14,7 @@ workspace:
   - apps/BarrelLock/BarrelLock_web
   - apps/BarrelLock/BarrelLock_macos
   - packages/app_fonts
+  - packages/barrel_lock
   - packages/core
   - packages/fast_loading
   - packages/fast_navigator
@@ -82,6 +83,7 @@ melos:
         dirExists: test
         scope:
           - "*app_fonts*"
+          - "barrel_lock"
           - "*core*"
           - "*fast_loading*"
           - "*fast_navigator*"

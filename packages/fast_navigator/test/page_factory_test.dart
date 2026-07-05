@@ -1,5 +1,6 @@
 import 'package:fast_navigator/fast_navigator.dart';
 import 'package:fast_navigator/src/page/custom_transition_page.dart';
+import 'package:fast_navigator/src/page/fade_transition_page.dart';
 import 'package:fast_navigator/src/page/no_transition_page.dart';
 import 'package:fast_navigator/src/page/page_factory.dart';
 import 'package:flutter/cupertino.dart';
@@ -115,6 +116,33 @@ void main() {
       );
 
       expect(page, isA<NoTransitionPage>());
+    });
+
+    testWidgets('FadePageTransition → FadeTransitionPage', (tester) async {
+      const fadeRoute = FastRoute(
+        name: 'fade',
+        path: '/fade',
+        transition: FadePageTransition(),
+        builder: _placeholderBuilder,
+      );
+
+      late Page<Object?> page;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              page = const PageFactory().build(
+                context: context,
+                match: matchFor(fadeRoute, path: '/fade'),
+              );
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+
+      expect(page, isA<FadeTransitionPage>());
     });
 
     testWidgets('CustomTransition → CustomTransitionPage', (tester) async {

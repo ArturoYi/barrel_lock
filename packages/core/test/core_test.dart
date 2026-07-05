@@ -65,6 +65,19 @@ void main() {
     });
   });
 
+  group('AppRoutes', () {
+    test('simple routes expose name and path', () {
+      expect(AppRoutes.home.name, 'home');
+      expect(AppRoutes.home.path, '/');
+      expect(AppRoutes.settings.path, '/settings');
+    });
+
+    test('DetailRoute call builds parameterized path', () {
+      expect(AppRoutes.detail.path, '/detail/:id');
+      expect(AppRoutes.detail(id: '42'), '/detail/42');
+    });
+  });
+
   group('core public API', () {
     test('appName exposes the correct constant', () {
       expect(appName, 'Flutter Bazaar');

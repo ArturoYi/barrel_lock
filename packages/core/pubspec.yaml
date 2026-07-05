@@ -13,6 +13,8 @@ dependencies:
     path: ../app_fonts
   fast_loading:
     path: ../fast_loading
+  fast_navigator:
+    path: ../fast_navigator
   fast_toast:
     path: ../fast_toast
   flutter:

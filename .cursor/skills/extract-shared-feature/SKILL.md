@@ -7,16 +7,15 @@ description: Extracts duplicated code from multi-platform BarrelLock apps into a
 
 ## 背景
 
-BarrelLock 按平台拆分为 6 个独立 Flutter 工程，当前 `lib/pages/`、`lib/router/` 在各平台间重复。新功能应优先抽到 `packages/`，平台 app 只做薄壳。
+BarrelLock 按平台拆分为 6 个独立 Flutter 工程。路由层已抽到 `packages/core/lib/router/`，各平台 `lib/pages/` 独立实现。
 
 ## 决策：什么该抽、什么留平台
 
 | 抽到 packages | 留在平台 app |
 |---------------|--------------|
-| 页面 Widget（无平台 API） | 平台权限、原生通道 |
-| Riverpod providers | 平台特有 main.dart 配置 |
-| 路由表、AppRoutes | 各平台 build.gradle / Info.plist 等 |
-| 主题、常量、工具类 | 平台特有插件初始化 |
+| AppRoutes、AppRouter、AppRouteBuilders | 平台 Page Widget（MVVM-C） |
+| Riverpod providers（跨平台共享时） | `lib/router/app_router_config.dart` 装配 |
+| 主题、常量、工具类 | 平台权限、原生通道、main.dart |
 
 ## 工作流
 
@@ -41,23 +40,23 @@ apps/BarrelLock/BarrelLock_macos/lib/
 ...
 ```
 
-若 `pages/`、`router/` 内容相同或仅 import 路径不同，适合抽取。
+若 `pages/` 内容相同或仅 import 路径不同，适合抽到共享 UI 包；**路由层已在 core，无需再抽**。
 
 ### Step 2: 创建包
 
 按 `add-workspace-package` skill 创建，推荐命名：
 
 ```
-packages/barrel_lock_ui/     # 共享 UI + 路由
-packages/barrel_lock/        # 业务逻辑 + providers
+packages/barrel_lock/     # 共享 M / VM / C（已实现 launch_screen）
+packages/barrel_lock_ui/  # 共享 View（可选，六端 UI 相同时）
 ```
 
 依赖关系建议：
 
 ```
-barrel_lock_ui → core, fast_navigator
-barrel_lock    → core, barrel_lock_ui
-各平台 app     → barrel_lock_ui (或 barrel_lock)
+barrel_lock    → core
+barrel_lock_ui → core, barrel_lock（可选）
+各平台 app     → core, barrel_lock
 ```
 
 ### Step 3: 迁移结构
@@ -66,34 +65,28 @@ barrel_lock    → core, barrel_lock_ui
 packages/barrel_lock_ui/
 ├── lib/
 │   ├── barrel_lock_ui.dart
-│   ├── router/
-│   │   └── app_router.dart      # 原 AppRouter + AppRoutes
 │   └── pages/
 │       ├── home_page.dart
 │       ├── detail_page.dart
 │       └── settings_page.dart
 ```
 
-入口 export：
-
-```dart
-library;
-
-export 'router/app_router.dart';
-export 'pages/home_page.dart';
-// ...
-```
+路由仍在 `packages/core/lib/router/`，平台 app 保留 `app_router_config.dart` 注入本地或共享 Page。
 
 ### Step 4: 平台 app 瘦身
 
 平台 `lib/main.dart` 改为：
 
 ```dart
-import 'package:barrel_lock_ui/barrel_lock_ui.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
+import 'router/app_router_config.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SPStorage.init();
+  configureBarrelLockRouter();
   runApp(const ProviderScope(child: BazaarApp()));
 }
 
@@ -102,19 +95,12 @@ class BazaarApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: appName,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      routerConfig: AppRouter.routerConfig,
-    );
+    return ThemedApp.router(routerConfig: AppRouter.routerConfig);
   }
 }
 ```
 
-删除各平台重复的 `lib/pages/`、`lib/router/`。
+删除各平台重复的 `lib/router/router.dart`（已迁移至 core）。
 
 ### Step 5: 平台差异处理
 

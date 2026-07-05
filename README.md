@@ -18,8 +18,12 @@ flutter_bazaar/
 │       ├── BarrelLock_web/      # Web 独立工程
 │       └── BarrelLock_macos/    # macOS 独立工程
 ├── packages/
-│   ├── core/                 # 共享核心库(常量/工具/异常)
-│   └── fast_navigator/       # 自研声明式路由框架(对标 go_router)
+│   ├── barrel_lock/          # BarrelLock 共享业务 Feature（MVVM-C M/VM/C）
+│   ├── core/                 # 共享核心库（主题/偏好/路由/Riverpod 入口）
+│   ├── fast_navigator/       # 自研声明式路由引擎
+│   ├── fast_loading/         # 全局 Loading 遮罩
+│   ├── fast_toast/           # 全局 Toast
+│   └── app_fonts/            # 字体资源
 ├── pubspec.yaml              # 工作区根配置 + Melos 8.0.0 scripts
 ├── pubspec.lock
 └── melos_outputs/            # 构建产物汇聚目录(.gitignore)
@@ -54,6 +58,19 @@ melos run run:macos
 # 或
 cd apps/BarrelLock/BarrelLock_macos && fvm flutter run -d macos
 ```
+
+## 路由架构（BarrelLock）
+
+路由地址（`AppRoutes`）与导航 API（`AppRouter`）在 `packages/core/lib/router/` 统一管理；各平台 Page Widget 通过 `AppRouteBuilders` 注入。
+
+```text
+core/router/                       → AppRoutes、AppRouter（SSOT）
+barrel_lock/features/              → 共享 M / VM / C（如 launch_screen）
+app/router/app_router_config.dart  → 注入本平台 pages/
+app/pages/                         → 各平台独立 View（MVVM-C 的 V 层）
+```
+
+详见 [packages/core/lib/router/README.md](packages/core/lib/router/README.md)、[packages/barrel_lock/README.md](packages/barrel_lock/README.md)。
 
 ## 常用命令
 

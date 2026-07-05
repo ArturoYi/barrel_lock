@@ -21,3 +21,5 @@ export 'theme/presentation/app_typography_x.dart';
 export 'theme/presentation/theme_notifier.dart';
 export 'theme/presentation/theme_setting_tile.dart';
 export 'theme/presentation/themed_app.dart';
+
+export 'router/router.dart';
