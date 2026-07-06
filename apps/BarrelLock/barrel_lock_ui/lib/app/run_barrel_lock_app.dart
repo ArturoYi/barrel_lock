@@ -40,6 +40,7 @@ Future<void> runBarrelLockApp({
       ...BarrelLockPreferenceKeys.allKeys,
     ],
   );
+  await AppDeviceInfo.init();
   configureRouter();
   runApp(scopeBuilder(const BarrelLockApp()));
 }
