@@ -6,7 +6,9 @@ export 'package:fast_loading/fast_loading.dart';
 export 'package:fast_toast/fast_toast.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 
-export 'app_info.dart';
+export 'app_device_info/app_device_info.dart';
+export 'app_device_info/app_device_info_reader.dart';
+
 export 'preference/app_preference.dart';
 export 'preference/preference_config.dart';
 export 'preference/preference_keys.dart';
@@ -20,7 +22,3 @@ export 'theme/presentation/app_theme.dart';
 export 'theme/presentation/app_typography.dart';
 export 'theme/presentation/app_typography_x.dart';
 export 'theme/presentation/theme_notifier.dart';
-export 'theme/presentation/theme_setting_tile.dart';
-export 'theme/presentation/themed_app.dart';
-
-export 'router/router.dart';

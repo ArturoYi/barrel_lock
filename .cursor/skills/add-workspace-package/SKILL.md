@@ -29,9 +29,9 @@ Task Progress:
 
 | 类型 | 路径 | 示例 |
 |------|------|------|
-| 共享库 | `packages/<name>/` | `packages/core`, `packages/fast_navigator` |
-| 业务 UI | `packages/<app>_ui/` | `packages/barrel_lock_ui` |
-| 平台 App | `apps/<App>/<App>_<platform>/` | `apps/BarrelLock/BarrelLock_android` |
+| 共享库（跨产品） | `packages/<name>/` | `packages/core`, `packages/fast_navigator` |
+| 产品共享层 | `apps/<App>/<name>/` | `apps/BarrelLock/barrel_lock` |
+| 平台 App | `apps/<App>/<App>_<platform>/` | `apps/BarrelLock/BarrelLock_android`（含 `lib/pages/`） |
 
 ### Step 2: pubspec.yaml 模板
 

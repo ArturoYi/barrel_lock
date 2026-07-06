@@ -7,6 +7,8 @@ environment:
   flutter: ">=3.27.0"
 
 workspace:
+  - apps/BarrelLock/barrel_lock
+  - apps/BarrelLock/barrel_lock_ui
   - apps/BarrelLock/BarrelLock_android
   - apps/BarrelLock/BarrelLock_ios
   - apps/BarrelLock/BarrelLock_windows
@@ -14,7 +16,6 @@ workspace:
   - apps/BarrelLock/BarrelLock_web
   - apps/BarrelLock/BarrelLock_macos
   - packages/app_fonts
-  - packages/barrel_lock
   - packages/core
   - packages/fast_loading
   - packages/fast_dialog
@@ -85,6 +86,8 @@ melos:
         scope:
           - "*app_fonts*"
           - "barrel_lock"
+          - "barrel_lock_ui"
+          - "barrel_lock_android"
           - "*core*"
           - "*fast_loading*"
           - "*fast_dialog*"

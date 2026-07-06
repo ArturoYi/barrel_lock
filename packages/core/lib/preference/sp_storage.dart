@@ -10,9 +10,18 @@ final class SPStorage {
 
   /// 初始化，App 启动时执行一次
   ///
-  /// [env] 可选环境标识（如 dev / test / prod），用于 key 前缀隔离
-  static Future<void> init({String env = ''}) async {
-    PreferenceConfig.initEnvPrefix(env);
+  /// [appNamespace] 应用命名空间（如 `barrel_lock`），与 [env] 组合隔离 key
+  /// [managedKeys] 受管 rawKey 白名单，clearAll / exportAll 仅操作这些 key
+  static Future<void> init({
+    required String appNamespace,
+    String env = 'prod',
+    required List<String> managedKeys,
+  }) async {
+    PreferenceConfig.init(
+      appNamespace: appNamespace,
+      env: env,
+      managedKeys: managedKeys,
+    );
     _instance = await SharedPreferences.getInstance();
   }
 
@@ -23,7 +32,7 @@ final class SPStorage {
     return _instance!;
   }
 
-  // ===================== 基础读写封装（自动拼接环境前缀） =====================
+  // ===================== 基础读写封装（自动拼接命名空间前缀） =====================
 
   static Future<bool> setString(String rawKey, String value) {
     final key = PreferenceConfig.getRealKey(rawKey);
@@ -82,52 +91,27 @@ final class SPStorage {
     return _sp.remove(key);
   }
 
-  /// 仅清除本模块命名空间下的 key，避免误删其他插件写入的数据
+  /// 仅清除受管 key 白名单内的数据，避免误删其他插件写入的数据
   static Future<void> clearAll() async {
-    for (final key in _scopedStorageKeys()) {
-      await _sp.remove(key);
+    for (final rawKey in PreferenceConfig.managedKeys) {
+      await remove(rawKey);
     }
   }
 
-  /// 获取当前命名空间下全部偏好数据，供导出使用
-  ///
-  /// - key 为业务 [rawKey]（已去掉环境前缀）
-  /// - value 支持 `String` / `bool` / `int` / `double` / `List<String>`
+  /// 获取受管 key 白名单内的偏好数据，供导出使用
   static Map<String, Object> getAllAsMap() {
     final result = <String, Object>{};
-    for (final storageKey in _scopedStorageKeys()) {
+    for (final rawKey in PreferenceConfig.managedKeys) {
+      final storageKey = PreferenceConfig.getRealKey(rawKey);
       final value = _readValue(storageKey);
       if (value != null) {
-        result[_toRawKey(storageKey)] = value;
+        result[rawKey] = value;
       }
     }
     return result;
   }
 
-  static Iterable<String> _scopedStorageKeys() {
-    final prefix = PreferenceConfig.envPrefix;
-    return _sp.getKeys().where((key) {
-      if (prefix.isEmpty) {
-        return true;
-      }
-      return key.startsWith(prefix);
-    });
-  }
-
-  static String _toRawKey(String storageKey) {
-    final prefix = PreferenceConfig.envPrefix;
-    if (prefix.isNotEmpty && storageKey.startsWith(prefix)) {
-      return storageKey.substring(prefix.length);
-    }
-    return storageKey;
-  }
-
   static Object? _readValue(String storageKey) {
-    final stringList = _sp.getStringList(storageKey);
-    if (stringList != null) {
-      return List<String>.from(stringList);
-    }
-
     final string = _sp.getString(storageKey);
     if (string != null) {
       return string;
@@ -146,6 +130,11 @@ final class SPStorage {
     final doubleValue = _sp.getDouble(storageKey);
     if (doubleValue != null) {
       return doubleValue;
+    }
+
+    final stringList = _sp.getStringList(storageKey);
+    if (stringList != null) {
+      return List<String>.from(stringList);
     }
 
     return null;

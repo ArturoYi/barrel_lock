@@ -19,12 +19,6 @@ final class AppPreference {
   static String? getColorScheme() =>
       SPStorage.getString(PreferenceKeys.colorScheme);
 
-  static Future<void> markFirstLaunch() =>
-      SPStorage.setBool(PreferenceKeys.isFirstLaunch, false);
-
-  static bool isFirstLaunch() =>
-      SPStorage.getBool(PreferenceKeys.isFirstLaunch, def: true);
-
   static Future<void> clearAllPreference() => SPStorage.clearAll();
 
   static Future<void> removeByKey(String rawKey) => SPStorage.remove(rawKey);

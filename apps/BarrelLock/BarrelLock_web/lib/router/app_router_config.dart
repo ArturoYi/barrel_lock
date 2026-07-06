@@ -1,11 +1,11 @@
-import 'package:core/core.dart';
+import 'package:barrel_lock/barrel_lock.dart';
 
 import '../pages/detail_page.dart';
-import '../pages/home_page.dart';
+import '../pages/home/home_page.dart';
 import '../pages/launch_screen/launch_screen_page.dart';
 import '../pages/settings_page.dart';
 
-/// BarrelLock Web 路由装配：向 [AppRouter] 注入本平台页面 Widget。
+/// 向 [AppRouter] 注入本平台 Page Widget。
 void configureBarrelLockRouter() {
   AppRouter.configure(
     AppRouteBuilders(

@@ -2,14 +2,36 @@
 final class PreferenceConfig {
   PreferenceConfig._();
 
-  /// 环境前缀，区分 dev/test/prod，防止多环境数据混淆
-  static String envPrefix = '';
+  static String _appNamespace = '';
+  static String _envPrefix = '';
+  static List<String> _managedKeys = const [];
 
-  /// 初始化环境前缀
-  static void initEnvPrefix(String env) {
-    envPrefix = env.isEmpty ? '' : '${env}_';
+  /// 完整 key 前缀，形如 `barrel_lock_prod_` 或 `barrel_lock_`
+  static String get namespacePrefix {
+    if (_appNamespace.isEmpty) {
+      throw StateError(
+        'PreferenceConfig 未初始化，请在 SPStorage.init 中传入 appNamespace',
+      );
+    }
+    return _envPrefix.isEmpty
+        ? '${_appNamespace}_'
+        : '${_appNamespace}_$_envPrefix';
   }
 
-  /// 拼接带环境隔离的真实 key
-  static String getRealKey(String rawKey) => '$envPrefix$rawKey';
+  /// 受管 key 白名单，供 clearAll / exportAll 使用
+  static List<String> get managedKeys => _managedKeys;
+
+  /// 初始化命名空间与受管 key 白名单
+  static void init({
+    required String appNamespace,
+    String env = 'prod',
+    required List<String> managedKeys,
+  }) {
+    _appNamespace = appNamespace;
+    _envPrefix = env.isEmpty ? '' : '${env}_';
+    _managedKeys = List.unmodifiable(managedKeys);
+  }
+
+  /// 拼接带命名空间隔离的真实 key
+  static String getRealKey(String rawKey) => '$namespacePrefix$rawKey';
 }

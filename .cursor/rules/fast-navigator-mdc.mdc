@@ -1,16 +1,16 @@
 ---
-description: fast_navigator 路由框架规范
-globs: "packages/fast_navigator/**,packages/core/lib/router/**,**/router/**,**/pages/**"
+description: fast_navigator 路由约定
+globs: "**/*.dart"
 alwaysApply: false
 ---
 
 # 路由约定
 
-- **路由表 SSOT**：`packages/core/lib/router/`（[AppRoutes]、[AppRouter]、[AppRouteBuilders]）
-- **平台装配**：各 app 仅保留 `lib/router/app_router_config.dart`，注入本地 Page Widget
+- **路由表 SSOT**：`apps/BarrelLock/barrel_lock/lib/router/`（AppRoutes、AppRouter、AppRouteBuilders）
+- **View 装配**：各平台 `lib/router/app_router_config.dart`
 - **页面跳转**：`AppRouter.push` / `pushNamed` / `go`，不用 Navigator 1.0
 - **路由地址**：无参 `.name` / `.path` 属性；带参 `AppRoutes.detail(id: '42')` 方法式调用
 - `NavigationState` 不可变：栈操作必须返回新实例，禁止 mutate `matches`
 - `RouteMatch.extra` 不参与 Page Key
-- 新增路由：在 core 扩展 [AppRoutes] + [AppRouteBuilders]，平台 config 补 builder
+- 新增路由：在 barrel_lock 扩展 AppRoutes + AppRouteBuilders，各平台 app_router_config 补 builder
 - Shell / Middleware 见 packages/fast_navigator/README.md

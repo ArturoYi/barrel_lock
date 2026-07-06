@@ -47,8 +47,8 @@ apps/BarrelLock/BarrelLock_macos/lib/
 按 `add-workspace-package` skill 创建，推荐命名：
 
 ```
-packages/barrel_lock/     # 共享 M / VM / C（已实现 launch_screen）
-packages/barrel_lock_ui/  # 共享 View（可选，六端 UI 相同时）
+apps/BarrelLock/barrel_lock/     # 共享 M / VM / C
+各平台 app/lib/pages/            # 各平台 View
 ```
 
 依赖关系建议：
@@ -62,7 +62,7 @@ barrel_lock_ui → core, barrel_lock（可选）
 ### Step 3: 迁移结构
 
 ```
-packages/barrel_lock_ui/
+apps/BarrelLock/barrel_lock_ui/
 ├── lib/
 │   ├── barrel_lock_ui.dart
 │   └── pages/
@@ -107,7 +107,7 @@ class BazaarApp extends StatelessWidget {
 若某平台需要特殊行为：
 
 ```dart
-// packages/barrel_lock_ui 中
+// apps/BarrelLock/barrel_lock_ui 中
 typedef PlatformInitializer = Future<void> Function();
 
 // 平台 app main.dart 注入

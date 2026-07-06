@@ -11,8 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  core:
   barrel_lock:
+  barrel_lock_ui:
+  core:
   cupertino_icons: ^1.0.8
 
 dev_dependencies:

@@ -1,6 +1,6 @@
 ---
-description: 页面模块 MVVM-C 架构约定
-globs: "**/pages/**,packages/barrel_lock/**,**/providers/**"
+description: Riverpod 状态管理规范
+globs: "**/*.dart"
 alwaysApply: false
 ---
 
@@ -10,28 +10,21 @@ alwaysApply: false
 
 | 层 | 位置 | 包 |
 |---|---|---|
-| **V** View | `apps/.../lib/pages/<feature>/` | 各平台 app |
-| **VM** ViewModel | `packages/barrel_lock/lib/features/<feature>/` | `barrel_lock` |
+| **V** View | 各平台 `lib/pages/<feature>/` | 各平台 app |
+| **VM** ViewModel | `apps/BarrelLock/barrel_lock/lib/features/<feature>/` | `barrel_lock` |
 | **M** Model | 同上 | `barrel_lock` |
 | **C** Coordinator | 同上 | `barrel_lock` |
 
-参考实现：`launch_screen` — View 在平台 app，M/VM/C 在 `packages/barrel_lock/`。
-
-## 平台 app 目录（仅 View）
-
-```
-pages/<feature>/
-└── <feature>_page.dart    # V：纯 UI，ConsumerWidget/ConsumerStatefulWidget
-```
+参考实现：`launch_screen` — View 在各平台 `lib/pages/`，M/VM/C 在 `barrel_lock`。
 
 ## barrel_lock Feature 目录
 
 ```
 features/<feature>/
-├── <feature>.dart               # export
-├── <feature>_view_model.dart    # VM
-├── <feature>_coordinator.dart   # C
-└── <feature>_model.dart         # M
+├── <feature>.dart
+├── <feature>_view_model.dart
+├── <feature>_coordinator.dart
+└── <feature>_model.dart
 ```
 
 | 层 | 允许 | 禁止 |
@@ -44,27 +37,6 @@ features/<feature>/
 ## 与本项目栈的映射
 
 - **VM 状态**：Riverpod 3.x `Notifier` / `AsyncNotifier`，import `package:core/core.dart`
-- **共享 Feature**：`package:barrel_lock/barrel_lock.dart`（禁止放进 `core`）
-- **C 层路由**：`AppRoutes` + `AppRouter`（`package:core/core.dart`）
+- **共享 Feature**：`package:barrel_lock/barrel_lock.dart`
+- **C 层路由**：`AppRoutes` + `AppRouter`（`package:barrel_lock/barrel_lock.dart`）
 - **平台差异**：通过 Riverpod `override` 注入（如 `launchScreenPrepareProvider`）
-
-## 示例（启动页 View）
-
-```dart
-import 'package:barrel_lock/barrel_lock.dart';
-import 'package:core/core.dart';
-
-// 首帧后通知 VM，不直接跳转
-ref.read(launchScreenViewModelProvider.notifier).onViewAppeared();
-```
-
-## 示例（平台差异注入）
-
-```dart
-ProviderScope(
-  overrides: [
-    launchScreenPrepareProvider.overrideWith((_) => platformLaunchInit),
-  ],
-  child: const BazaarApp(),
-);
-```
