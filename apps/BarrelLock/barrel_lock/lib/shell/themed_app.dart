@@ -1,6 +1,8 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
+import 'lifecycle_bootstrap.dart';
+
 /// BarrelLock 应用主题 + 全局 Overlay 容器。
 class ThemedApp extends ConsumerStatefulWidget {
   const ThemedApp.router({
@@ -24,6 +26,7 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    bootstrapBarrelLockLifecycle();
     FastToast.loadingPauseCheck = () => FastLoading.isShowing;
     FastLoading.visibilityListenable.addListener(_resumeToastAfterLoading);
   }
@@ -32,6 +35,7 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
   void dispose() {
     FastLoading.visibilityListenable.removeListener(_resumeToastAfterLoading);
     WidgetsBinding.instance.removeObserver(this);
+    disposeBarrelLockLifecycle();
     super.dispose();
   }
 
@@ -63,7 +67,8 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
         darkTheme: darkTheme,
         themeMode: settings.mode.toFlutter,
         routerConfig: withLoadingRouteGuard(routerConfig),
-        builder: _overlayBuilder,
+        builder: (context, child) =>
+            _overlayBuilder(context, child, settings.fontScale),
       );
     }
 
@@ -73,14 +78,24 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
       darkTheme: darkTheme,
       themeMode: settings.mode.toFlutter,
       home: widget._home,
-      builder: _overlayBuilder,
+      builder: (context, child) =>
+          _overlayBuilder(context, child, settings.fontScale),
     );
   }
 
-  Widget _overlayBuilder(BuildContext context, Widget? child) {
+  Widget _overlayBuilder(
+    BuildContext context,
+    Widget? child,
+    AppFontScale fontScale,
+  ) {
     final content = child ?? const SizedBox.shrink();
-    return FastLoadingOverlay(
-      child: FastToastOverlay(child: FastDialogOverlay(child: content)),
+    return MediaQuery(
+      data: MediaQuery.of(
+        context,
+      ).copyWith(textScaler: TextScaler.linear(fontScale.scaleFactor)),
+      child: FastLoadingOverlay(
+        child: FastToastOverlay(child: FastDialogOverlay(child: content)),
+      ),
     );
   }
 }

@@ -66,6 +66,37 @@ void main() {
       expect(theme.textTheme.bodyMedium?.fontFamily, AppFonts.notoSansSC);
       expect(typography.bodyMedium.fontFamily, AppFonts.notoSansSC);
     });
+
+    test('disables Material press splash globally', () {
+      final theme = AppTheme.light(AppColorScheme.deepPurple);
+
+      expect(theme.splashFactory, same(NoSplash.splashFactory));
+      expect(theme.highlightColor, Colors.transparent);
+    });
+  });
+
+  group('AppFontScale', () {
+    test('fromStorage falls back to standard for unknown values', () {
+      expect(AppFontScale.fromStorage(null), AppFontScale.standard);
+      expect(AppFontScale.fromStorage(''), AppFontScale.standard);
+      expect(AppFontScale.fromStorage('unknown'), AppFontScale.standard);
+      expect(AppFontScale.fromStorage('large'), AppFontScale.large);
+    });
+
+    test('scaleFactor increases monotonically', () {
+      expect(
+        AppFontScale.small.scaleFactor,
+        lessThan(AppFontScale.standard.scaleFactor),
+      );
+      expect(
+        AppFontScale.standard.scaleFactor,
+        lessThan(AppFontScale.large.scaleFactor),
+      );
+      expect(
+        AppFontScale.large.scaleFactor,
+        lessThan(AppFontScale.extraLarge.scaleFactor),
+      );
+    });
   });
 
   group('SPStorage', () {

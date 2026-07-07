@@ -56,10 +56,6 @@ class HomePage extends ConsumerWidget {
         }
 
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-            title: Text(state.appName),
-          ),
           body: IndexedStack(index: selectedIndex, children: _tabPages),
           bottomNavigationBar: NavigationBar(
             selectedIndex: selectedIndex,

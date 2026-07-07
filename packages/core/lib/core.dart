@@ -15,9 +15,11 @@ export 'preference/preference_keys.dart';
 export 'preference/sp_storage.dart';
 
 export 'theme/domain/app_color_scheme.dart';
+export 'theme/domain/app_font_scale.dart';
 export 'theme/domain/app_theme_mode.dart';
 export 'theme/domain/theme_settings.dart';
 export 'theme/presentation/app_color_scheme_x.dart';
+export 'theme/presentation/app_font_scale_x.dart';
 export 'theme/presentation/app_theme.dart';
 export 'theme/presentation/app_typography.dart';
 export 'theme/presentation/app_typography_x.dart';

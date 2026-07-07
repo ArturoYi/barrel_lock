@@ -44,6 +44,19 @@ class ThemeSettingTile extends ConsumerWidget {
                 ),
             ],
           ),
+          const SizedBox(height: 24),
+          Text('字体大小', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          SegmentedButton<AppFontScale>(
+            segments: [
+              for (final scale in AppFontScale.values)
+                ButtonSegment(value: scale, label: Text(scale.displayName)),
+            ],
+            selected: {settings.fontScale},
+            onSelectionChanged: (selected) {
+              notifier.setFontScale(selected.first);
+            },
+          ),
         ],
       ),
     );

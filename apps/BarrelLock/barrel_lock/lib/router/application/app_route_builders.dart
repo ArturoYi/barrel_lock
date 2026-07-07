@@ -11,10 +11,16 @@ final class AppRouteBuilders {
     required this.home,
     required this.detail,
     required this.settings,
+    required this.dataMigration,
+    required this.appLock,
+    required this.clearData,
   });
 
   final AppRouteBuilder launchScreen;
   final AppRouteBuilder home;
   final AppRouteBuilder detail;
   final AppRouteBuilder settings;
+  final AppRouteBuilder dataMigration;
+  final AppRouteBuilder appLock;
+  final AppRouteBuilder clearData;
 }

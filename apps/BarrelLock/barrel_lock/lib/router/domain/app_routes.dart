@@ -13,4 +13,19 @@ abstract final class AppRoutes {
   static const detail = DetailRoute();
 
   static const settings = AppSimpleRoute(name: 'settings', path: '/settings');
+
+  static const dataMigration = AppSimpleRoute(
+    name: 'dataMigration',
+    path: '/settings/data-migration',
+  );
+
+  static const appLock = AppSimpleRoute(
+    name: 'appLock',
+    path: '/settings/app-lock',
+  );
+
+  static const clearData = AppSimpleRoute(
+    name: 'clearData',
+    path: '/settings/clear-data',
+  );
 }

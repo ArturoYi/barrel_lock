@@ -19,6 +19,12 @@ final class AppPreference {
   static String? getColorScheme() =>
       SPStorage.getString(PreferenceKeys.colorScheme);
 
+  static Future<void> setFontScale(String scale) =>
+      SPStorage.setString(PreferenceKeys.fontScale, scale);
+
+  static String? getFontScale() =>
+      SPStorage.getString(PreferenceKeys.fontScale);
+
   static Future<void> clearAllPreference() => SPStorage.clearAll();
 
   static Future<void> removeByKey(String rawKey) => SPStorage.remove(rawKey);

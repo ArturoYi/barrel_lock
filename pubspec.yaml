@@ -21,6 +21,7 @@ workspace:
   - packages/fast_dialog
   - packages/fast_navigator
   - packages/fast_toast
+  - packages/fast_lifecycle
 
 dev_dependencies:
   melos: ^8.0.0

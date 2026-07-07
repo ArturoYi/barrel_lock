@@ -73,6 +73,21 @@ final class AppRouter {
         path: AppRoutes.settings.path,
         builder: builders.settings,
       ),
+      FastRoute(
+        name: AppRoutes.dataMigration.name,
+        path: AppRoutes.dataMigration.path,
+        builder: builders.dataMigration,
+      ),
+      FastRoute(
+        name: AppRoutes.appLock.name,
+        path: AppRoutes.appLock.path,
+        builder: builders.appLock,
+      ),
+      FastRoute(
+        name: AppRoutes.clearData.name,
+        path: AppRoutes.clearData.path,
+        builder: builders.clearData,
+      ),
     ];
   }
 

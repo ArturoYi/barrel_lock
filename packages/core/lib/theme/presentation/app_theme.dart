@@ -26,6 +26,8 @@ abstract final class AppTheme {
       colorScheme: colorScheme,
       useMaterial3: true,
       fontFamily: AppFonts.notoSansSC,
+      splashFactory: NoSplash.splashFactory,
+      highlightColor: Colors.transparent,
       // textTheme 仅含 M3 几何；文字色由 colorScheme 与组件主题 / DefaultTextStyle 注入。
       textTheme: typography.toTextTheme(),
       extensions: [typography],

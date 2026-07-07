@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/theme_repository_impl.dart';
 import '../domain/app_color_scheme.dart';
+import '../domain/app_font_scale.dart';
 import '../domain/app_theme_mode.dart';
 import '../domain/theme_repository.dart';
 import '../domain/theme_settings.dart';
@@ -29,6 +30,12 @@ class ThemeNotifier extends Notifier<ThemeSettings> {
     if (state.colorScheme == colorScheme) return;
     state = state.copyWith(colorScheme: colorScheme);
     await _repository.saveColorScheme(colorScheme);
+  }
+
+  Future<void> setFontScale(AppFontScale fontScale) async {
+    if (state.fontScale == fontScale) return;
+    state = state.copyWith(fontScale: fontScale);
+    await _repository.saveFontScale(fontScale);
   }
 }
 
