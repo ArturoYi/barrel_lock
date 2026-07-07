@@ -4,5 +4,8 @@ final class BarrelLockPreferenceKeys {
 
   static const String isFirstLaunch = 'is_first_launch';
 
-  static const List<String> allKeys = [isFirstLaunch];
+  /// 锁屏偏好（加密 JSON）。
+  static const String appLockPreferences = 'app_lock_preferences';
+
+  static const List<String> allKeys = [isFirstLaunch, appLockPreferences];
 }

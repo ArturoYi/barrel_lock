@@ -27,6 +27,10 @@ dev_dependencies:
   melos: ^8.0.0
   flutter_lints: ^6.0.0
 
+dependency_overrides:
+  # drift_dev >=2.34.1 需要 analyzer ^13，与 riverpod/test 默认约束冲突
+  analyzer: ^13.0.0
+
 # Melos 8.0.0 + Dart pub workspaces 管理方式:
 # - 所有 melos 配置(包含 scripts / ide / command / sdkPath)都在 pubspec.yaml 的 melos: 块内。
 # - 根 pubspec.yaml 用 workspace: 列出子包,各子包 pubspec.yaml 用 resolution: workspace 引用。
@@ -75,6 +79,14 @@ melos:
       exec:
         command: dart format --output=none --set-exit-if-changed .
         concurrency: 1
+
+    build:drift:
+      description: Run drift build_runner code generation in core package.
+      exec:
+        command: dart run build_runner build --delete-conflicting-outputs
+        concurrency: 1
+      packageFilters:
+        scope: core
 
     # 纯 Dart / Flutter 库测试(core / fast_navigator 等),用 dart test 即可。
     test:dart:

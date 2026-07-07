@@ -140,6 +140,22 @@ void main() {
     });
   });
 
+  group('AppStorage', () {
+    tearDown(() async {
+      await AppStorage.close();
+    });
+
+    test('throws when accessed before init', () {
+      expect(() => AppStorage.database, throwsStateError);
+    });
+
+    test('initForTesting opens in-memory database', () async {
+      await AppStorage.initForTesting();
+      expect(AppStorage.database, isA<AppDatabase>());
+      expect(StorageConfig.databaseFileName, 'test_app_test');
+    });
+  });
+
   group('AppDeviceInfoSnapshot', () {
     test('versionLabel and osDescription format display strings', () {
       const snapshot = AppDeviceInfoSnapshot(
