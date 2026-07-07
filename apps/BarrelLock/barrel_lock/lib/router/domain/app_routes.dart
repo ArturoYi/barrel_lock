@@ -24,6 +24,11 @@ abstract final class AppRoutes {
     path: '/settings/app-lock',
   );
 
+  static const appLockPinSetup = AppSimpleRoute(
+    name: 'appLockPinSetup',
+    path: '/settings/app-lock/pin',
+  );
+
   static const clearData = AppSimpleRoute(
     name: 'clearData',
     path: '/settings/clear-data',

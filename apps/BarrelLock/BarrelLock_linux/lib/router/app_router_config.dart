@@ -15,7 +15,8 @@ void configureBarrelLockRouter() {
       detail: (_, match) => DetailPage(id: match.parameters.pathParams['id']!),
       settings: (_, _) => const SettingsPage(),
       dataMigration: (_, _) => const DataMigrationPage(),
-      appLock: (_, _) => const AppLockPage(),
+      appLock: (_, _) => const AppLockSettingsPage(),
+      appLockPinSetup: (_, _) => const AppLockPinSetupPage(),
       clearData: (_, _) => const ClearDataPage(),
     ),
   );

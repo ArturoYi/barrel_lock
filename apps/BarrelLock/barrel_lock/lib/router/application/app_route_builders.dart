@@ -13,6 +13,7 @@ final class AppRouteBuilders {
     required this.settings,
     required this.dataMigration,
     required this.appLock,
+    required this.appLockPinSetup,
     required this.clearData,
   });
 
@@ -22,5 +23,6 @@ final class AppRouteBuilders {
   final AppRouteBuilder settings;
   final AppRouteBuilder dataMigration;
   final AppRouteBuilder appLock;
+  final AppRouteBuilder appLockPinSetup;
   final AppRouteBuilder clearData;
 }

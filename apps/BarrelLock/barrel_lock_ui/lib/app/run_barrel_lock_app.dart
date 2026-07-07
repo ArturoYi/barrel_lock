@@ -41,6 +41,11 @@ Future<void> runBarrelLockApp({
     ],
   );
   await BarrelLockCrypto.init();
+  AppIdentityAuth.init(
+    config: const IdentityAuthConfig(
+      pinStorageKey: PreferenceKeys.identityAuthPin,
+    ),
+  );
   await AppDeviceInfo.init();
   configureRouter();
   runApp(scopeBuilder(const BarrelLockApp()));

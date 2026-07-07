@@ -84,6 +84,11 @@ final class AppRouter {
         builder: builders.appLock,
       ),
       FastRoute(
+        name: AppRoutes.appLockPinSetup.name,
+        path: AppRoutes.appLockPinSetup.path,
+        builder: builders.appLockPinSetup,
+      ),
+      FastRoute(
         name: AppRoutes.clearData.name,
         path: AppRoutes.clearData.path,
         builder: builders.clearData,

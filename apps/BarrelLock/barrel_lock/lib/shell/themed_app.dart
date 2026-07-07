@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
+import '../features/app_lock/app_lock_session.dart';
 import 'lifecycle_bootstrap.dart';
 
 /// BarrelLock 应用主题 + 全局 Overlay 容器。
@@ -94,7 +95,9 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
         context,
       ).copyWith(textScaler: TextScaler.linear(fontScale.scaleFactor)),
       child: FastLoadingOverlay(
-        child: FastToastOverlay(child: FastDialogOverlay(child: content)),
+        child: AppLockLifecycleHost(
+          child: FastToastOverlay(child: FastDialogOverlay(child: content)),
+        ),
       ),
     );
   }

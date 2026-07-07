@@ -12,6 +12,14 @@ export 'app_device_info/app_device_info_reader.dart';
 export 'crypto/app_crypto.dart';
 export 'crypto/encrypted_payload.dart';
 
+export 'identity_auth/app_identity_auth.dart';
+export 'identity_auth/biometric/biometric_availability.dart';
+export 'identity_auth/identity_auth_config.dart';
+export 'identity_auth/identity_auth_method.dart';
+export 'identity_auth/identity_auth_reason.dart';
+export 'identity_auth/identity_auth_result.dart';
+export 'identity_auth/identity_auth_ui_delegate.dart';
+
 export 'storage/app_database.dart';
 export 'storage/app_storage.dart';
 export 'storage/crud_repository.dart';

@@ -27,6 +27,9 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.3.2
+  local_auth: ^2.3.0
+  local_auth_android: ^1.0.46
+  local_auth_darwin: ^1.4.2
   package_info_plus: ^10.2.0
   shared_preferences: ^2.5.5
 

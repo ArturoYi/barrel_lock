@@ -17,12 +17,22 @@ void main() {
     await SPStorage.init(
       appNamespace: 'barrel_lock',
       env: 'test',
-      managedKeys: BarrelLockPreferenceKeys.allKeys,
+      managedKeys: [
+        ...PreferenceKeys.allKeys,
+        ...BarrelLockPreferenceKeys.allKeys,
+      ],
+    );
+    AppIdentityAuth.reset();
+    AppIdentityAuth.init(
+      config: const IdentityAuthConfig(
+        pinStorageKey: PreferenceKeys.identityAuthPin,
+      ),
     );
   });
 
   tearDown(() {
     AppCrypto.reset();
+    AppIdentityAuth.reset();
   });
 
   group('BarrelLockCrypto', () {

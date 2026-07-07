@@ -1,6 +1,5 @@
 import 'package:barrel_lock/barrel_lock.dart';
 
-import '../pages/settings/pages/app_lock_page.dart';
 import '../pages/settings/pages/clear_data_page.dart';
 import '../pages/settings/pages/data_migration_page.dart';
 import '../pages/detail_page.dart';
@@ -17,7 +16,8 @@ void configureBarrelLockRouter() {
       detail: (_, match) => DetailPage(id: match.parameters.pathParams['id']!),
       settings: (_, _) => const SettingsPage(),
       dataMigration: (_, _) => const DataMigrationPage(),
-      appLock: (_, _) => const AppLockPage(),
+      appLock: (_, _) => const AppLockSettingsPage(),
+      appLockPinSetup: (_, _) => const AppLockPinSetupPage(),
       clearData: (_, _) => const ClearDataPage(),
     ),
   );
