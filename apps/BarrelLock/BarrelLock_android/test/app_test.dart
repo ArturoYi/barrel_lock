@@ -15,21 +15,32 @@ void main() {
       env: 'test',
       managedKeys: PreferenceKeys.allKeys,
     );
+    AppDeviceInfoReader.debugSetSnapshot(
+      const AppDeviceInfoSnapshot(
+        appName: 'BarrelLock',
+        packageName: 'com.example.barrel_lock',
+        version: '1.0.0',
+        buildNumber: '1',
+        platform: AppDeviceInfoPlatform.android,
+      ),
+    );
   });
+
+  tearDown(AppDeviceInfoReader.debugReset);
 
   test('exports unified app entrypoints', () {
     expect(runBarrelLockApp, isNotNull);
     expect(BarrelLockApp.new, isNotNull);
   });
 
-  testWidgets('HomePage renders BarrelLock greeting', (tester) async {
+  testWidgets('HomePage renders tab shell', (tester) async {
     await tester.pumpWidget(
       const ProviderScope(child: MaterialApp(home: HomePage())),
     );
 
     expect(find.text('BarrelLock'), findsOneWidget);
-    expect(find.textContaining('Hello'), findsOneWidget);
-    expect(find.text('路径跳转 → 详情页'), findsOneWidget);
+    expect(find.text('密码'), findsWidgets);
+    expect(find.text('设置'), findsOneWidget);
   });
 
   testWidgets('SettingsPage renders theme controls', (tester) async {
