@@ -1,7 +1,8 @@
+import 'package:barrel_lock/features/app_lock/shell/app_lock_overlay/app_lock_overlay.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-import '../features/app_lock/app_lock_session.dart';
+import '../features/app_lock/shell/app_lock_session_lifecycle.dart';
 import 'lifecycle_bootstrap.dart';
 
 /// BarrelLock 应用主题 + 全局 Overlay 容器。
@@ -94,9 +95,11 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
       data: MediaQuery.of(
         context,
       ).copyWith(textScaler: TextScaler.linear(fontScale.scaleFactor)),
-      child: FastLoadingOverlay(
-        child: AppLockLifecycleHost(
-          child: FastToastOverlay(child: FastDialogOverlay(child: content)),
+      child: AppLockSessionLifecycleBinder(
+        child: AppLockOverlay(
+          child: FastLoadingOverlay(
+            child: FastToastOverlay(child: FastDialogOverlay(child: content)),
+          ),
         ),
       ),
     );

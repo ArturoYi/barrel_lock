@@ -101,10 +101,11 @@ void main() {
       await container.read(appLockPinManageViewModelProvider.future);
 
       notifier.openChangeMode();
-      notifier.currentPinController.text = '1234';
-      notifier.pinController.text = '5678';
-      notifier.confirmPinController.text = '5678';
-      await notifier.changePin();
+      await notifier.changePin(
+        currentPin: '1234',
+        pin: '5678',
+        confirmPin: '5678',
+      );
 
       expect(await AppIdentityAuth.verifyAppPin('5678'), isTrue);
       expect(await AppIdentityAuth.verifyAppPin('1234'), isFalse);
@@ -134,8 +135,7 @@ void main() {
       await container.read(appLockPinManageViewModelProvider.future);
 
       notifier.openClearMode();
-      notifier.currentPinController.text = '1234';
-      await notifier.clearPin();
+      await notifier.clearPin(currentPin: '1234');
 
       expect(await AppIdentityAuth.hasAppPin(), isFalse);
       final preferences = await model.load();

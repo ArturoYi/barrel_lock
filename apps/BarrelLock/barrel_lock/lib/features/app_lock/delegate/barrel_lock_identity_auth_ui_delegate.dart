@@ -1,8 +1,13 @@
 import 'package:core/core.dart';
 
-import 'app_lock_pin_prompt.dart';
+import '../view_model/app_lock_pin_prompt_view_model.dart';
 
-/// BarrelLock 默认身份验证 UI 委托：PIN 走全局遮罩，提示走 Toast。
+/// BarrelLock 默认身份验证 UI 委托（桥接 core 与 app_lock PIN ViewModel）。
+///
+/// - PIN 输入 → [AppLockPinPromptViewModel.requestPin]
+/// - 生物识别不可用 → Toast 提示
+///
+/// 各平台可 override [identityAuthUiDelegateProvider] 替换交互方式。
 final class BarrelLockIdentityAuthUiDelegate implements IdentityAuthUiDelegate {
   BarrelLockIdentityAuthUiDelegate(this._ref);
 

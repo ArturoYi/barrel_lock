@@ -1,5 +1,7 @@
 import 'package:barrel_lock/barrel_lock.dart';
 
+import '../pages/app_lock/app_lock_pin_manage_page.dart';
+import '../pages/app_lock/app_lock_settings_page.dart';
 import '../pages/settings_subpages.dart';
 import '../pages/detail_page.dart';
 import '../pages/home/home_page.dart';

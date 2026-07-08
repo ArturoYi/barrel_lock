@@ -3,3 +3,4 @@ library;
 
 export 'app/barrel_lock_app.dart';
 export 'app/run_barrel_lock_app.dart';
+export 'pages/launch_screen/launch_screen_center_icon.dart';

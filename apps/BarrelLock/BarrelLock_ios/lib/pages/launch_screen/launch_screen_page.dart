@@ -1,4 +1,5 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:barrel_lock_ui/barrel_lock_ui.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +22,9 @@ class _LaunchScreenPageState extends ConsumerState<LaunchScreenPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const ColoredBox(color: Color(0xFF000000), child: SizedBox.expand());
+    return const ColoredBox(
+      color: Color(0xFF000000),
+      child: Center(child: LaunchScreenCenterIcon()),
+    );
   }
 }
