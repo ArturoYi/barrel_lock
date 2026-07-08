@@ -26,6 +26,8 @@ void main() {
     AppIdentityAuth.init(
       config: const IdentityAuthConfig(
         pinStorageKey: PreferenceKeys.identityAuthPin,
+        minPinLength: AppLockPinPolicy.length,
+        maxPinLength: AppLockPinPolicy.length,
       ),
     );
   });

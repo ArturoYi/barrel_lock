@@ -1,8 +1,9 @@
 import 'package:core/core.dart';
 
-import '../model/app_lock_auth_service.dart';
-import '../model/app_lock_model.dart';
-import 'app_lock_pin_prompt_view_model.dart';
+import '../runtime_auth/app_lock_pin_prompt_view_model.dart';
+import '../shared/model/app_lock_auth_service.dart';
+import '../shared/model/app_lock_model.dart';
+import '../shared/model/app_lock_preferences.dart';
 
 /// 锁屏会话运行时状态（MVVM-C 的 VM 层输出）。
 ///
@@ -11,9 +12,13 @@ final class AppLockSessionState {
   const AppLockSessionState({
     required this.isLocked,
     required this.isAuthenticating,
+    required this.showBackgroundShield,
   });
 
-  const AppLockSessionState.idle() : isLocked = false, isAuthenticating = false;
+  const AppLockSessionState.idle()
+    : isLocked = false,
+      isAuthenticating = false,
+      showBackgroundShield = false;
 
   /// 是否应显示锁屏遮罩（验证进行中为 `true`）。
   final bool isLocked;
@@ -21,10 +26,21 @@ final class AppLockSessionState {
   /// 是否正在执行身份验证循环（防止重入）。
   final bool isAuthenticating;
 
-  AppLockSessionState copyWith({bool? isLocked, bool? isAuthenticating}) {
+  /// 应用处于 inactive / paused 时的隐私遮罩（与 [isLocked] 分离，便于最小粒度刷新）。
+  final bool showBackgroundShield;
+
+  /// 是否应在 Overlay 中渲染 [AppLockSessionBarrier]。
+  bool get showSessionBarrier => showBackgroundShield;
+
+  AppLockSessionState copyWith({
+    bool? isLocked,
+    bool? isAuthenticating,
+    bool? showBackgroundShield,
+  }) {
     return AppLockSessionState(
       isLocked: isLocked ?? this.isLocked,
       isAuthenticating: isAuthenticating ?? this.isAuthenticating,
+      showBackgroundShield: showBackgroundShield ?? this.showBackgroundShield,
     );
   }
 }
@@ -56,6 +72,7 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
 
   bool _pendingUnlockOnResume = false;
   var _coldStartLockScheduled = false;
+  var _lockEnabled = false;
 
   @override
   AppLockSessionState build() {
@@ -78,27 +95,58 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
       return;
     }
 
-    final preferences = await _model.load();
-    if (!ref.mounted) {
-      return;
-    }
-    if (!preferences.enabled) {
+    final preferences = await _loadPreferences();
+    if (preferences == null || !preferences.enabled) {
       return;
     }
 
     await _authenticate(preferences);
   }
 
-  /// 应用进入后台：若锁屏已启用，标记恢复时需重新验证。
-  Future<void> onAppPaused() async {
-    final preferences = await _model.load();
-    if (!ref.mounted) {
-      return;
+  /// inactive / paused 时立即显示隐私遮罩（同步，不 await 偏好加载）。
+  void showBackgroundShield() {
+    if (!state.showBackgroundShield) {
+      state = state.copyWith(showBackgroundShield: true);
     }
-    if (!preferences.enabled) {
+  }
+
+  /// resumed 时收起隐私遮罩；若待验证则无缝切到 [isLocked]，避免闪屏。
+  void hideBackgroundShield() {
+    if (state.showBackgroundShield) {
+      state = state.copyWith(showBackgroundShield: false);
+    }
+  }
+
+  /// paused 时同步标记待验证（避免 resume 早于 async [onAppPaused] 完成）。
+  void markPendingUnlockOnPause() {
+    if (!_lockEnabled) {
       return;
     }
     _pendingUnlockOnResume = true;
+  }
+
+  /// 应用进入 paused：校验偏好并刷新待验证标记。
+  Future<void> onAppPaused() async {
+    final preferences = await _loadPreferences();
+    if (preferences == null || !preferences.enabled) {
+      _pendingUnlockOnResume = false;
+      return;
+    }
+    _pendingUnlockOnResume = true;
+  }
+
+  /// 设置页刚启用锁屏后调用（冷启动逻辑只执行一次，启用后需主动触发）。
+  Future<void> lockAfterEnabled() async {
+    if (state.isAuthenticating || state.isLocked) {
+      return;
+    }
+
+    final preferences = await _loadPreferences();
+    if (preferences == null || !preferences.enabled) {
+      return;
+    }
+
+    await _authenticate(preferences);
   }
 
   /// 应用回到前台：若有待验证标记则启动验证循环。
@@ -107,8 +155,8 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
       return;
     }
 
-    final preferences = await _model.load();
-    if (!ref.mounted) {
+    final preferences = await _loadPreferences();
+    if (preferences == null) {
       return;
     }
     if (!preferences.enabled) {
@@ -119,12 +167,25 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
     await _authenticate(preferences);
   }
 
+  Future<AppLockPreferences?> _loadPreferences() async {
+    final preferences = await _model.load();
+    if (!ref.mounted) {
+      return null;
+    }
+    _lockEnabled = preferences.enabled;
+    return preferences;
+  }
+
   Future<void> _authenticate(AppLockPreferences preferences) async {
     if (state.isAuthenticating) {
       return;
     }
 
-    state = state.copyWith(isLocked: true, isAuthenticating: true);
+    state = state.copyWith(
+      isLocked: true,
+      isAuthenticating: true,
+      showBackgroundShield: false,
+    );
 
     while (true) {
       var result = await _authService.authenticateForAppLock(

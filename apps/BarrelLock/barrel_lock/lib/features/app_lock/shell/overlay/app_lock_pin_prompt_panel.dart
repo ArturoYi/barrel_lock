@@ -26,38 +26,42 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
     super.initState();
     _pinController = TextEditingController();
     _pinFocusNode = FocusNode();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _pinFocusNode.requestFocus();
-      }
-    });
+    schedulePinFieldFocus(
+      _pinFocusNode,
+      isMounted: () => mounted,
+      afterSystemAuth: true,
+    );
   }
 
   @override
   void didUpdateWidget(covariant AppLockPinPromptPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.state.attempt != widget.state.attempt) {
+      releasePinFieldFocus(_pinFocusNode);
       _pinController.clear();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _pinFocusNode.requestFocus();
-        }
-      });
+      schedulePinFieldFocus(
+        _pinFocusNode,
+        isMounted: () => mounted,
+        afterSystemAuth: true,
+      );
     }
   }
 
   @override
   void dispose() {
+    cancelPendingPinFieldFocus();
     _pinFocusNode.dispose();
     _pinController.dispose();
     super.dispose();
   }
 
   void _submitPin() {
+    releasePinFieldFocus(_pinFocusNode);
     ref.read(appLockPinPromptProvider.notifier).submitPin(_pinController.text);
   }
 
   void _cancel() {
+    cancelPendingPinFieldFocus();
     ref.read(appLockPinPromptProvider.notifier).cancel();
   }
 
@@ -70,37 +74,42 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
     final state = widget.state;
     final isSubmitting = state.isSubmitting;
 
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
     return Material(
       type: MaterialType.transparency,
       child: SafeArea(
-        child: OrientationBuilder(
-          builder: (context, orientation) {
-            final layout = switch (orientation) {
-              Orientation.portrait => AppLockPinPromptPortraitLayout(
-                state: state,
-                pinController: _pinController,
-                pinFocusNode: _pinFocusNode,
-                isSubmitting: isSubmitting,
-                onSubmit: _submitPin,
-                onCancel: _cancel,
-                onToggleObscure: _toggleObscure,
-              ),
-              Orientation.landscape => AppLockPinPromptLandscapeLayout(
-                state: state,
-                pinController: _pinController,
-                pinFocusNode: _pinFocusNode,
-                isSubmitting: isSubmitting,
-                onSubmit: _submitPin,
-                onCancel: _cancel,
-                onToggleObscure: _toggleObscure,
-              ),
-            };
+        child: Padding(
+          padding: EdgeInsets.only(bottom: bottomInset),
+          child: OrientationBuilder(
+            builder: (context, orientation) {
+              final layout = switch (orientation) {
+                Orientation.portrait => AppLockPinPromptPortraitLayout(
+                  state: state,
+                  pinController: _pinController,
+                  pinFocusNode: _pinFocusNode,
+                  isSubmitting: isSubmitting,
+                  onSubmit: _submitPin,
+                  onCancel: _cancel,
+                  onToggleObscure: _toggleObscure,
+                ),
+                Orientation.landscape => AppLockPinPromptLandscapeLayout(
+                  state: state,
+                  pinController: _pinController,
+                  pinFocusNode: _pinFocusNode,
+                  isSubmitting: isSubmitting,
+                  onSubmit: _submitPin,
+                  onCancel: _cancel,
+                  onToggleObscure: _toggleObscure,
+                ),
+              };
 
-            return KeyedSubtree(
-              key: ValueKey<int>(state.attempt),
-              child: layout,
-            );
-          },
+              return KeyedSubtree(
+                key: ValueKey<int>(state.attempt),
+                child: layout,
+              );
+            },
+          ),
         ),
       ),
     );

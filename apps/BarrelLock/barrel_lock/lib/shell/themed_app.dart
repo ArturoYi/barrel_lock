@@ -1,9 +1,6 @@
-import 'package:barrel_lock/features/app_lock/shell/app_lock_overlay/app_lock_overlay.dart';
+import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-
-import '../features/app_lock/shell/app_lock_session_lifecycle.dart';
-import 'lifecycle_bootstrap.dart';
 
 /// BarrelLock 应用主题 + 全局 Overlay 容器。
 class ThemedApp extends ConsumerStatefulWidget {
@@ -62,44 +59,45 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
     final darkTheme = AppTheme.dark(settings.colorScheme);
     final routerConfig = widget._routerConfig;
 
+    final Widget app;
     if (routerConfig != null) {
-      return MaterialApp.router(
+      app = MaterialApp.router(
         title: 'BarrelLock',
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: settings.mode.toFlutter,
         routerConfig: withLoadingRouteGuard(routerConfig),
         builder: (context, child) =>
-            _overlayBuilder(context, child, settings.fontScale),
+            _contentOverlayBuilder(context, child, settings.fontScale),
+      );
+    } else {
+      app = MaterialApp(
+        title: 'BarrelLock',
+        theme: lightTheme,
+        darkTheme: darkTheme,
+        themeMode: settings.mode.toFlutter,
+        home: widget._home,
+        builder: (context, child) =>
+            _contentOverlayBuilder(context, child, settings.fontScale),
       );
     }
 
-    return MaterialApp(
-      title: 'BarrelLock',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: settings.mode.toFlutter,
-      home: widget._home,
-      builder: (context, child) =>
-          _overlayBuilder(context, child, settings.fontScale),
-    );
+    return AppLockSessionLifecycleBinder(child: app);
   }
 
-  Widget _overlayBuilder(
+  Widget _contentOverlayBuilder(
     BuildContext context,
     Widget? child,
     AppFontScale fontScale,
   ) {
     final content = child ?? const SizedBox.shrink();
-    return MediaQuery(
-      data: MediaQuery.of(
-        context,
-      ).copyWith(textScaler: TextScaler.linear(fontScale.scaleFactor)),
-      child: AppLockSessionLifecycleBinder(
-        child: AppLockOverlay(
-          child: FastLoadingOverlay(
-            child: FastToastOverlay(child: FastDialogOverlay(child: content)),
-          ),
+    return AppLockOverlay(
+      child: MediaQuery(
+        data: MediaQuery.of(
+          context,
+        ).copyWith(textScaler: TextScaler.linear(fontScale.scaleFactor)),
+        child: FastLoadingOverlay(
+          child: FastToastOverlay(child: FastDialogOverlay(child: content)),
         ),
       ),
     );

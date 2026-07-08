@@ -1,6 +1,6 @@
 import 'package:core/core.dart';
 
-import '../view_model/app_lock_pin_prompt_view_model.dart';
+import 'app_lock_pin_prompt_view_model.dart';
 
 /// BarrelLock 默认身份验证 UI 委托（桥接 core 与 app_lock PIN ViewModel）。
 ///

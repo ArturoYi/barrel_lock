@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 
-import '../../../router/domain/app_routes.dart';
-import '../../../router/application/app_router.dart';
+import '../../../../router/domain/app_routes.dart';
+import '../../../../router/application/app_router.dart';
 
 /// 锁屏保护模块导航网关（MVVM-C 的 C 层契约）。
 ///

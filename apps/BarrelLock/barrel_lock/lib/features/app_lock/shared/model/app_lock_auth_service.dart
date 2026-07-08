@@ -1,20 +1,12 @@
 import 'package:core/core.dart';
 
-import '../delegate/barrel_lock_identity_auth_ui_delegate.dart';
-import 'app_lock_model.dart';
+import '../../runtime_auth/barrel_lock_identity_auth_ui_delegate.dart';
+import 'app_lock_preferences.dart';
 
 /// 锁屏保护身份验证服务（MVVM-C 的 M 层）。
 ///
 /// 封装 [AppIdentityAuth] 与 [AppLockPreferences] 的联动，供各 ViewModel 复用。
 /// PIN 输入 UI 通过 [IdentityAuthUiDelegate] 委托给平台（默认 [BarrelLockIdentityAuthUiDelegate]）。
-///
-/// ## 数据流
-///
-/// ```
-/// ViewModel → AppLockAuthService → AppIdentityAuth → Biometric / AppPinStore
-///                      ↓
-///            IdentityAuthUiDelegate → AppLockPinPromptViewModel
-/// ```
 final class AppLockAuthService {
   const AppLockAuthService({required this.uiDelegate});
 
@@ -30,6 +22,9 @@ final class AppLockAuthService {
 
   /// 保存应用内 PIN（仅哈希落盘）。
   Future<void> setAppPin(String pin) => AppIdentityAuth.setAppPin(pin);
+
+  /// 设置备用 PIN（开启保护 / PIN 管理共用）。
+  Future<void> setupFallbackPin(String pin) => setAppPin(pin);
 
   /// 清除应用内 PIN。
   Future<void> clearAppPin() => AppIdentityAuth.clearAppPin();
@@ -53,7 +48,7 @@ final class AppLockAuthService {
 
   /// 是否已具备至少一种解锁方式（生物识别可用 **或** 已设应用内 PIN）。
   ///
-  /// 启用锁屏保护的前置条件；设置页 [AppLockViewModel.onEnabledChanged] 依赖此方法。
+  /// PIN 管理页清除策略等场景使用；**开启保护**改由 [AppLockEnableSetupViewModel] 门禁。
   Future<bool> hasAnyUnlockMethod() async {
     final availability = await checkBiometricAvailability();
     if (availability == BiometricAvailability.available) {

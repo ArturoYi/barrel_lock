@@ -65,7 +65,9 @@ final class LocalAuthBiometricAuthAdapter implements BiometricAuthAdapter {
         ],
         options: const AuthenticationOptions(
           stickyAuth: true,
-          biometricOnly: true,
+          // 允许面容 / 指纹失败后回退设备密码（iOS「输入密码」）。
+          // biometricOnly: true 会直接失败，无法弹出系统密码界面。
+          biometricOnly: false,
         ),
       );
     } on PlatformException {

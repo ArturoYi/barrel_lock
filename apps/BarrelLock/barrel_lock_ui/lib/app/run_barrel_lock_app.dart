@@ -44,6 +44,8 @@ Future<void> runBarrelLockApp({
   AppIdentityAuth.init(
     config: const IdentityAuthConfig(
       pinStorageKey: PreferenceKeys.identityAuthPin,
+      minPinLength: AppLockPinPolicy.length,
+      maxPinLength: AppLockPinPolicy.length,
     ),
   );
   await AppDeviceInfo.init();

@@ -2,34 +2,74 @@ import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-/// 锁屏保护设置页（MVVM-C 的 V 层）。
-///
-/// 本文件为占位实现，请自行补充 UI。接入方式：
-///
-/// ```dart
-/// final state = ref.watch(appLockViewModelProvider);
-/// final vm = ref.read(appLockViewModelProvider.notifier);
-///
-/// // 用户事件 → vm.onPop() / vm.onEnabledChanged() / vm.onOpenPinManage() 等
-/// // 渲染 → state.when(loading: ..., error: ..., data: ...)
-/// ```
+import '../settings/widgets/settings_subpage_scaffold.dart';
+import 'enable_setup/app_lock_enable_setup_host.dart';
+import 'settings/layout/app_lock_settings_landscape_body.dart';
+import 'settings/layout/app_lock_settings_portrait_body.dart';
+
+/// 应用保护设置页（MVVM-C 的 V 层）。
 class AppLockSettingsPage extends ConsumerWidget {
   const AppLockSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(appLockViewModelProvider);
-    final viewModel = ref.read(appLockViewModelProvider.notifier);
+    final state = ref.watch(appLockSettingsViewModelProvider);
+    final viewModel = ref.read(appLockSettingsViewModelProvider.notifier);
+    final enableSetup = ref.watch(appLockEnableSetupProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(onPressed: viewModel.onPop),
-        title: const Text('锁屏保护'),
-      ),
+    final controlsLocked = state.maybeWhen(
+      data: (data) => data.isLoading || enableSetup.isVisible,
+      orElse: () => enableSetup.isVisible,
+    );
+
+    return SettingsSubpageScaffold(
+      title: '应用保护',
+      onBack: viewModel.onPop,
       body: state.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text('加载失败：$error')),
-        data: (_) => const Center(child: Text('请在此实现锁屏保护设置 UI')),
+        data: (data) {
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              OrientationBuilder(
+                builder: (context, orientation) {
+                  final bodyProps = (
+                    data: data,
+                    enableSetupVisible: enableSetup.isVisible,
+                    onEnabledChanged: controlsLocked
+                        ? null
+                        : viewModel.onEnabledChanged,
+                    onBiometricOnResumeChanged: controlsLocked
+                        ? null
+                        : viewModel.onBiometricOnResumeChanged,
+                    onOpenPinManage: viewModel.onOpenPinManage,
+                  );
+
+                  return switch (orientation) {
+                    Orientation.portrait => AppLockSettingsPortraitBody(
+                      data: bodyProps.data,
+                      enableSetupVisible: bodyProps.enableSetupVisible,
+                      onEnabledChanged: bodyProps.onEnabledChanged,
+                      onBiometricOnResumeChanged:
+                          bodyProps.onBiometricOnResumeChanged,
+                      onOpenPinManage: bodyProps.onOpenPinManage,
+                    ),
+                    Orientation.landscape => AppLockSettingsLandscapeBody(
+                      data: bodyProps.data,
+                      enableSetupVisible: bodyProps.enableSetupVisible,
+                      onEnabledChanged: bodyProps.onEnabledChanged,
+                      onBiometricOnResumeChanged:
+                          bodyProps.onBiometricOnResumeChanged,
+                      onOpenPinManage: bodyProps.onOpenPinManage,
+                    ),
+                  };
+                },
+              ),
+              const AppLockEnableSetupHost(),
+            ],
+          );
+        },
       ),
     );
   }

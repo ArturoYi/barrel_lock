@@ -1,10 +1,8 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
-import 'package:core/identity_auth/biometric/noop_biometric_auth_adapter.dart';
-import 'package:cryptography/cryptography.dart';
-import 'package:cryptography/dart.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'features/app_lock/test_support.dart';
 
 final class _RecordingAppLockCoordinator implements AppLockCoordinatorGateway {
   int popCount = 0;
@@ -18,34 +16,10 @@ final class _RecordingAppLockCoordinator implements AppLockCoordinatorGateway {
 
 void main() {
   setUp(() async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    SharedPreferences.setMockInitialValues({});
-    AppCrypto.reset();
-    AppIdentityAuth.reset();
-    await SPStorage.init(
-      appNamespace: 'barrel_lock',
-      env: 'test',
-      managedKeys: [
-        ...PreferenceKeys.allKeys,
-        ...BarrelLockPreferenceKeys.allKeys,
-      ],
-    );
-    await BarrelLockCrypto.init();
-    Cryptography.instance = DartCryptography.defaultInstance.withRandom(
-      SecureRandom.forTesting(seed: 42),
-    );
-    AppIdentityAuth.init(
-      config: const IdentityAuthConfig(
-        pinStorageKey: PreferenceKeys.identityAuthPin,
-      ),
-      biometricAdapter: const NoopBiometricAuthAdapter(),
-    );
+    await initAppLockTestEnvironment();
   });
 
-  tearDown(() {
-    AppCrypto.reset();
-    AppIdentityAuth.reset();
-  });
+  tearDown(resetAppLockTestEnvironment);
 
   group('AppLockPinManageViewModel', () {
     test('starts in setup mode when pin is missing', () async {
@@ -67,7 +41,7 @@ void main() {
     });
 
     test('starts in hub mode when pin exists', () async {
-      await AppIdentityAuth.setAppPin('1234');
+      await AppIdentityAuth.setAppPin(testAppLockPin);
 
       final container = ProviderContainer(
         overrides: [
@@ -87,7 +61,7 @@ void main() {
     });
 
     test('changePin updates stored pin after verifying current pin', () async {
-      await AppIdentityAuth.setAppPin('1234');
+      await AppIdentityAuth.setAppPin(testAppLockPin);
 
       final coordinator = _RecordingAppLockCoordinator();
       final container = ProviderContainer(
@@ -102,19 +76,19 @@ void main() {
 
       notifier.openChangeMode();
       await notifier.changePin(
-        currentPin: '1234',
-        pin: '5678',
-        confirmPin: '5678',
+        currentPin: testAppLockPin,
+        pin: testAppLockPinAlt,
+        confirmPin: testAppLockPinAlt,
       );
 
-      expect(await AppIdentityAuth.verifyAppPin('5678'), isTrue);
-      expect(await AppIdentityAuth.verifyAppPin('1234'), isFalse);
+      expect(await AppIdentityAuth.verifyAppPin(testAppLockPinAlt), isTrue);
+      expect(await AppIdentityAuth.verifyAppPin(testAppLockPin), isFalse);
       expect(coordinator.popCount, 1);
     });
 
     test('clearPin removes stored pin and preference flag', () async {
       const model = AppLockModel();
-      await AppIdentityAuth.setAppPin('1234');
+      await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
         const AppLockPreferences(
           enabled: false,
@@ -135,7 +109,7 @@ void main() {
       await container.read(appLockPinManageViewModelProvider.future);
 
       notifier.openClearMode();
-      await notifier.clearPin(currentPin: '1234');
+      await notifier.clearPin(currentPin: testAppLockPin);
 
       expect(await AppIdentityAuth.hasAppPin(), isFalse);
       final preferences = await model.load();
@@ -145,7 +119,7 @@ void main() {
 
     test('blocks clear when lock enabled without fallback biometric', () async {
       const model = AppLockModel();
-      await AppIdentityAuth.setAppPin('1234');
+      await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
         const AppLockPreferences(
           enabled: true,

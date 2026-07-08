@@ -128,7 +128,9 @@ final class AppIdentityAuth {
       if (passed) {
         return IdentityAuthResult.success(method: IdentityAuthMethod.biometric);
       }
-      // 生物识别未通过时继续尝试应用内 PIN（若已配置）。
+      // 等待系统 LocalAuthentication 弹窗完全关闭，再回退应用内 PIN。
+      await _waitForBiometricUiDismissal();
+      // 生物识别 / 设备密码均未通过时继续尝试应用内 PIN（若已配置）。
     } else if (availability == BiometricAvailability.notEnrolled ||
         availability == BiometricAvailability.deviceNotSecure ||
         availability == BiometricAvailability.notSupported) {
@@ -157,6 +159,17 @@ final class AppIdentityAuth {
     }
 
     return IdentityAuthResult.failure(message: '应用内密码错误');
+  }
+
+  static Future<void> _waitForBiometricUiDismissal() async {
+    final delay = switch (defaultTargetPlatform) {
+      TargetPlatform.iOS => const Duration(milliseconds: 500),
+      TargetPlatform.android => const Duration(milliseconds: 400),
+      _ => Duration.zero,
+    };
+    if (delay > Duration.zero) {
+      await Future<void>.delayed(delay);
+    }
   }
 
   static void _validatePinLength(String pin) {

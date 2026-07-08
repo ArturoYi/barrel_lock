@@ -1,9 +1,9 @@
 import 'package:core/core.dart';
 
-import '../coordinator/app_lock_coordinator.dart';
-import '../model/app_lock_auth_service.dart';
-import '../model/app_lock_model.dart';
-import 'app_lock_view_model.dart';
+import '../settings/app_lock_settings_view_model.dart';
+import '../shared/coordinator/app_lock_coordinator.dart';
+import '../shared/model/app_lock_auth_service.dart';
+import '../shared/model/app_lock_model.dart';
 
 /// 备用密码管理子流程模式。
 enum AppLockPinManageMode {

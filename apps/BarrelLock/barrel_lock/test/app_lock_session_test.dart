@@ -1,10 +1,8 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
-import 'package:core/identity_auth/biometric/noop_biometric_auth_adapter.dart';
-import 'package:cryptography/cryptography.dart';
-import 'package:cryptography/dart.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'features/app_lock/test_support.dart';
 
 final class _QueueingUiDelegate implements IdentityAuthUiDelegate {
   _QueueingUiDelegate(this.responses);
@@ -52,39 +50,15 @@ Future<void> waitForColdStartAuth(ProviderContainer container) async {
 
 void main() {
   setUp(() async {
-    TestWidgetsFlutterBinding.ensureInitialized();
-    SharedPreferences.setMockInitialValues({});
-    AppCrypto.reset();
-    AppIdentityAuth.reset();
-    await SPStorage.init(
-      appNamespace: 'barrel_lock',
-      env: 'test',
-      managedKeys: [
-        ...PreferenceKeys.allKeys,
-        ...BarrelLockPreferenceKeys.allKeys,
-      ],
-    );
-    await BarrelLockCrypto.init();
-    Cryptography.instance = DartCryptography.defaultInstance.withRandom(
-      SecureRandom.forTesting(seed: 42),
-    );
-    AppIdentityAuth.init(
-      config: const IdentityAuthConfig(
-        pinStorageKey: PreferenceKeys.identityAuthPin,
-      ),
-      biometricAdapter: const NoopBiometricAuthAdapter(),
-    );
+    await initAppLockTestEnvironment();
   });
 
-  tearDown(() {
-    AppCrypto.reset();
-    AppIdentityAuth.reset();
-  });
+  tearDown(resetAppLockTestEnvironment);
 
   group('AppLockSessionViewModel', () {
     test('locks on cold start when enabled and unlocks with pin', () async {
       const model = AppLockModel();
-      await AppIdentityAuth.setAppPin('1234');
+      await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
         const AppLockPreferences(
           enabled: true,
@@ -96,7 +70,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           identityAuthUiDelegateProvider.overrideWithValue(
-            _QueueingUiDelegate(['1234']),
+            _QueueingUiDelegate([testAppLockPin]),
           ),
         ],
       );
@@ -112,7 +86,7 @@ void main() {
 
     test('retries authentication after pin cancellation', () async {
       const model = AppLockModel();
-      await AppIdentityAuth.setAppPin('1234');
+      await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
         const AppLockPreferences(
           enabled: true,
@@ -121,7 +95,7 @@ void main() {
         ),
       );
 
-      final delegate = _QueueingUiDelegate([null, '1234']);
+      final delegate = _QueueingUiDelegate([null, testAppLockPin]);
       final container = ProviderContainer(
         overrides: [identityAuthUiDelegateProvider.overrideWithValue(delegate)],
       );
@@ -170,9 +144,26 @@ void main() {
       fail('never started authenticating');
     });
 
-    test('locks again after returning from background', () async {
+    test('locks after enabling without app restart', () async {
       const model = AppLockModel();
-      await AppIdentityAuth.setAppPin('1234');
+      await AppIdentityAuth.setAppPin(testAppLockPin);
+      await model.save(
+        const AppLockPreferences(
+          enabled: false,
+          useBiometricOnResume: true,
+          hasFallbackPin: true,
+        ),
+      );
+
+      final delegate = _QueueingUiDelegate([testAppLockPin]);
+      final container = ProviderContainer(
+        overrides: [identityAuthUiDelegateProvider.overrideWithValue(delegate)],
+      );
+      addTearDown(container.dispose);
+
+      container.read(appLockSessionProvider);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
       await model.save(
         const AppLockPreferences(
           enabled: true,
@@ -181,7 +172,26 @@ void main() {
         ),
       );
 
-      final delegate = _QueueingUiDelegate(['1234', '1234']);
+      await container.read(appLockSessionProvider.notifier).lockAfterEnabled();
+
+      final session = container.read(appLockSessionProvider);
+      expect(session.isLocked, isFalse);
+      expect(session.isAuthenticating, isFalse);
+      expect(delegate.callCount, 1);
+    });
+
+    test('locks again after returning from background', () async {
+      const model = AppLockModel();
+      await AppIdentityAuth.setAppPin(testAppLockPin);
+      await model.save(
+        const AppLockPreferences(
+          enabled: true,
+          useBiometricOnResume: true,
+          hasFallbackPin: true,
+        ),
+      );
+
+      final delegate = _QueueingUiDelegate([testAppLockPin, testAppLockPin]);
       final container = ProviderContainer(
         overrides: [identityAuthUiDelegateProvider.overrideWithValue(delegate)],
       );
