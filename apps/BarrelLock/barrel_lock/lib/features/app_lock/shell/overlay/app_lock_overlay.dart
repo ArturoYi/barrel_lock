@@ -26,8 +26,21 @@ final class AppLockOverlay extends ConsumerWidget {
       fit: StackFit.expand,
       children: [
         child,
-        if (showSessionBarrier) const AppLockSessionBarrier(),
-        const AppLockPinPromptOverlayLayer(),
+        Positioned.fill(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 150),
+            layoutBuilder: (currentChild, previousChildren) {
+              return Stack(
+                fit: StackFit.expand,
+                children: [...previousChildren, ?currentChild],
+              );
+            },
+            child: showSessionBarrier
+                ? const AppLockSessionBarrier(key: ValueKey('visible'))
+                : const SizedBox.shrink(key: ValueKey('hidden')),
+          ),
+        ),
+        // const AppLockPinPromptOverlayLayer(),
       ],
     );
   }

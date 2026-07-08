@@ -38,18 +38,18 @@ class _AppLockSessionLifecycleBinderState
     super.dispose();
   }
 
-  @override
-  void onFlatInactive(RawLifeCycleEvent event) {
-    ref.read(appLockSessionProvider.notifier).showBackgroundShield();
-  }
-
-  @override
-  void onFlatPaused(RawLifeCycleEvent event) {
+  void _onAppGoingBackground() {
     final notifier = ref.read(appLockSessionProvider.notifier);
     notifier.showBackgroundShield();
     notifier.markPendingUnlockOnPause();
     notifier.onAppPaused();
   }
+
+  @override
+  void onFlatInactive(RawLifeCycleEvent event) => _onAppGoingBackground();
+
+  @override
+  void onFlatPaused(RawLifeCycleEvent event) => _onAppGoingBackground();
 
   @override
   void onFlatResumed(RawLifeCycleEvent event) {
