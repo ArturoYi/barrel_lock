@@ -14,27 +14,6 @@ final class _RecordingAppLockCoordinator implements AppLockCoordinatorGateway {
   void openPinManage() => openPinManageCount++;
 }
 
-final class _QueueingUiDelegate implements IdentityAuthUiDelegate {
-  _QueueingUiDelegate(this.responses);
-
-  final List<String?> responses;
-  var callCount = 0;
-
-  @override
-  Future<String?> promptForAppPin({required IdentityAuthReason reason}) async {
-    final index = callCount++;
-    if (index >= responses.length) {
-      return responses.last;
-    }
-    return responses[index];
-  }
-
-  @override
-  Future<void> onBiometricUnavailable({
-    required IdentityAuthReason reason,
-  }) async {}
-}
-
 void main() {
   setUp(() async {
     await initAppLockTestEnvironment();
@@ -49,6 +28,7 @@ void main() {
           appLockCoordinatorProvider.overrideWithValue(
             _RecordingAppLockCoordinator(),
           ),
+          ...appLockEnableSetupTestOverrides(),
         ],
       );
       addTearDown(container.dispose);
@@ -76,7 +56,7 @@ void main() {
             _RecordingAppLockCoordinator(),
           ),
           identityAuthUiDelegateProvider.overrideWithValue(
-            _QueueingUiDelegate([testAppLockPin]),
+            QueueingUiDelegate([testAppLockPin]),
           ),
         ],
       );
@@ -95,7 +75,30 @@ void main() {
           .requireValue;
       expect(settings.preferences.enabled, isTrue);
       expect(container.read(appLockEnableSetupProvider).isVisible, isFalse);
-      expect(container.read(appLockSessionProvider).isLocked, isFalse);
+      expect(container.read(appLockSessionProvider).isLocked, isTrue);
+    });
+
+    test('onPop cancels enable setup flow', () async {
+      final coordinator = _RecordingAppLockCoordinator();
+      final container = ProviderContainer(
+        overrides: [
+          appLockCoordinatorProvider.overrideWithValue(coordinator),
+          ...appLockEnableSetupTestOverrides(),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(
+        appLockSettingsViewModelProvider.notifier,
+      );
+      await container.read(appLockSettingsViewModelProvider.future);
+
+      container.read(appLockEnableSetupProvider.notifier).begin();
+      expect(container.read(appLockEnableSetupProvider).isVisible, isTrue);
+
+      notifier.onPop();
+
+      expect(container.read(appLockEnableSetupProvider).isVisible, isFalse);
     });
 
     test('openPinManage navigates through coordinator', () async {
@@ -113,6 +116,21 @@ void main() {
       notifier.onOpenPinManage();
 
       expect(coordinator.openPinManageCount, 1);
+    });
+
+    test('derives hasFallbackPin from auth layer on load', () async {
+      await AppIdentityAuth.setAppPin(testAppLockPin);
+      await const AppLockModel().saveEnabled(false);
+
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+
+      final settings = await container.read(
+        appLockSettingsViewModelProvider.future,
+      );
+
+      expect(settings.preferences.enabled, isFalse);
+      expect(settings.preferences.hasFallbackPin, isTrue);
     });
   });
 }

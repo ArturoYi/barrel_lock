@@ -4,8 +4,8 @@ import '../enable_setup/app_lock_enable_setup_view_model.dart';
 import '../session/app_lock_session_view_model.dart';
 import '../shared/coordinator/app_lock_coordinator.dart';
 import '../shared/model/app_lock_auth_service.dart';
-import '../shared/model/app_lock_model.dart';
 import '../shared/model/app_lock_preferences.dart';
+import '../shared/model/app_lock_preferences_repository.dart';
 
 /// 应用保护设置页展示状态（MVVM-C 的 VM 层输出）。
 final class AppLockSettingsViewState {
@@ -38,7 +38,8 @@ final class AppLockSettingsViewState {
 /// 应用保护设置页 ViewModel（MVVM-C 的 VM 层）。
 final class AppLockSettingsViewModel
     extends AsyncNotifier<AppLockSettingsViewState> {
-  AppLockModel get _model => ref.read(appLockModelProvider);
+  AppLockPreferencesRepository get _preferencesRepository =>
+      ref.read(appLockPreferencesRepositoryProvider);
 
   AppLockCoordinatorGateway get _coordinator =>
       ref.read(appLockCoordinatorProvider);
@@ -47,14 +48,7 @@ final class AppLockSettingsViewModel
 
   @override
   Future<AppLockSettingsViewState> build() async {
-    var preferences = await _model.load();
-
-    final hasFallbackPin = await _authService.hasAppPin();
-    if (preferences.hasFallbackPin != hasFallbackPin) {
-      preferences = preferences.copyWith(hasFallbackPin: hasFallbackPin);
-      await _model.save(preferences);
-    }
-
+    final preferences = await _preferencesRepository.load();
     return AppLockSettingsViewState(preferences: preferences, isLoading: false);
   }
 
@@ -94,7 +88,7 @@ final class AppLockSettingsViewModel
         clearStatusMessage: true,
       ),
     );
-    await _model.save(updated);
+    await _preferencesRepository.setEnabled(enabled);
     state = AsyncData(current.copyWith(preferences: updated, isLoading: false));
   }
 }
@@ -103,10 +97,3 @@ final appLockSettingsViewModelProvider =
     AsyncNotifierProvider<AppLockSettingsViewModel, AppLockSettingsViewState>(
       AppLockSettingsViewModel.new,
     );
-
-/// 兼容旧名称。
-typedef AppLockViewState = AppLockSettingsViewState;
-
-typedef AppLockViewModel = AppLockSettingsViewModel;
-
-final appLockViewModelProvider = appLockSettingsViewModelProvider;

@@ -1,8 +1,8 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:flutter/material.dart';
 
-import '../../../settings/widgets/settings_list_tile.dart';
-import '../../../settings/widgets/settings_section_card.dart';
+import '../../settings/widgets/settings_list_tile.dart';
+import '../../settings/widgets/settings_section_card.dart';
 
 /// 横屏：内容区居中限宽展示。
 final class AppLockSettingsLandscapeBody extends StatelessWidget {

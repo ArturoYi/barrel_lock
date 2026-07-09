@@ -3,7 +3,8 @@ import 'package:core/core.dart';
 import '../settings/app_lock_settings_view_model.dart';
 import '../shared/coordinator/app_lock_coordinator.dart';
 import '../shared/model/app_lock_auth_service.dart';
-import '../shared/model/app_lock_model.dart';
+import '../shared/model/app_lock_preferences_repository.dart';
+import '../shared/policy/app_lock_pin_policy.dart';
 
 /// 应用内 PIN 管理子流程模式（UI 文案称「备用密码」）。
 enum AppLockPinManageMode {
@@ -96,22 +97,15 @@ final class AppLockPinManageState {
 /// 应用内 PIN 管理页 ViewModel（MVVM-C 的 VM 层；路由入口文案为「备用密码」）。
 ///
 /// PIN 明文由 View 层收集后通过方法参数传入；ViewModel 不持有 [TextEditingController]。
-///
-/// ## View 接入示例
-///
-/// ```dart
-/// final vm = ref.read(appLockPinManageViewModelProvider.notifier);
-/// await vm.savePin(pin: pinController.text, confirmPin: confirmController.text);
-/// ```
 final class AppLockPinManageViewModel
     extends AsyncNotifier<AppLockPinManageState> {
-  late final AppLockModel _model;
+  late final AppLockPreferencesRepository _preferencesRepository;
   late final AppLockCoordinatorGateway _coordinator;
   late final AppLockAuthService _authService;
 
   @override
   Future<AppLockPinManageState> build() async {
-    _model = ref.read(appLockModelProvider);
+    _preferencesRepository = ref.read(appLockPreferencesRepositoryProvider);
     _coordinator = ref.read(appLockCoordinatorProvider);
     _authService = ref.read(appLockAuthServiceProvider);
     return _loadInitialState();
@@ -212,24 +206,22 @@ final class AppLockPinManageViewModel
 
   /// 清除 PIN（需验证当前密码）。
   Future<void> clearPin({required String currentPin}) async {
-    final trimmedCurrent = currentPin.trim();
-    if (trimmedCurrent.isEmpty) {
-      _setError('请输入当前密码');
+    final validationError = AppLockPinPolicy.validateCurrentPin(currentPin);
+    if (validationError != null) {
+      _setError(validationError);
       return;
     }
 
     _setBusy(true);
     try {
-      final valid = await _authService.verifyAppPin(trimmedCurrent);
+      final valid = await _authService.verifyAppPin(currentPin.trim());
       if (!valid) {
         _setError('当前密码错误');
         return;
       }
 
-      await _authService.clearAppPin();
-      final preferences = await _model.load();
-      await _model.save(preferences.copyWith(hasFallbackPin: false));
-      ref.invalidate(appLockViewModelProvider);
+      await _preferencesRepository.clearFallbackPin();
+      ref.invalidate(appLockSettingsViewModelProvider);
       _coordinator.pop();
     } finally {
       _setBusy(false);
@@ -242,41 +234,30 @@ final class AppLockPinManageViewModel
     required String pin,
     required String confirmPin,
   }) async {
-    final trimmedCurrent = currentPin.trim();
-    final trimmedPin = pin.trim();
-    final trimmedConfirm = confirmPin.trim();
-
-    if (isChange && trimmedCurrent.isEmpty) {
-      _setError('请输入当前密码');
-      return;
-    }
-    if (trimmedPin.isEmpty || trimmedConfirm.isEmpty) {
-      _setError('请填写新密码');
-      return;
-    }
-    if (trimmedPin != trimmedConfirm) {
-      _setError('两次输入不一致');
-      return;
-    }
-    if (isChange && trimmedPin == trimmedCurrent) {
-      _setError('新密码不能与当前密码相同');
+    final validationError = isChange
+        ? AppLockPinPolicy.validateChange(
+            currentPin: currentPin,
+            pin: pin,
+            confirmPin: confirmPin,
+          )
+        : AppLockPinPolicy.validateSetup(pin: pin, confirmPin: confirmPin);
+    if (validationError != null) {
+      _setError(validationError);
       return;
     }
 
     _setBusy(true);
     try {
       if (isChange) {
-        final valid = await _authService.verifyAppPin(trimmedCurrent);
+        final valid = await _authService.verifyAppPin(currentPin.trim());
         if (!valid) {
           _setError('当前密码错误');
           return;
         }
       }
 
-      await _authService.setAppPin(trimmedPin);
-      final preferences = await _model.load();
-      await _model.save(preferences.copyWith(hasFallbackPin: true));
-      ref.invalidate(appLockViewModelProvider);
+      await _preferencesRepository.saveFallbackPin(pin.trim());
+      ref.invalidate(appLockSettingsViewModelProvider);
       _coordinator.pop();
     } on ArgumentError catch (error) {
       _setError(error.message?.toString() ?? '密码格式无效');
@@ -286,7 +267,7 @@ final class AppLockPinManageViewModel
   }
 
   Future<({bool canClear, String? reason})> _resolveClearPolicy() async {
-    final preferences = await _model.load();
+    final preferences = await _preferencesRepository.load();
     if (!preferences.enabled) {
       return (canClear: true, reason: null);
     }

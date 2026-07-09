@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 /// 本文件为占位实现，请自行补充 UI。接入方式：
 ///
 /// ```dart
-/// final state = ref.watch(appLockViewModelProvider);
-/// final vm = ref.read(appLockViewModelProvider.notifier);
+/// final state = ref.watch(appLockSettingsViewModelProvider);
+/// final vm = ref.read(appLockSettingsViewModelProvider.notifier);
 ///
 /// // 用户事件 → vm.onPop() / vm.onEnabledChanged() / vm.onOpenPinManage() 等
 /// // 渲染 → state.when(loading: ..., error: ..., data: ...)
@@ -18,8 +18,8 @@ class AppLockSettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(appLockViewModelProvider);
-    final viewModel = ref.read(appLockViewModelProvider.notifier);
+    final state = ref.watch(appLockSettingsViewModelProvider);
+    final viewModel = ref.read(appLockSettingsViewModelProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(

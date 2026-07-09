@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../settings/widgets/settings_subpage_scaffold.dart';
 import 'enable_setup/app_lock_enable_setup_host.dart';
-import 'settings/layout/app_lock_settings_landscape_body.dart';
-import 'settings/layout/app_lock_settings_portrait_body.dart';
+import 'layout/app_lock_settings_landscape_body.dart';
+import 'layout/app_lock_settings_portrait_body.dart';
 
 /// 应用保护设置页（MVVM-C 的 V 层）。
 class AppLockSettingsPage extends ConsumerWidget {

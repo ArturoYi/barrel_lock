@@ -1,3 +1,12 @@
+/// 开启验证流程内的 PageView 步骤。
+enum AppLockEnableSetupStep {
+  /// 输入 PIN 与确认 PIN。
+  pin,
+
+  /// 输入忘记密码时的提示语。
+  hint,
+}
+
 /// 开启应用保护前的 PIN 设置流程阶段。
 enum AppLockEnableSetupPhase {
   /// 未展示开启验证 UI。
@@ -14,6 +23,7 @@ enum AppLockEnableSetupPhase {
 final class AppLockEnableSetupState {
   const AppLockEnableSetupState({
     required this.phase,
+    required this.step,
     required this.obscurePin,
     required this.obscureConfirmPin,
     this.errorMessage,
@@ -21,21 +31,35 @@ final class AppLockEnableSetupState {
 
   const AppLockEnableSetupState.idle()
     : phase = AppLockEnableSetupPhase.idle,
+      step = AppLockEnableSetupStep.pin,
       obscurePin = true,
       obscureConfirmPin = true,
       errorMessage = null;
 
+  /// 当前开启验证流程的阶段。
   final AppLockEnableSetupPhase phase;
+
+  /// PageView 当前步骤；仅在 [phase] 为 [AppLockEnableSetupPhase.active] 时有效。
+  final AppLockEnableSetupStep step;
+
+  /// 是否遮蔽 PIN 输入框明文（由 [AppLockEnableSetupViewModel.toggleObscurePin] 切换）。
   final bool obscurePin;
+
+  /// 是否遮蔽确认 PIN 输入框明文（由 [AppLockEnableSetupViewModel.toggleObscureConfirmPin] 切换）。
   final bool obscureConfirmPin;
+
+  /// PIN 校验或落盘失败时的提示；`null` 表示无错误。
   final String? errorMessage;
 
+  /// 是否处于开启验证流程中（`phase != idle`）；用于禁用设置页控件。
   bool get isVisible => phase != AppLockEnableSetupPhase.idle;
 
+  /// 是否正在提交 PIN 并开启保护（应禁用输入与按钮）。
   bool get isBusy => phase == AppLockEnableSetupPhase.submitting;
 
   AppLockEnableSetupState copyWith({
     AppLockEnableSetupPhase? phase,
+    AppLockEnableSetupStep? step,
     bool? obscurePin,
     bool? obscureConfirmPin,
     String? errorMessage,
@@ -43,6 +67,7 @@ final class AppLockEnableSetupState {
   }) {
     return AppLockEnableSetupState(
       phase: phase ?? this.phase,
+      step: step ?? this.step,
       obscurePin: obscurePin ?? this.obscurePin,
       obscureConfirmPin: obscureConfirmPin ?? this.obscureConfirmPin,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),

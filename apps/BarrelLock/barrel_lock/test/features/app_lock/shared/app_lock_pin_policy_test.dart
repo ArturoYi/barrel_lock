@@ -23,5 +23,35 @@ void main() {
         '两次输入不一致',
       );
     });
+
+    test('validateChange rejects same current and new pin', () {
+      expect(
+        AppLockPinPolicy.validateChange(
+          currentPin: '123456',
+          pin: '123456',
+          confirmPin: '123456',
+        ),
+        '新密码不能与当前密码相同',
+      );
+    });
+
+    test('validateCurrentPin rejects empty input', () {
+      expect(AppLockPinPolicy.validateCurrentPin('  '), '请输入当前密码');
+    });
+
+    test('validateHint accepts non-empty trimmed hint', () {
+      expect(AppLockPinPolicy.validateHint(' 我的宠物 '), isNull);
+    });
+
+    test('validateHint rejects empty hint', () {
+      expect(AppLockPinPolicy.validateHint('   '), '请输入提示语');
+    });
+
+    test('validateHint rejects overly long hint', () {
+      expect(
+        AppLockPinPolicy.validateHint('a' * (AppLockPinPolicy.hintMaxLength + 1)),
+        isNotNull,
+      );
+    });
   });
 }

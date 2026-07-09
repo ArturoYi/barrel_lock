@@ -2,8 +2,8 @@ import 'package:core/core.dart';
 
 import '../runtime_auth/app_lock_pin_prompt_view_model.dart';
 import '../shared/model/app_lock_auth_service.dart';
-import '../shared/model/app_lock_model.dart';
 import '../shared/model/app_lock_preferences.dart';
+import '../shared/model/app_lock_preferences_repository.dart';
 
 /// 锁屏会话运行时状态（MVVM-C 的 VM 层输出）。
 ///
@@ -66,7 +66,7 @@ final class AppLockSessionState {
 /// }
 /// ```
 final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
-  late final AppLockModel _model;
+  late final AppLockPreferencesRepository _preferencesRepository;
   late final AppLockAuthService _authService;
 
   /// 应用进入后台后是否需在 [onAppResumed] 时触发解锁验证。
@@ -86,7 +86,7 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
 
   @override
   AppLockSessionState build() {
-    _model = ref.read(appLockModelProvider);
+    _preferencesRepository = ref.read(appLockPreferencesRepositoryProvider);
     _authService = ref.read(appLockAuthServiceProvider);
     _scheduleColdStartLockIfNeeded();
     return const AppLockSessionState.idle();
@@ -201,7 +201,7 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
   }
 
   Future<AppLockPreferences?> _loadPreferences() async {
-    final preferences = await _model.load();
+    final preferences = await _preferencesRepository.load();
     if (!ref.mounted) {
       return null;
     }
@@ -284,6 +284,3 @@ final appLockSessionProvider =
     NotifierProvider<AppLockSessionViewModel, AppLockSessionState>(
       AppLockSessionViewModel.new,
     );
-
-/// 兼容旧代码中对 Notifier 类型的引用。
-typedef AppLockSessionNotifier = AppLockSessionViewModel;

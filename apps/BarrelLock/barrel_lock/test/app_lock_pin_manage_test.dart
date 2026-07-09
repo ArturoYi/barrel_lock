@@ -86,12 +86,9 @@ void main() {
       expect(coordinator.popCount, 1);
     });
 
-    test('clearPin removes stored pin and preference flag', () async {
-      const model = AppLockModel();
+    test('clearPin removes stored pin', () async {
       await AppIdentityAuth.setAppPin(testAppLockPin);
-      await model.save(
-        const AppLockPreferences(enabled: false, hasFallbackPin: true),
-      );
+      await const AppLockModel().saveEnabled(false);
 
       final coordinator = _RecordingAppLockCoordinator();
       final container = ProviderContainer(
@@ -108,17 +105,15 @@ void main() {
       await notifier.clearPin(currentPin: testAppLockPin);
 
       expect(await AppIdentityAuth.hasAppPin(), isFalse);
-      final preferences = await model.load();
+
+      final preferences = await createTestPreferencesRepository().load();
       expect(preferences.hasFallbackPin, isFalse);
       expect(coordinator.popCount, 1);
     });
 
     test('blocks clear when lock enabled without fallback biometric', () async {
-      const model = AppLockModel();
       await AppIdentityAuth.setAppPin(testAppLockPin);
-      await model.save(
-        const AppLockPreferences(enabled: true, hasFallbackPin: true),
-      );
+      await const AppLockModel().saveEnabled(true);
 
       final container = ProviderContainer(
         overrides: [
@@ -135,6 +130,30 @@ void main() {
 
       expect(state.canClearPin, isFalse);
       expect(state.clearBlockedReason, isNotNull);
+    });
+
+    test('rejects invalid pin format via AppLockPinPolicy', () async {
+      final container = ProviderContainer(
+        overrides: [
+          appLockCoordinatorProvider.overrideWithValue(
+            _RecordingAppLockCoordinator(),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final notifier = container.read(
+        appLockPinManageViewModelProvider.notifier,
+      );
+      await container.read(appLockPinManageViewModelProvider.future);
+
+      await notifier.savePin(pin: '12345', confirmPin: '12345');
+
+      final state = container
+          .read(appLockPinManageViewModelProvider)
+          .requireValue;
+      expect(state.errorMessage, isNotNull);
+      expect(await AppIdentityAuth.hasAppPin(), isFalse);
     });
   });
 }

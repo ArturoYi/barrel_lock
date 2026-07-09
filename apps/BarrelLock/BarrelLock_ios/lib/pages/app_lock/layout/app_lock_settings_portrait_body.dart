@@ -1,8 +1,8 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:flutter/material.dart';
 
-import '../../../settings/widgets/settings_list_tile.dart';
-import '../../../settings/widgets/settings_section_card.dart';
+import '../../settings/widgets/settings_list_tile.dart';
+import '../../settings/widgets/settings_section_card.dart';
 
 /// 竖屏：滚动列表展示应用保护设置项。
 final class AppLockSettingsPortraitBody extends StatelessWidget {

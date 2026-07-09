@@ -8,8 +8,8 @@ class AppLockSettingsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(appLockViewModelProvider);
-    final viewModel = ref.read(appLockViewModelProvider.notifier);
+    final state = ref.watch(appLockSettingsViewModelProvider);
+    final viewModel = ref.read(appLockSettingsViewModelProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(

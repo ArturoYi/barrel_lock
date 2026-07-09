@@ -2,8 +2,7 @@ import 'package:core/core.dart';
 
 import '../session/app_lock_session_view_model.dart';
 import '../settings/app_lock_settings_view_model.dart';
-import '../shared/model/app_lock_auth_service.dart';
-import '../shared/model/app_lock_model.dart';
+import '../shared/model/app_lock_preferences_repository.dart';
 import '../shared/policy/app_lock_pin_policy.dart';
 import 'app_lock_enable_setup_coordinator.dart';
 import 'app_lock_enable_setup_state.dart';
@@ -13,14 +12,12 @@ import 'app_lock_enable_setup_state.dart';
 /// 与 [AppLockPinPromptViewModel]（运行时解锁）分离；仅在设置页内嵌 Panel 驱动。
 final class AppLockEnableSetupViewModel
     extends Notifier<AppLockEnableSetupState> {
-  late final AppLockModel _model;
-  late final AppLockAuthService _authService;
+  late final AppLockPreferencesRepository _preferencesRepository;
   late final AppLockEnableSetupCoordinatorGateway _coordinator;
 
   @override
   AppLockEnableSetupState build() {
-    _model = ref.read(appLockModelProvider);
-    _authService = ref.read(appLockAuthServiceProvider);
+    _preferencesRepository = ref.read(appLockPreferencesRepositoryProvider);
     _coordinator = ref.read(appLockEnableSetupCoordinatorProvider);
     return const AppLockEnableSetupState.idle();
   }
@@ -29,6 +26,7 @@ final class AppLockEnableSetupViewModel
   void begin() {
     state = const AppLockEnableSetupState(
       phase: AppLockEnableSetupPhase.active,
+      step: AppLockEnableSetupStep.pin,
       obscurePin: true,
       obscureConfirmPin: true,
     );
@@ -43,6 +41,20 @@ final class AppLockEnableSetupViewModel
     state = const AppLockEnableSetupState.idle();
   }
 
+  /// 从提示语步骤返回 PIN 步骤。
+  void backToPinStep() {
+    if (state.phase != AppLockEnableSetupPhase.active ||
+        state.step != AppLockEnableSetupStep.hint ||
+        state.isBusy) {
+      return;
+    }
+    state = state.copyWith(
+      step: AppLockEnableSetupStep.pin,
+      clearError: true,
+    );
+  }
+
+  /// 切换 PIN 输入框明文 / 密文显示；提交中不生效。
   void toggleObscurePin() {
     if (state.isBusy) {
       return;
@@ -50,6 +62,7 @@ final class AppLockEnableSetupViewModel
     state = state.copyWith(obscurePin: !state.obscurePin);
   }
 
+  /// 切换确认 PIN 输入框明文 / 密文显示；提交中不生效。
   void toggleObscureConfirmPin() {
     if (state.isBusy) {
       return;
@@ -57,12 +70,13 @@ final class AppLockEnableSetupViewModel
     state = state.copyWith(obscureConfirmPin: !state.obscureConfirmPin);
   }
 
-  /// 校验并落盘 PIN，成功后开启应用保护。
-  Future<void> submitPin({
+  /// 校验 PIN 并进入提示语步骤。
+  void continueToHintStep({
     required String pin,
     required String confirmPin,
-  }) async {
-    if (state.phase != AppLockEnableSetupPhase.active) {
+  }) {
+    if (state.phase != AppLockEnableSetupPhase.active ||
+        state.step != AppLockEnableSetupStep.pin) {
       return;
     }
 
@@ -76,38 +90,87 @@ final class AppLockEnableSetupViewModel
     }
 
     state = state.copyWith(
+      step: AppLockEnableSetupStep.hint,
+      clearError: true,
+    );
+  }
+
+  /// 校验提示语并落盘 PIN，成功后开启应用保护。
+  Future<void> submitSetup({
+    required String pin,
+    required String confirmPin,
+    required String hint,
+  }) async {
+    if (state.phase != AppLockEnableSetupPhase.active ||
+        state.step != AppLockEnableSetupStep.hint) {
+      return;
+    }
+
+    final pinError = AppLockPinPolicy.validateSetup(
+      pin: pin,
+      confirmPin: confirmPin,
+    );
+    if (pinError != null) {
+      state = state.copyWith(
+        step: AppLockEnableSetupStep.pin,
+        errorMessage: pinError,
+      );
+      return;
+    }
+
+    final hintError = AppLockPinPolicy.validateHint(hint);
+    if (hintError != null) {
+      state = state.copyWith(errorMessage: hintError);
+      return;
+    }
+
+    state = state.copyWith(
       phase: AppLockEnableSetupPhase.submitting,
       clearError: true,
     );
 
     try {
-      await _authService.setupFallbackPin(pin.trim());
-
-      final preferences = await _model.load();
-      await _model.save(
-        preferences.copyWith(enabled: true, hasFallbackPin: true),
+      await _preferencesRepository.enableWithFallbackPin(
+        pin.trim(),
+        fallbackPinHint: hint,
       );
+      if (!ref.mounted) {
+        return;
+      }
 
       ref.invalidate(appLockSettingsViewModelProvider);
       await ref.read(appLockSessionProvider.notifier).lockAfterEnabled();
+      if (!ref.mounted) {
+        return;
+      }
 
       _coordinator.onEnableSetupCompleted();
       state = const AppLockEnableSetupState.idle();
     } on ArgumentError catch (error) {
+      if (!ref.mounted) {
+        return;
+      }
       state = state.copyWith(
         phase: AppLockEnableSetupPhase.active,
+        step: AppLockEnableSetupStep.hint,
         errorMessage: error.message?.toString() ?? '密码格式无效',
       );
     } catch (error) {
+      if (!ref.mounted) {
+        return;
+      }
       state = state.copyWith(
         phase: AppLockEnableSetupPhase.active,
+        step: AppLockEnableSetupStep.hint,
         errorMessage: '开启失败，请重试',
       );
     }
   }
 }
 
+/// 设置页内嵌开启验证 Panel 的状态；由 [AppLockEnableSetupViewModel] 维护。
 final appLockEnableSetupProvider =
     NotifierProvider<AppLockEnableSetupViewModel, AppLockEnableSetupState>(
       AppLockEnableSetupViewModel.new,
+      isAutoDispose: true,
     );

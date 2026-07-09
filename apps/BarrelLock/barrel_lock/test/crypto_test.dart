@@ -83,26 +83,29 @@ void main() {
       await BarrelLockCrypto.init();
     });
 
-    test('load returns defaults when no saved preferences', () async {
+    test('loadEnabled returns false when no saved preferences', () async {
       const model = AppLockModel();
-      final prefs = await model.load();
-
-      expect(prefs.enabled, isFalse);
-      expect(prefs.hasFallbackPin, isFalse);
+      expect(await model.loadEnabled(), isFalse);
     });
 
-    test('save and load roundtrip', () async {
+    test('saveEnabled roundtrip', () async {
       const model = AppLockModel();
-      const saved = AppLockPreferences(enabled: true, hasFallbackPin: true);
+      await model.saveEnabled(true);
+      expect(await model.loadEnabled(), isTrue);
+    });
 
-      await model.save(saved);
-      final loaded = await model.load();
+    test('saveEnabled does not imply pin exists', () async {
+      const model = AppLockModel();
+      await model.saveEnabled(true);
 
-      expect(loaded, saved);
-      expect(
-        SPStorage.getString(BarrelLockPreferenceKeys.appLockPreferences),
-        isNot(contains('enabled')),
-      );
+      expect(await model.loadEnabled(), isTrue);
+      expect(await AppIdentityAuth.hasAppPin(), isFalse);
+    });
+
+    test('saveFallbackPinHint roundtrip', () async {
+      const model = AppLockModel();
+      await model.saveFallbackPinHint('我的宠物叫小白');
+      expect(await model.loadFallbackPinHint(), '我的宠物叫小白');
     });
   });
 }

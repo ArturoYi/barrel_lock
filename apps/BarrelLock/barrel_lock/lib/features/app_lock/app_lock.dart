@@ -21,11 +21,11 @@
 /// | 层级 | 名称 | 说明 |
 /// |------|------|------|
 /// | UI 文案 | 备用密码 | 设置页、PIN 管理页等面向用户的称呼 |
-/// | 业务 / VM 状态 | `hasFallbackPin` | [AppLockPreferences.hasFallbackPin]、各 ViewModel 展示字段 |
+/// | 业务 / VM 状态 | `hasFallbackPin` | [AppLockPreferences.hasFallbackPin]、[AppLockPreferencesRepository.load] 读时派生 |
 /// | Auth 持久化 SSOT | `hasAppPin` / `setAppPin` | [AppLockAuthService] → [AppIdentityAuth]（哈希落盘） |
 ///
 /// 「备用」指生物识别不可用或失败时的回退解锁方式，不是系统锁屏密码。
-/// ViewModel 写入 PIN 后须同步更新 [AppLockPreferences.hasFallbackPin]。
+/// PIN 写入请通过 [AppLockPreferencesRepository] 统一网关，禁止 VM 手动同步 `hasFallbackPin`。
 library;
 
 export 'enable_setup/app_lock_enable_setup_coordinator.dart';
@@ -41,5 +41,6 @@ export 'shared/coordinator/app_lock_coordinator.dart';
 export 'shared/model/app_lock_auth_service.dart';
 export 'shared/model/app_lock_model.dart';
 export 'shared/model/app_lock_preferences.dart';
+export 'shared/model/app_lock_preferences_repository.dart';
 export 'shared/policy/app_lock_pin_policy.dart';
 export 'overlay/app_lock_overlay.dart';

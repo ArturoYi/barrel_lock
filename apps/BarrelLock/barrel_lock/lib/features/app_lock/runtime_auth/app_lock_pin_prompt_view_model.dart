@@ -143,6 +143,3 @@ final appLockPinPromptProvider =
     NotifierProvider<AppLockPinPromptViewModel, AppLockPinPromptState?>(
       AppLockPinPromptViewModel.new,
     );
-
-/// 兼容旧代码中对 Notifier 类型的引用。
-typedef AppLockPinPromptNotifier = AppLockPinPromptViewModel;

@@ -2,7 +2,7 @@ import 'package:barrel_lock/barrel_lock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// 开启验证 PIN 输入表单（设置页内嵌，非全局 Overlay）。
+/// 开启验证 PIN 输入表单（设置页内嵌 Panel 使用）。
 final class AppLockEnableSetupForm extends StatelessWidget {
   const AppLockEnableSetupForm({
     super.key,
@@ -91,13 +91,7 @@ final class AppLockEnableSetupForm extends StatelessWidget {
         const SizedBox(height: 16),
         FilledButton(
           onPressed: isBusy ? null : onSubmit,
-          child: isBusy
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('确认开启'),
+          child: const Text('下一步'),
         ),
         const SizedBox(height: 8),
         Align(
