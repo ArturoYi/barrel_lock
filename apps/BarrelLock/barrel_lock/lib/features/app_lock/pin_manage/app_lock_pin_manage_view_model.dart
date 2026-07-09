@@ -5,26 +5,29 @@ import '../shared/coordinator/app_lock_coordinator.dart';
 import '../shared/model/app_lock_auth_service.dart';
 import '../shared/model/app_lock_model.dart';
 
-/// 备用密码管理子流程模式。
+/// 应用内 PIN 管理子流程模式（UI 文案称「备用密码」）。
 enum AppLockPinManageMode {
-  /// 首次设置（尚无 PIN）。
+  /// 首次设置（尚未配置应用内 PIN）。
   setup,
 
-  /// 已设置时的操作入口（修改 / 清除）。
+  /// 已配置时的操作入口（修改 / 清除）。
   hub,
 
-  /// 修改密码表单。
+  /// 修改 PIN 表单。
   change,
 
-  /// 清除密码表单。
+  /// 清除 PIN 表单。
   clear,
 }
 
-/// 备用密码管理页展示状态（MVVM-C 的 VM 层输出）。
+/// 应用内 PIN 管理页展示状态（MVVM-C 的 VM 层输出）。
+///
+/// 展示字段 [hasFallbackPin] 与 [AppLockPreferences.hasFallbackPin] 同名；
+/// 初始化时由 [AppLockAuthService.hasAppPin] 查询 Auth 层 SSOT。
 final class AppLockPinManageState {
   const AppLockPinManageState({
     required this.mode,
-    required this.hasPin,
+    required this.hasFallbackPin,
     required this.isBusy,
     required this.obscureCurrentPin,
     required this.obscurePin,
@@ -34,19 +37,36 @@ final class AppLockPinManageState {
     this.clearBlockedReason,
   });
 
+  /// 当前子流程；决定 View 渲染 setup / hub / change / clear 哪套表单。
   final AppLockPinManageMode mode;
-  final bool hasPin;
+
+  /// 是否已配置备用 PIN；与 [AppLockPreferences.hasFallbackPin] 对齐，来源 [AppLockAuthService.hasAppPin]。
+  final bool hasFallbackPin;
+
+  /// 保存 / 修改 / 清除 PIN 的异步操作是否进行中；为 true 时 View 应禁用提交。
   final bool isBusy;
+
+  /// change / clear 模式下「当前 PIN」输入框是否遮蔽明文。
   final bool obscureCurrentPin;
+
+  /// setup / change 模式下「新 PIN」输入框是否遮蔽明文。
   final bool obscurePin;
+
+  /// setup / change 模式下「确认 PIN」输入框是否遮蔽明文。
   final bool obscureConfirmPin;
+
+  /// 校验或操作失败时的提示文案；成功 pop 前由 ViewModel 清空。
   final String? errorMessage;
+
+  /// 是否允许清除 PIN；锁屏保护已开启且无生物识别等备选解锁方式时为 false。
   final bool canClearPin;
+
+  /// [canClearPin] 为 false 时的原因说明；点击「清除」时也会写入 [errorMessage] 展示。
   final String? clearBlockedReason;
 
   AppLockPinManageState copyWith({
     AppLockPinManageMode? mode,
-    bool? hasPin,
+    bool? hasFallbackPin,
     bool? isBusy,
     bool? obscureCurrentPin,
     bool? obscurePin,
@@ -59,7 +79,7 @@ final class AppLockPinManageState {
   }) {
     return AppLockPinManageState(
       mode: mode ?? this.mode,
-      hasPin: hasPin ?? this.hasPin,
+      hasFallbackPin: hasFallbackPin ?? this.hasFallbackPin,
       isBusy: isBusy ?? this.isBusy,
       obscureCurrentPin: obscureCurrentPin ?? this.obscureCurrentPin,
       obscurePin: obscurePin ?? this.obscurePin,
@@ -73,7 +93,7 @@ final class AppLockPinManageState {
   }
 }
 
-/// 备用密码管理页 ViewModel（MVVM-C 的 VM 层）。
+/// 应用内 PIN 管理页 ViewModel（MVVM-C 的 VM 层；路由入口文案为「备用密码」）。
 ///
 /// PIN 明文由 View 层收集后通过方法参数传入；ViewModel 不持有 [TextEditingController]。
 ///
@@ -98,11 +118,13 @@ final class AppLockPinManageViewModel
   }
 
   Future<AppLockPinManageState> _loadInitialState() async {
-    final hasPin = await _authService.hasAppPin();
+    final hasFallbackPin = await _authService.hasAppPin();
     final clearPolicy = await _resolveClearPolicy();
     return AppLockPinManageState(
-      mode: hasPin ? AppLockPinManageMode.hub : AppLockPinManageMode.setup,
-      hasPin: hasPin,
+      mode: hasFallbackPin
+          ? AppLockPinManageMode.hub
+          : AppLockPinManageMode.setup,
+      hasFallbackPin: hasFallbackPin,
       isBusy: false,
       obscureCurrentPin: true,
       obscurePin: true,
@@ -123,7 +145,7 @@ final class AppLockPinManageViewModel
 
     state = AsyncData(
       current.copyWith(
-        mode: current.hasPin
+        mode: current.hasFallbackPin
             ? AppLockPinManageMode.hub
             : AppLockPinManageMode.setup,
         clearError: true,

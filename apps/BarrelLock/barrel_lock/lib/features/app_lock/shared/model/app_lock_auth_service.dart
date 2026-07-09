@@ -12,7 +12,7 @@ final class AppLockAuthService {
 
   final IdentityAuthUiDelegate uiDelegate;
 
-  /// 查询当前设备生物识别可用性（设置页展示用）。
+  /// 查询当前设备生物识别可用性。
   Future<BiometricAvailability> checkBiometricAvailability() {
     return AppIdentityAuth.checkBiometricAvailability();
   }
@@ -32,18 +32,13 @@ final class AppLockAuthService {
   /// 校验 PIN，不触发 UI（PIN 管理页的「验证当前密码」场景）。
   Future<bool> verifyAppPin(String pin) => AppIdentityAuth.verifyAppPin(pin);
 
-  /// 按当前锁屏偏好执行身份验证。
+  /// 执行锁屏身份验证；可用时优先生物识别，失败回退应用内 PIN。
   ///
-  /// 调用方须先确认 [AppLockPreferences.enabled]；内部根据 [preferBiometric] 决定验证顺序。
+  /// 调用方须先确认 [AppLockPreferences.enabled]。
   Future<IdentityAuthResult> authenticateForAppLock({
     required IdentityAuthReason reason,
-    required AppLockPreferences preferences,
   }) {
-    return AppIdentityAuth.authenticate(
-      reason: reason,
-      ui: uiDelegate,
-      preferBiometric: preferences.useBiometricOnResume,
-    );
+    return AppIdentityAuth.authenticate(reason: reason, ui: uiDelegate);
   }
 
   /// 是否已具备至少一种解锁方式（生物识别可用 **或** 已设应用内 PIN）。

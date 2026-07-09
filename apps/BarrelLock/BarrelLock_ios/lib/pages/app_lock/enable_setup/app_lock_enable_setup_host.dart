@@ -30,7 +30,7 @@ class _AppLockEnableSetupHostState
 
   @override
   void dispose() {
-    releasePinFieldFocus(_pinFocusNode);
+    _pinFocusNode.unfocus();
     _pinFocusNode.dispose();
     _confirmPinController.dispose();
     _pinController.dispose();
@@ -38,13 +38,13 @@ class _AppLockEnableSetupHostState
   }
 
   void _clearInputs() {
-    releasePinFieldFocus(_pinFocusNode);
+    _pinFocusNode.unfocus();
     _pinController.clear();
     _confirmPinController.clear();
   }
 
   void _submit() {
-    releasePinFieldFocus(_pinFocusNode);
+    _pinFocusNode.unfocus();
     ref
         .read(appLockEnableSetupProvider.notifier)
         .submitPin(
@@ -54,7 +54,7 @@ class _AppLockEnableSetupHostState
   }
 
   void _cancel() {
-    releasePinFieldFocus(_pinFocusNode);
+    _pinFocusNode.unfocus();
     ref.read(appLockEnableSetupProvider.notifier).cancel();
     _clearInputs();
   }
@@ -72,7 +72,11 @@ class _AppLockEnableSetupHostState
       }
       if (previous?.phase != AppLockEnableSetupPhase.active &&
           next.phase == AppLockEnableSetupPhase.active) {
-        schedulePinFieldFocus(_pinFocusNode, isMounted: () => mounted);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _pinFocusNode.canRequestFocus) {
+            _pinFocusNode.requestFocus();
+          }
+        });
       }
     });
 

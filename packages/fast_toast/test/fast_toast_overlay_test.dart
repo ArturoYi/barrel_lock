@@ -260,5 +260,31 @@ void main() {
 
       expect(find.text('after-detach'), findsOneWidget);
     });
+
+    testWidgets('elevated layer renders above normal overlay host sibling', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) {
+            return FastToastElevatedHost(
+              wrapped: FastToastOverlay(
+                child: child ?? const SizedBox.shrink(),
+              ),
+            );
+          },
+          home: const Scaffold(body: Text('content')),
+        ),
+      );
+      await tester.pump();
+
+      FastToast.show(
+        'above-lock',
+        config: const ToastConfig(overlayLayer: ToastOverlayLayer.elevated),
+      );
+      await tester.pump();
+
+      expect(find.text('above-lock'), findsOneWidget);
+    });
   });
 }

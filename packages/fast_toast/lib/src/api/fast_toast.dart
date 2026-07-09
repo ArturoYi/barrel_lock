@@ -1,5 +1,6 @@
 import '../core/toast_controller.dart';
 import '../domain/toast_config.dart';
+import '../domain/toast_overlay_layer_resolver.dart';
 import '../domain/toast_style.dart';
 import '../domain/toast_type.dart';
 
@@ -16,6 +17,11 @@ abstract final class FastToast {
   /// 注入 Loading 暂停检查（例如 `() => FastLoading.isShowing`）。
   static set loadingPauseCheck(bool Function()? check) {
     ToastController.loadingPauseCheck = check;
+  }
+
+  /// 注入 Overlay 层级解析（例如锁屏期间自动 elevated）。
+  static set overlayLayerResolver(ToastOverlayLayerResolver? resolver) {
+    ToastController.overlayLayerResolver = resolver;
   }
 
   /// 展示 Toast。

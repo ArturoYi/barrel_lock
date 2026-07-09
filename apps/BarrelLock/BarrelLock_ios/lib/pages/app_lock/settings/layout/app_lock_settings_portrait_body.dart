@@ -1,5 +1,4 @@
 import 'package:barrel_lock/barrel_lock.dart';
-import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../settings/widgets/settings_list_tile.dart';
@@ -12,14 +11,12 @@ final class AppLockSettingsPortraitBody extends StatelessWidget {
     required this.data,
     required this.enableSetupVisible,
     required this.onEnabledChanged,
-    required this.onBiometricOnResumeChanged,
     required this.onOpenPinManage,
   });
 
   final AppLockSettingsViewState data;
   final bool enableSetupVisible;
   final ValueChanged<bool>? onEnabledChanged;
-  final ValueChanged<bool>? onBiometricOnResumeChanged;
   final VoidCallback onOpenPinManage;
 
   @override
@@ -46,14 +43,6 @@ final class AppLockSettingsPortraitBody extends StatelessWidget {
               value: data.preferences.enabled,
               onChanged: onEnabledChanged,
             ),
-            if (data.biometricAvailability == BiometricAvailability.available)
-              SettingsSwitchTile(
-                title: '回到前台时使用生物识别',
-                subtitle: '优先使用面容 ID / 指纹，失败时回退数字密码',
-                icon: Icons.fingerprint,
-                value: data.preferences.useBiometricOnResume,
-                onChanged: onBiometricOnResumeChanged,
-              ),
           ],
         ),
         const SizedBox(height: 16),

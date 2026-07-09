@@ -12,27 +12,22 @@ final class AppLockSettingsViewState {
   const AppLockSettingsViewState({
     required this.preferences,
     required this.isLoading,
-    required this.biometricAvailability,
     this.statusMessage,
   });
 
   final AppLockPreferences preferences;
   final bool isLoading;
-  final BiometricAvailability biometricAvailability;
   final String? statusMessage;
 
   AppLockSettingsViewState copyWith({
     AppLockPreferences? preferences,
     bool? isLoading,
-    BiometricAvailability? biometricAvailability,
     String? statusMessage,
     bool clearStatusMessage = false,
   }) {
     return AppLockSettingsViewState(
       preferences: preferences ?? this.preferences,
       isLoading: isLoading ?? this.isLoading,
-      biometricAvailability:
-          biometricAvailability ?? this.biometricAvailability,
       statusMessage: clearStatusMessage
           ? null
           : (statusMessage ?? this.statusMessage),
@@ -43,31 +38,24 @@ final class AppLockSettingsViewState {
 /// 应用保护设置页 ViewModel（MVVM-C 的 VM 层）。
 final class AppLockSettingsViewModel
     extends AsyncNotifier<AppLockSettingsViewState> {
-  late final AppLockModel _model;
-  late final AppLockCoordinatorGateway _coordinator;
-  late final AppLockAuthService _authService;
+  AppLockModel get _model => ref.read(appLockModelProvider);
+
+  AppLockCoordinatorGateway get _coordinator =>
+      ref.read(appLockCoordinatorProvider);
+
+  AppLockAuthService get _authService => ref.read(appLockAuthServiceProvider);
 
   @override
   Future<AppLockSettingsViewState> build() async {
-    _model = ref.read(appLockModelProvider);
-    _coordinator = ref.read(appLockCoordinatorProvider);
-    _authService = ref.read(appLockAuthServiceProvider);
-
-    final biometricAvailability = await _authService
-        .checkBiometricAvailability();
     var preferences = await _model.load();
 
-    final hasPin = await _authService.hasAppPin();
-    if (preferences.hasFallbackPin != hasPin) {
-      preferences = preferences.copyWith(hasFallbackPin: hasPin);
+    final hasFallbackPin = await _authService.hasAppPin();
+    if (preferences.hasFallbackPin != hasFallbackPin) {
+      preferences = preferences.copyWith(hasFallbackPin: hasFallbackPin);
       await _model.save(preferences);
     }
 
-    return AppLockSettingsViewState(
-      preferences: preferences,
-      isLoading: false,
-      biometricAvailability: biometricAvailability,
-    );
+    return AppLockSettingsViewState(preferences: preferences, isLoading: false);
   }
 
   void onPop() {
@@ -94,14 +82,6 @@ final class AppLockSettingsViewModel
 
     await _persistEnabled(true);
     await ref.read(appLockSessionProvider.notifier).lockAfterEnabled();
-  }
-
-  Future<void> onBiometricOnResumeChanged(bool value) async {
-    final current = state.requireValue;
-    final updated = current.preferences.copyWith(useBiometricOnResume: value);
-    state = AsyncData(current.copyWith(preferences: updated, isLoading: true));
-    await _model.save(updated);
-    state = AsyncData(current.copyWith(preferences: updated, isLoading: false));
   }
 
   Future<void> _persistEnabled(bool enabled) async {

@@ -1,3 +1,4 @@
+import 'barrel_lock_global_overlays.dart';
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     bootstrapBarrelLockLifecycle();
+    configureBarrelLockToastOverlayResolver(ref);
     FastToast.loadingPauseCheck = () => FastLoading.isShowing;
     FastLoading.visibilityListenable.addListener(_resumeToastAfterLoading);
   }
@@ -33,6 +35,7 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
   @override
   void dispose() {
     FastLoading.visibilityListenable.removeListener(_resumeToastAfterLoading);
+    FastToast.overlayLayerResolver = null;
     WidgetsBinding.instance.removeObserver(this);
     disposeBarrelLockLifecycle();
     super.dispose();
@@ -91,14 +94,12 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
     AppFontScale fontScale,
   ) {
     final content = child ?? const SizedBox.shrink();
-    return AppLockOverlay(
+    return BarrelLockGlobalOverlays(
       child: MediaQuery(
         data: MediaQuery.of(
           context,
         ).copyWith(textScaler: TextScaler.linear(fontScale.scaleFactor)),
-        child: FastLoadingOverlay(
-          child: FastToastOverlay(child: FastDialogOverlay(child: content)),
-        ),
+        child: content,
       ),
     );
   }

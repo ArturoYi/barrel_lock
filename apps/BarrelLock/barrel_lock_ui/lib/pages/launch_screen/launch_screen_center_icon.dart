@@ -1,3 +1,4 @@
+import 'package:barrel_lock_ui/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 
 /// 启动页居中图标，淡入出现。
@@ -31,12 +32,7 @@ class _LaunchScreenCenterIconState extends State<LaunchScreenCenterIcon>
   Widget build(BuildContext context) {
     return FadeTransition(
       opacity: CurvedAnimation(parent: _fadeController, curve: Curves.easeIn),
-      child: Image.asset(
-        'assets/app_icon_center.png',
-        package: 'barrel_lock_ui',
-        width: 128,
-        height: 128,
-      ),
+      child: Assets.appIconCenter.image(width: 128, height: 128),
     );
   }
 }

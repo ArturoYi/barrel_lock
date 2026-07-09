@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../domain/toast_config.dart';
+import '../domain/toast_overlay_layer.dart';
+import '../domain/toast_overlay_layer_resolver.dart';
 import '../domain/toast_priority.dart';
 import '../domain/toast_request.dart';
 import '../domain/toast_style.dart';
@@ -17,11 +19,20 @@ final class ToastController extends ChangeNotifier {
   /// 可选：返回 true 时暂停 dequeue（供 App 注入 `FastLoading.isShowing`）。
   static bool Function()? loadingPauseCheck;
 
+  /// 可选：App 按运行时上下文覆盖 overlay 层级（如锁屏期间自动 elevated）。
+  static ToastOverlayLayerResolver? overlayLayerResolver;
+
   final ToastQueue _queue = ToastQueue();
-  final ToastOverlayHost _host = ToastOverlayHost();
+  final ToastOverlayHost _normalHost = ToastOverlayHost();
+  final ToastOverlayHost _elevatedHost = ToastOverlayHost();
 
   ToastRequest? _current;
   bool _isShowing = false;
+
+  ToastOverlayHost _hostFor(ToastOverlayLayer layer) => switch (layer) {
+    ToastOverlayLayer.normal => _normalHost,
+    ToastOverlayLayer.elevated => _elevatedHost,
+  };
 
   /// 是否正在展示 Toast。
   bool get isShowing => _isShowing;
@@ -34,17 +45,27 @@ final class ToastController extends ChangeNotifier {
 
   ToastRequest? get current => _current;
 
+  @visibleForTesting
+  ToastRequest? get pendingRequest => _queue.first;
+
   /// 注册根 Overlay；若队列有 pending 请求则尝试展示。
-  void attach(OverlayState overlayState) {
-    _host.attach(overlayState);
+  void attach(
+    OverlayState overlayState, {
+    ToastOverlayLayer layer = ToastOverlayLayer.normal,
+  }) {
+    _hostFor(layer).attach(overlayState);
     _tryShowNext();
   }
 
-  /// 注销根 Overlay；立即移除 Entry，保留队列。
-  void detach() {
-    _host.removeImmediately();
-    _current = null;
-    _isShowing = false;
+  /// 注销根 Overlay；立即移除该层 Entry，保留队列。
+  void detach({ToastOverlayLayer layer = ToastOverlayLayer.normal}) {
+    final host = _hostFor(layer);
+    if (_isShowing && _current?.config.overlayLayer == layer) {
+      host.removeImmediately();
+      _current = null;
+      _isShowing = false;
+    }
+    host.detach();
     notifyListeners();
   }
 
@@ -58,7 +79,12 @@ final class ToastController extends ChangeNotifier {
     final request = ToastRequest(
       message: message,
       type: type,
-      config: config ?? const ToastConfig(),
+      config: _resolveOverlayLayer(
+        config: config ?? const ToastConfig(),
+        message: message,
+        type: type,
+        style: style,
+      ),
       style: style,
     );
 
@@ -71,10 +97,40 @@ final class ToastController extends ChangeNotifier {
     _tryShowNext();
   }
 
+  ToastConfig _resolveOverlayLayer({
+    required ToastConfig config,
+    required String message,
+    required ToastType type,
+    ToastStyle? style,
+  }) {
+    if (config.overlayLayer != ToastOverlayLayer.normal) {
+      return config;
+    }
+    final resolver = overlayLayerResolver;
+    if (resolver == null) {
+      return config;
+    }
+    final resolved = resolver(
+      ToastRequest(message: message, type: type, config: config, style: style),
+    );
+    if (resolved == null || resolved == ToastOverlayLayer.normal) {
+      return config;
+    }
+    return ToastConfig(
+      duration: config.duration,
+      position: config.position,
+      animation: config.animation,
+      dismissible: config.dismissible,
+      bypassLoadingPause: config.bypassLoadingPause,
+      priority: config.priority,
+      overlayLayer: resolved,
+    );
+  }
+
   /// 高优：立即移除当前 Toast，插队队首并马上展示；其余 pending 保留。
   void _enqueueHighPriority(ToastRequest request) {
-    if (_isShowing) {
-      _host.removeImmediately();
+    if (_isShowing && _current != null) {
+      _hostFor(_current!.config.overlayLayer).removeImmediately();
       _current = null;
       _isShowing = false;
     }
@@ -85,16 +141,17 @@ final class ToastController extends ChangeNotifier {
 
   /// 手动关闭当前 Toast；退场结束后自动 dequeue 下一条。
   void dismiss() {
-    if (!_isShowing) {
+    if (!_isShowing || _current == null) {
       return;
     }
-    _host.dismissCurrent();
+    _hostFor(_current!.config.overlayLayer).dismissCurrent();
   }
 
   /// 清空队列并立即移除当前 Toast。
   void dismissAll() {
     _queue.clear();
-    _host.removeImmediately();
+    _normalHost.removeImmediately();
+    _elevatedHost.removeImmediately();
     _current = null;
     _isShowing = false;
     notifyListeners();
@@ -106,7 +163,7 @@ final class ToastController extends ChangeNotifier {
   }
 
   void _tryShowNext() {
-    if (_isShowing || _host.overlayState == null || _queue.isEmpty) {
+    if (_isShowing || _queue.isEmpty) {
       return;
     }
 
@@ -115,10 +172,15 @@ final class ToastController extends ChangeNotifier {
       return;
     }
 
+    final host = _hostFor(next.config.overlayLayer);
+    if (host.overlayState == null) {
+      return;
+    }
+
     _queue.dequeue();
     _current = next;
     _isShowing = true;
-    _host.show(request: next, onDismissed: _onCurrentDismissed);
+    host.show(request: next, onDismissed: _onCurrentDismissed);
     notifyListeners();
   }
 
@@ -140,9 +202,11 @@ final class ToastController extends ChangeNotifier {
   @visibleForTesting
   void resetForTest() {
     _queue.clear();
-    _host.detach();
+    _normalHost.detach();
+    _elevatedHost.detach();
     _current = null;
     _isShowing = false;
     loadingPauseCheck = null;
+    overlayLayerResolver = null;
   }
 }

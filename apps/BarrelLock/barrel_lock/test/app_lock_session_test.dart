@@ -25,17 +25,20 @@ final class _QueueingUiDelegate implements IdentityAuthUiDelegate {
   }) async {}
 }
 
+/// 等待冷启动锁屏请求并完成验证（单测无 Overlay 层，需手动调用 [startAuthentication]）。
 Future<void> waitForColdStartAuth(ProviderContainer container) async {
   const timeout = Duration(seconds: 2);
   final deadline = DateTime.now().add(timeout);
 
   while (DateTime.now().isBefore(deadline)) {
     final session = container.read(appLockSessionProvider);
-    if (session.isAuthenticating || session.isLocked) {
+    if (session.isLocked && session.isAuthenticating) {
       break;
     }
     await Future<void>.delayed(const Duration(milliseconds: 10));
   }
+
+  await container.read(appLockSessionProvider.notifier).startAuthentication();
 
   while (DateTime.now().isBefore(deadline)) {
     final session = container.read(appLockSessionProvider);
@@ -60,11 +63,7 @@ void main() {
       const model = AppLockModel();
       await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
-        const AppLockPreferences(
-          enabled: true,
-          useBiometricOnResume: true,
-          hasFallbackPin: true,
-        ),
+        const AppLockPreferences(enabled: true, hasFallbackPin: true),
       );
 
       final container = ProviderContainer(
@@ -88,11 +87,7 @@ void main() {
       const model = AppLockModel();
       await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
-        const AppLockPreferences(
-          enabled: true,
-          useBiometricOnResume: true,
-          hasFallbackPin: true,
-        ),
+        const AppLockPreferences(enabled: true, hasFallbackPin: true),
       );
 
       final delegate = _QueueingUiDelegate([null, testAppLockPin]);
@@ -112,11 +107,7 @@ void main() {
     test('enters authentication when unlock is unavailable', () async {
       const model = AppLockModel();
       await model.save(
-        const AppLockPreferences(
-          enabled: true,
-          useBiometricOnResume: true,
-          hasFallbackPin: false,
-        ),
+        const AppLockPreferences(enabled: true, hasFallbackPin: false),
       );
 
       final delegate = _QueueingUiDelegate([]);
@@ -148,11 +139,7 @@ void main() {
       const model = AppLockModel();
       await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
-        const AppLockPreferences(
-          enabled: false,
-          useBiometricOnResume: true,
-          hasFallbackPin: true,
-        ),
+        const AppLockPreferences(enabled: false, hasFallbackPin: true),
       );
 
       final delegate = _QueueingUiDelegate([testAppLockPin]);
@@ -165,14 +152,13 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 50));
 
       await model.save(
-        const AppLockPreferences(
-          enabled: true,
-          useBiometricOnResume: true,
-          hasFallbackPin: true,
-        ),
+        const AppLockPreferences(enabled: true, hasFallbackPin: true),
       );
 
       await container.read(appLockSessionProvider.notifier).lockAfterEnabled();
+      await container
+          .read(appLockSessionProvider.notifier)
+          .startAuthentication();
 
       final session = container.read(appLockSessionProvider);
       expect(session.isLocked, isFalse);
@@ -184,11 +170,7 @@ void main() {
       const model = AppLockModel();
       await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
-        const AppLockPreferences(
-          enabled: true,
-          useBiometricOnResume: true,
-          hasFallbackPin: true,
-        ),
+        const AppLockPreferences(enabled: true, hasFallbackPin: true),
       );
 
       final delegate = _QueueingUiDelegate([testAppLockPin, testAppLockPin]);
@@ -203,6 +185,7 @@ void main() {
 
       await notifier.onAppPaused();
       await notifier.onAppResumed();
+      await notifier.startAuthentication();
 
       final session = container.read(appLockSessionProvider);
       expect(session.isLocked, isFalse);

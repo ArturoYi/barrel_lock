@@ -40,9 +40,6 @@ class AppLockSettingsPage extends ConsumerWidget {
                     onEnabledChanged: controlsLocked
                         ? null
                         : viewModel.onEnabledChanged,
-                    onBiometricOnResumeChanged: controlsLocked
-                        ? null
-                        : viewModel.onBiometricOnResumeChanged,
                     onOpenPinManage: viewModel.onOpenPinManage,
                   );
 
@@ -51,16 +48,12 @@ class AppLockSettingsPage extends ConsumerWidget {
                       data: bodyProps.data,
                       enableSetupVisible: bodyProps.enableSetupVisible,
                       onEnabledChanged: bodyProps.onEnabledChanged,
-                      onBiometricOnResumeChanged:
-                          bodyProps.onBiometricOnResumeChanged,
                       onOpenPinManage: bodyProps.onOpenPinManage,
                     ),
                     Orientation.landscape => AppLockSettingsLandscapeBody(
                       data: bodyProps.data,
                       enableSetupVisible: bodyProps.enableSetupVisible,
                       onEnabledChanged: bodyProps.onEnabledChanged,
-                      onBiometricOnResumeChanged:
-                          bodyProps.onBiometricOnResumeChanged,
                       onOpenPinManage: bodyProps.onOpenPinManage,
                     ),
                   };

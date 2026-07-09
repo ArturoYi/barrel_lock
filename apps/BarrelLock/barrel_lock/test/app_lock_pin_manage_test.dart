@@ -37,7 +37,7 @@ void main() {
       );
 
       expect(state.mode, AppLockPinManageMode.setup);
-      expect(state.hasPin, isFalse);
+      expect(state.hasFallbackPin, isFalse);
     });
 
     test('starts in hub mode when pin exists', () async {
@@ -57,7 +57,7 @@ void main() {
       );
 
       expect(state.mode, AppLockPinManageMode.hub);
-      expect(state.hasPin, isTrue);
+      expect(state.hasFallbackPin, isTrue);
     });
 
     test('changePin updates stored pin after verifying current pin', () async {
@@ -90,11 +90,7 @@ void main() {
       const model = AppLockModel();
       await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
-        const AppLockPreferences(
-          enabled: false,
-          useBiometricOnResume: true,
-          hasFallbackPin: true,
-        ),
+        const AppLockPreferences(enabled: false, hasFallbackPin: true),
       );
 
       final coordinator = _RecordingAppLockCoordinator();
@@ -121,11 +117,7 @@ void main() {
       const model = AppLockModel();
       await AppIdentityAuth.setAppPin(testAppLockPin);
       await model.save(
-        const AppLockPreferences(
-          enabled: true,
-          useBiometricOnResume: true,
-          hasFallbackPin: true,
-        ),
+        const AppLockPreferences(enabled: true, hasFallbackPin: true),
       );
 
       final container = ProviderContainer(

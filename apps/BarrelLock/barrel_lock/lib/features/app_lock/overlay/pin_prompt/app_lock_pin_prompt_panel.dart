@@ -1,8 +1,9 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:barrel_lock/shared/widgets/numeric_keyboard_listener.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
+import 'app_lock_pin_keypad.dart';
 import 'layout/app_lock_pin_prompt_landscape_layout.dart';
 import 'layout/app_lock_pin_prompt_portrait_layout.dart';
 
@@ -18,50 +19,21 @@ final class AppLockPinPromptPanel extends ConsumerStatefulWidget {
 }
 
 class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
-  late final TextEditingController _pinController;
-  late final FocusNode _pinFocusNode;
-
-  @override
-  void initState() {
-    super.initState();
-    _pinController = TextEditingController();
-    _pinFocusNode = FocusNode();
-    schedulePinFieldFocus(
-      _pinFocusNode,
-      isMounted: () => mounted,
-      afterSystemAuth: true,
-    );
-  }
+  String _pinBuffer = '';
 
   @override
   void didUpdateWidget(covariant AppLockPinPromptPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.state.attempt != widget.state.attempt) {
-      releasePinFieldFocus(_pinFocusNode);
-      _pinController.clear();
-      schedulePinFieldFocus(
-        _pinFocusNode,
-        isMounted: () => mounted,
-        afterSystemAuth: true,
-      );
+      _pinBuffer = '';
     }
   }
 
-  @override
-  void dispose() {
-    cancelPendingPinFieldFocus();
-    _pinFocusNode.dispose();
-    _pinController.dispose();
-    super.dispose();
-  }
-
   void _submitPin() {
-    releasePinFieldFocus(_pinFocusNode);
-    ref.read(appLockPinPromptProvider.notifier).submitPin(_pinController.text);
+    ref.read(appLockPinPromptProvider.notifier).submitPin(_pinBuffer);
   }
 
   void _cancel() {
-    cancelPendingPinFieldFocus();
     ref.read(appLockPinPromptProvider.notifier).cancel();
   }
 
@@ -69,38 +41,72 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
     ref.read(appLockPinPromptProvider.notifier).toggleObscure();
   }
 
+  void _onDigitPressed(int digit) {
+    if (widget.state.isSubmitting ||
+        _pinBuffer.length >= AppLockPinPolicy.length) {
+      return;
+    }
+    setState(() {
+      _pinBuffer += '$digit';
+    });
+  }
+
+  void _onDeletePressed() {
+    if (widget.state.isSubmitting || _pinBuffer.isEmpty) {
+      return;
+    }
+    setState(() {
+      _pinBuffer = _pinBuffer.substring(0, _pinBuffer.length - 1);
+    });
+  }
+
+  void _onClearPressed() {
+    if (widget.state.isSubmitting || _pinBuffer.isEmpty) {
+      return;
+    }
+    setState(() {
+      _pinBuffer = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = widget.state;
     final isSubmitting = state.isSubmitting;
 
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-
-    return Material(
-      type: MaterialType.transparency,
-      child: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.only(bottom: bottomInset),
+    return NumericKeyboardListener(
+      enabled: !isSubmitting,
+      onDigitPressed: _onDigitPressed,
+      onDeletePressed: _onDeletePressed,
+      onSubmit: _submitPin,
+      onCancel: _cancel,
+      child: Material(
+        type: MaterialType.transparency,
+        child: SafeArea(
           child: OrientationBuilder(
             builder: (context, orientation) {
               final layout = switch (orientation) {
                 Orientation.portrait => AppLockPinPromptPortraitLayout(
                   state: state,
-                  pinController: _pinController,
-                  pinFocusNode: _pinFocusNode,
+                  pinBuffer: _pinBuffer,
                   isSubmitting: isSubmitting,
                   onSubmit: _submitPin,
                   onCancel: _cancel,
                   onToggleObscure: _toggleObscure,
+                  onDigitPressed: _onDigitPressed,
+                  onDeletePressed: _onDeletePressed,
+                  onClearPressed: _onClearPressed,
                 ),
                 Orientation.landscape => AppLockPinPromptLandscapeLayout(
                   state: state,
-                  pinController: _pinController,
-                  pinFocusNode: _pinFocusNode,
+                  pinBuffer: _pinBuffer,
                   isSubmitting: isSubmitting,
                   onSubmit: _submitPin,
                   onCancel: _cancel,
                   onToggleObscure: _toggleObscure,
+                  onDigitPressed: _onDigitPressed,
+                  onDeletePressed: _onDeletePressed,
+                  onClearPressed: _onClearPressed,
                 ),
               };
 
@@ -116,56 +122,91 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
   }
 }
 
-/// 竖屏 / 横屏布局共用的 PIN 输入区骨架。
+/// 竖屏 / 横屏布局共用的 PIN 输入区骨架（自定义键盘，无系统输入框）。
 final class AppLockPinPromptInputSection extends StatelessWidget {
   const AppLockPinPromptInputSection({
     super.key,
     required this.state,
-    required this.pinController,
-    required this.pinFocusNode,
+    required this.pinBuffer,
     required this.isSubmitting,
     required this.onSubmit,
     required this.onToggleObscure,
+    required this.onDigitPressed,
+    required this.onDeletePressed,
+    required this.onClearPressed,
   });
 
   final AppLockPinPromptState state;
-  final TextEditingController pinController;
-  final FocusNode pinFocusNode;
+  final String pinBuffer;
   final bool isSubmitting;
   final VoidCallback onSubmit;
   final VoidCallback onToggleObscure;
+  final ValueChanged<int> onDigitPressed;
+  final VoidCallback onDeletePressed;
+  final VoidCallback onClearPressed;
+
+  String get _displayPin {
+    if (state.obscurePin) {
+      return List.filled(pinBuffer.length, '●').join();
+    }
+    return pinBuffer;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        TextField(
-          controller: pinController,
-          focusNode: pinFocusNode,
-          enabled: !isSubmitting,
-          obscureText: state.obscurePin,
-          keyboardType: TextInputType.number,
-          textInputAction: TextInputAction.done,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          decoration: InputDecoration(
-            labelText: '应用内密码',
-            suffixIcon: IconButton(
+        Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                label: '应用内密码',
+                value: _displayPin,
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: theme.colorScheme.outline),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    _displayPin.isEmpty ? ' ' : _displayPin,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      letterSpacing: 8,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            IconButton(
               onPressed: isSubmitting ? null : onToggleObscure,
               icon: Icon(
                 state.obscurePin ? Icons.visibility_off : Icons.visibility,
               ),
             ),
-          ),
-          onSubmitted: isSubmitting ? null : (_) => onSubmit(),
+          ],
+        ),
+        const SizedBox(height: 16),
+        AppLockPinKeypad(
+          onDigitPressed: onDigitPressed,
+          onDeletePressed: onDeletePressed,
+          onClearPressed: onClearPressed,
+          enabled: !isSubmitting,
+          isFull: pinBuffer.length >= AppLockPinPolicy.length,
         ),
         if (state.errorMessage case final message?) ...[
           const SizedBox(height: 8),
           Text(
             message,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.error,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.error,
             ),
           ),
         ],

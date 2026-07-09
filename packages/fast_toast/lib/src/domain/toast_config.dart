@@ -1,4 +1,5 @@
 import 'toast_animation.dart';
+import 'toast_overlay_layer.dart';
 import 'toast_position.dart';
 import 'toast_priority.dart';
 
@@ -11,6 +12,7 @@ final class ToastConfig {
     this.dismissible = false,
     this.bypassLoadingPause = false,
     this.priority = ToastPriority.normal,
+    this.overlayLayer = ToastOverlayLayer.normal,
   });
 
   final Duration duration;
@@ -19,4 +21,5 @@ final class ToastConfig {
   final bool dismissible;
   final bool bypassLoadingPause;
   final ToastPriority priority;
+  final ToastOverlayLayer overlayLayer;
 }

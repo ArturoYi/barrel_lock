@@ -8,21 +8,25 @@ final class AppLockPinPromptLandscapeLayout extends StatelessWidget {
   const AppLockPinPromptLandscapeLayout({
     super.key,
     required this.state,
-    required this.pinController,
-    required this.pinFocusNode,
+    required this.pinBuffer,
     required this.isSubmitting,
     required this.onSubmit,
     required this.onCancel,
     required this.onToggleObscure,
+    required this.onDigitPressed,
+    required this.onDeletePressed,
+    required this.onClearPressed,
   });
 
   final AppLockPinPromptState state;
-  final TextEditingController pinController;
-  final FocusNode pinFocusNode;
+  final String pinBuffer;
   final bool isSubmitting;
   final VoidCallback onSubmit;
   final VoidCallback onCancel;
   final VoidCallback onToggleObscure;
+  final ValueChanged<int> onDigitPressed;
+  final VoidCallback onDeletePressed;
+  final VoidCallback onClearPressed;
 
   static const _cardMaxWidth = 720.0;
   static const _horizontalPadding = 32.0;
@@ -43,12 +47,14 @@ final class AppLockPinPromptLandscapeLayout extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: _cardMaxWidth),
                 child: _LandscapeCard(
                   state: state,
-                  pinController: pinController,
-                  pinFocusNode: pinFocusNode,
+                  pinBuffer: pinBuffer,
                   isSubmitting: isSubmitting,
                   onSubmit: onSubmit,
                   onCancel: onCancel,
                   onToggleObscure: onToggleObscure,
+                  onDigitPressed: onDigitPressed,
+                  onDeletePressed: onDeletePressed,
+                  onClearPressed: onClearPressed,
                 ),
               ),
             ),
@@ -62,21 +68,25 @@ final class AppLockPinPromptLandscapeLayout extends StatelessWidget {
 final class _LandscapeCard extends StatelessWidget {
   const _LandscapeCard({
     required this.state,
-    required this.pinController,
-    required this.pinFocusNode,
+    required this.pinBuffer,
     required this.isSubmitting,
     required this.onSubmit,
     required this.onCancel,
     required this.onToggleObscure,
+    required this.onDigitPressed,
+    required this.onDeletePressed,
+    required this.onClearPressed,
   });
 
   final AppLockPinPromptState state;
-  final TextEditingController pinController;
-  final FocusNode pinFocusNode;
+  final String pinBuffer;
   final bool isSubmitting;
   final VoidCallback onSubmit;
   final VoidCallback onCancel;
   final VoidCallback onToggleObscure;
+  final ValueChanged<int> onDigitPressed;
+  final VoidCallback onDeletePressed;
+  final VoidCallback onClearPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -111,11 +121,13 @@ final class _LandscapeCard extends StatelessWidget {
                   children: [
                     AppLockPinPromptInputSection(
                       state: state,
-                      pinController: pinController,
-                      pinFocusNode: pinFocusNode,
+                      pinBuffer: pinBuffer,
                       isSubmitting: isSubmitting,
                       onSubmit: onSubmit,
                       onToggleObscure: onToggleObscure,
+                      onDigitPressed: onDigitPressed,
+                      onDeletePressed: onDeletePressed,
+                      onClearPressed: onClearPressed,
                     ),
                     Align(
                       alignment: Alignment.centerRight,

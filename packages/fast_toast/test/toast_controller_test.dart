@@ -58,6 +58,31 @@ void main() {
       expect(controller.totalCount, 0);
     });
 
+    test('overlayLayerResolver elevates during lock session context', () {
+      ToastController.overlayLayerResolver = (_) => ToastOverlayLayer.elevated;
+
+      controller.enqueue(message: 'locked');
+
+      expect(
+        controller.pendingRequest?.config.overlayLayer,
+        ToastOverlayLayer.elevated,
+      );
+    });
+
+    test('explicit elevated overlayLayer skips resolver', () {
+      ToastController.overlayLayerResolver = (_) => ToastOverlayLayer.elevated;
+
+      controller.enqueue(
+        message: 'already-elevated',
+        config: const ToastConfig(overlayLayer: ToastOverlayLayer.elevated),
+      );
+
+      expect(
+        controller.pendingRequest?.config.overlayLayer,
+        ToastOverlayLayer.elevated,
+      );
+    });
+
     test('dismiss at idle is no-op', () {
       controller.dismiss();
       expect(controller.isShowing, isFalse);

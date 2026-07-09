@@ -48,8 +48,7 @@ final class AppLockSessionState {
 /// 锁屏会话 ViewModel（MVVM-C 的 VM 层）。
 ///
 /// 职责：
-/// - 冷启动：若 [AppLockPreferences.enabled] 则立即触发验证
-/// - 后台恢复：[onAppPaused] 标记待验证，[onAppResumed] 执行验证
+/// - 冷启动 / 恢复 / 启用：先置 [isLocked] + [isAuthenticating]，由 [AppLockPinPromptOverlayLayer] 延迟后调用 [startAuthentication]
 /// - 验证循环：生物识别 → PIN 回退 → 失败重试（取消不退出循环，避免遮罩下无入口）
 ///
 /// 生命周期事件由 [AppLockSessionLifecycleBinder] 转发；锁屏 / PIN 遮罩 UI 由各平台 View 实现。
@@ -70,9 +69,20 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
   late final AppLockModel _model;
   late final AppLockAuthService _authService;
 
+  /// 应用进入后台后是否需在 [onAppResumed] 时触发解锁验证。
+  ///
+  /// 由 [markPendingUnlockOnPause]（同步）与 [onAppPaused]（异步确认偏好）共同维护，
+  /// 避免 resume 早于 pause 异步完成时漏锁。
   bool _pendingUnlockOnResume = false;
+
+  /// [build] 是否已调度过冷启动验证，防止重复注册 microtask。
   var _coldStartLockScheduled = false;
+
+  /// 最近一次加载的 [AppLockPreferences.enabled] 缓存，供 [markPendingUnlockOnPause] 同步判断。
   var _lockEnabled = false;
+
+  /// 验证循环是否已在运行（与 [AppLockSessionState.isAuthenticating] 分离，后者表示待验证/验证中 UI）。
+  var _authLoopRunning = false;
 
   @override
   AppLockSessionState build() {
@@ -91,7 +101,7 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
   }
 
   Future<void> _lockOnColdStartIfNeeded() async {
-    if (state.isAuthenticating) {
+    if (state.isLocked || state.isAuthenticating) {
       return;
     }
 
@@ -100,7 +110,7 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
       return;
     }
 
-    await _authenticate(preferences);
+    _requestLock();
   }
 
   /// inactive / paused 时立即显示隐私遮罩（同步，不 await 偏好加载）。
@@ -146,12 +156,12 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
       return;
     }
 
-    await _authenticate(preferences);
+    _requestLock();
   }
 
   /// 应用回到前台：若有待验证标记则启动验证循环。
   Future<void> onAppResumed() async {
-    if (!_pendingUnlockOnResume || state.isAuthenticating) {
+    if (!_pendingUnlockOnResume || state.isAuthenticating || state.isLocked) {
       return;
     }
 
@@ -164,7 +174,30 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
       return;
     }
 
+    _requestLock();
+  }
+
+  /// 由 [AppLockPinPromptOverlayLayer] 在锁屏遮罩展示后延迟调用，启动实际验证循环。
+  Future<void> startAuthentication() async {
+    if (!state.isLocked || !state.isAuthenticating || _authLoopRunning) {
+      return;
+    }
+
+    final preferences = await _loadPreferences();
+    if (preferences == null || !preferences.enabled) {
+      state = state.copyWith(isLocked: false, isAuthenticating: false);
+      return;
+    }
+
     await _authenticate(preferences);
+  }
+
+  void _requestLock() {
+    state = state.copyWith(
+      isLocked: true,
+      isAuthenticating: true,
+      showBackgroundShield: false,
+    );
   }
 
   Future<AppLockPreferences?> _loadPreferences() async {
@@ -177,20 +210,22 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
   }
 
   Future<void> _authenticate(AppLockPreferences preferences) async {
-    if (state.isAuthenticating) {
+    if (_authLoopRunning) {
       return;
     }
+    _authLoopRunning = true;
 
-    state = state.copyWith(
-      isLocked: true,
-      isAuthenticating: true,
-      showBackgroundShield: false,
-    );
+    try {
+      await _runAuthenticationLoop(preferences);
+    } finally {
+      _authLoopRunning = false;
+    }
+  }
 
+  Future<void> _runAuthenticationLoop(AppLockPreferences preferences) async {
     while (true) {
       var result = await _authService.authenticateForAppLock(
         reason: IdentityAuthReason.unlockOnResume,
-        preferences: preferences,
       );
       if (!ref.mounted) {
         return;

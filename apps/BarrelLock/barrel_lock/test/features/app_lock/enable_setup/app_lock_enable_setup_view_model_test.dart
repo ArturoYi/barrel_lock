@@ -78,6 +78,8 @@ void main() {
       );
       addTearDown(container.dispose);
 
+      // 设置页已挂载时 submitPin 会 invalidate 设置 VM，须能安全重建。
+      await container.read(appLockSettingsViewModelProvider.future);
       container.read(appLockSessionProvider);
       final notifier = container.read(appLockEnableSetupProvider.notifier);
       notifier.begin();

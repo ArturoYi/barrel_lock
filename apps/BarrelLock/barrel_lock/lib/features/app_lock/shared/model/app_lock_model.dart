@@ -22,17 +22,12 @@ final class AppLockModel {
       BarrelLockPreferenceKeys.appLockPreferences,
     );
     if (raw == null) {
-      return const AppLockPreferences(
-        enabled: false,
-        useBiometricOnResume: true,
-        hasFallbackPin: false,
-      );
+      return const AppLockPreferences(enabled: false, hasFallbackPin: false);
     }
 
     final map = jsonDecode(raw) as Map<String, dynamic>;
     return AppLockPreferences(
       enabled: map['enabled'] as bool? ?? false,
-      useBiometricOnResume: map['useBiometricOnResume'] as bool? ?? true,
       hasFallbackPin: map['hasFallbackPin'] as bool? ?? false,
     );
   }
@@ -41,7 +36,6 @@ final class AppLockModel {
   Future<void> save(AppLockPreferences preferences) async {
     final raw = jsonEncode({
       'enabled': preferences.enabled,
-      'useBiometricOnResume': preferences.useBiometricOnResume,
       'hasFallbackPin': preferences.hasFallbackPin,
     });
     await BarrelLockEncryptedStorage.setString(

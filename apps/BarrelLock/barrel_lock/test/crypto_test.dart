@@ -88,17 +88,12 @@ void main() {
       final prefs = await model.load();
 
       expect(prefs.enabled, isFalse);
-      expect(prefs.useBiometricOnResume, isTrue);
       expect(prefs.hasFallbackPin, isFalse);
     });
 
     test('save and load roundtrip', () async {
       const model = AppLockModel();
-      const saved = AppLockPreferences(
-        enabled: true,
-        useBiometricOnResume: false,
-        hasFallbackPin: true,
-      );
+      const saved = AppLockPreferences(enabled: true, hasFallbackPin: true);
 
       await model.save(saved);
       final loaded = await model.load();
