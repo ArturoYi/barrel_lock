@@ -1,7 +1,9 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-/// 主题设置 UI 组件。
+import 'settings_section_card.dart';
+
+/// 外观分组内联 UI：主题模式 + 主题色（竖屏直接展示 / 横屏 Detail 面板）。
 class ThemeSettingTile extends ConsumerWidget {
   const ThemeSettingTile({super.key});
 
@@ -11,11 +13,11 @@ class ThemeSettingTile extends ConsumerWidget {
     final notifier = ref.read(themeSettingsProvider.notifier);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('主题模式', style: Theme.of(context).textTheme.titleMedium),
+          const SettingsSubsectionTitle(title: '主题模式'),
           const SizedBox(height: 12),
           SegmentedButton<AppThemeMode>(
             segments: const [
@@ -29,7 +31,7 @@ class ThemeSettingTile extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 24),
-          Text('主题色', style: Theme.of(context).textTheme.titleMedium),
+          const SettingsSubsectionTitle(title: '主题色'),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -45,7 +47,7 @@ class ThemeSettingTile extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 24),
-          Text('字体大小', style: Theme.of(context).textTheme.titleMedium),
+          const SettingsSubsectionTitle(title: '字体大小'),
           const SizedBox(height: 12),
           SegmentedButton<AppFontScale>(
             segments: [

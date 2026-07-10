@@ -3,6 +3,16 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 /// 备用密码管理页（MVVM-C 的 V 层）。
+///
+/// 本文件为占位实现，请自行补充 UI。接入方式：
+///
+/// ```dart
+/// final state = ref.watch(appLockPinManageViewModelProvider);
+/// final vm = ref.read(appLockPinManageViewModelProvider.notifier);
+///
+/// // 按 state.mode 切换 setup / hub / change / clear 布局
+/// // 提交 → vm.savePin(pin:, confirmPin:) / vm.changePin(...) / vm.clearPin(...)
+/// ```
 class AppLockPinManagePage extends ConsumerWidget {
   const AppLockPinManagePage({super.key});
 
@@ -26,4 +36,5 @@ class AppLockPinManagePage extends ConsumerWidget {
   }
 }
 
+/// 兼容路由装配名称。
 typedef AppLockPinSetupPage = AppLockPinManagePage;

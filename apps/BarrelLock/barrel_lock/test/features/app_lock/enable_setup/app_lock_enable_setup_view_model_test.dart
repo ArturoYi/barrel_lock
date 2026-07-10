@@ -117,10 +117,7 @@ void main() {
 
       final notifier = container.read(appLockEnableSetupProvider.notifier);
       notifier.begin();
-      notifier.continueToHintStep(
-        pin: testAppLockPin,
-        confirmPin: '654321',
-      );
+      notifier.continueToHintStep(pin: testAppLockPin, confirmPin: '654321');
 
       final setup = container.read(appLockEnableSetupProvider);
       expect(setup.step, AppLockEnableSetupStep.pin);

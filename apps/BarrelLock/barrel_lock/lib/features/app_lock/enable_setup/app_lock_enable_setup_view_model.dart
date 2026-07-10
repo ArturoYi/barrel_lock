@@ -48,10 +48,7 @@ final class AppLockEnableSetupViewModel
         state.isBusy) {
       return;
     }
-    state = state.copyWith(
-      step: AppLockEnableSetupStep.pin,
-      clearError: true,
-    );
+    state = state.copyWith(step: AppLockEnableSetupStep.pin, clearError: true);
   }
 
   /// 切换 PIN 输入框明文 / 密文显示；提交中不生效。
@@ -71,10 +68,7 @@ final class AppLockEnableSetupViewModel
   }
 
   /// 校验 PIN 并进入提示语步骤。
-  void continueToHintStep({
-    required String pin,
-    required String confirmPin,
-  }) {
+  void continueToHintStep({required String pin, required String confirmPin}) {
     if (state.phase != AppLockEnableSetupPhase.active ||
         state.step != AppLockEnableSetupStep.pin) {
       return;
@@ -89,10 +83,7 @@ final class AppLockEnableSetupViewModel
       return;
     }
 
-    state = state.copyWith(
-      step: AppLockEnableSetupStep.hint,
-      clearError: true,
-    );
+    state = state.copyWith(step: AppLockEnableSetupStep.hint, clearError: true);
   }
 
   /// 校验提示语并落盘 PIN，成功后开启应用保护。

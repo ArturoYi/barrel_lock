@@ -49,7 +49,9 @@ void main() {
 
     test('validateHint rejects overly long hint', () {
       expect(
-        AppLockPinPolicy.validateHint('a' * (AppLockPinPolicy.hintMaxLength + 1)),
+        AppLockPinPolicy.validateHint(
+          'a' * (AppLockPinPolicy.hintMaxLength + 1),
+        ),
         isNotNull,
       );
     });

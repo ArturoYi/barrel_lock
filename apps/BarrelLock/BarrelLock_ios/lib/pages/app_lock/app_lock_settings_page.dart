@@ -22,17 +22,17 @@ class AppLockSettingsPage extends ConsumerWidget {
       orElse: () => enableSetup.isVisible,
     );
 
-    return SettingsSubpageScaffold(
-      title: '应用保护',
-      onBack: viewModel.onPop,
-      body: state.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(child: Text('加载失败：$error')),
-        data: (data) {
-          return Stack(
-            fit: StackFit.expand,
-            children: [
-              OrientationBuilder(
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        SettingsSubpageScaffold(
+          title: '应用保护',
+          onBack: viewModel.onPop,
+          body: state.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => Center(child: Text('加载失败：$error')),
+            data: (data) {
+              return OrientationBuilder(
                 builder: (context, orientation) {
                   final bodyProps = (
                     data: data,
@@ -58,12 +58,12 @@ class AppLockSettingsPage extends ConsumerWidget {
                     ),
                   };
                 },
-              ),
-              const AppLockEnableSetupHost(),
-            ],
-          );
-        },
-      ),
+              );
+            },
+          ),
+        ),
+        const AppLockEnableSetupHost(),
+      ],
     );
   }
 }
