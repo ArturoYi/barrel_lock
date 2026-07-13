@@ -38,5 +38,5 @@ export 'theme/presentation/app_color_scheme_x.dart';
 export 'theme/presentation/app_font_scale_x.dart';
 export 'theme/presentation/app_theme.dart';
 export 'theme/presentation/app_typography.dart';
-export 'theme/presentation/app_typography_x.dart';
+export 'theme/presentation/app_theme_x.dart';
 export 'theme/presentation/theme_notifier.dart';

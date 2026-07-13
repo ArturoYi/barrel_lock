@@ -22,15 +22,23 @@ abstract final class AppTheme {
     );
     final typography = AppTypography.standard(colorScheme: colorScheme);
 
-    return ThemeData(
+    final theme = ThemeData(
       colorScheme: colorScheme,
       useMaterial3: true,
       fontFamily: AppFonts.notoSansSC,
       splashFactory: NoSplash.splashFactory,
       highlightColor: Colors.transparent,
-      // textTheme 仅含 M3 几何；文字色由 colorScheme 与组件主题 / DefaultTextStyle 注入。
+      // 几何层无 color；merge 会抹掉 Typography 默认色，需在 ThemeData 落盘后回填。
       textTheme: typography.toTextTheme(),
       extensions: [typography],
+    );
+
+    return theme.copyWith(
+      textTheme: theme.textTheme.apply(
+        bodyColor: colorScheme.onSurface,
+        displayColor: colorScheme.onSurface,
+        decorationColor: colorScheme.onSurface,
+      ),
     );
   }
 }

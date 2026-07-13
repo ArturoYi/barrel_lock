@@ -1,4 +1,5 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/settings_gradient_background.dart';
@@ -46,9 +47,7 @@ class SettingsLandscapeSplitView extends StatelessWidget {
                   SizedBox(
                     width: masterWidth,
                     child: Material(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.surfaceContainerLowest,
+                      color: context.colors.surfaceContainerLowest,
                       child: ListView(
                         padding: const EdgeInsets.fromLTRB(12, 16, 12, 24),
                         children: [
@@ -70,23 +69,20 @@ class SettingsLandscapeSplitView extends StatelessWidget {
                   const VerticalDivider(width: 1),
                   Expanded(
                     child: Material(
-                      color: Theme.of(context).colorScheme.surface,
+                      color: context.colors.surface,
                       child: ListView(
                         padding: const EdgeInsets.all(24),
                         children: [
                           Text(
                             selected.title,
-                            style: Theme.of(context).textTheme.headlineSmall,
+                            style: context.textTheme.headlineSmall,
                           ),
                           const SizedBox(height: 8),
                           Text(
                             _detailHint(selected.kind),
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
-                                ),
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: context.colors.onSurfaceVariant,
+                            ),
                           ),
                           const SizedBox(height: 24),
                           AnimatedSwitcher(

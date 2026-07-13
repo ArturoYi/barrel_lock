@@ -58,10 +58,7 @@ void main() {
 
       final notifier = container.read(appLockEnableSetupProvider.notifier);
       notifier.begin();
-      notifier.continueToHintStep(
-        pin: testAppLockPin,
-        confirmPin: testAppLockPin,
-      );
+      notifier.continueToHintStep(pin: testAppLockPin);
 
       final setup = container.read(appLockEnableSetupProvider);
       expect(setup.step, AppLockEnableSetupStep.hint);
@@ -82,16 +79,9 @@ void main() {
       container.read(appLockSessionProvider);
       final notifier = container.read(appLockEnableSetupProvider.notifier);
       notifier.begin();
-      notifier.continueToHintStep(
-        pin: testAppLockPin,
-        confirmPin: testAppLockPin,
-      );
+      notifier.continueToHintStep(pin: testAppLockPin);
 
-      await notifier.submitSetup(
-        pin: testAppLockPin,
-        confirmPin: testAppLockPin,
-        hint: testAppLockHint,
-      );
+      await notifier.submitSetup(pin: testAppLockPin, hint: testAppLockHint);
 
       expect(container.read(appLockEnableSetupProvider).isVisible, isFalse);
       expect(coordinator.completedCount, 1);
@@ -105,7 +95,7 @@ void main() {
       expect(preferences.fallbackPinHint, testAppLockHint);
     });
 
-    test('continueToHintStep rejects invalid confirmation', () async {
+    test('continueToHintStep rejects invalid pin', () async {
       final container = ProviderContainer(
         overrides: appLockEnableSetupTestOverrides(
           coordinator: _RecordingEnableSetupCoordinator(),
@@ -117,7 +107,7 @@ void main() {
 
       final notifier = container.read(appLockEnableSetupProvider.notifier);
       notifier.begin();
-      notifier.continueToHintStep(pin: testAppLockPin, confirmPin: '654321');
+      notifier.continueToHintStep(pin: '12345');
 
       final setup = container.read(appLockEnableSetupProvider);
       expect(setup.step, AppLockEnableSetupStep.pin);
@@ -136,16 +126,9 @@ void main() {
 
       final notifier = container.read(appLockEnableSetupProvider.notifier);
       notifier.begin();
-      notifier.continueToHintStep(
-        pin: testAppLockPin,
-        confirmPin: testAppLockPin,
-      );
+      notifier.continueToHintStep(pin: testAppLockPin);
 
-      await notifier.submitSetup(
-        pin: testAppLockPin,
-        confirmPin: testAppLockPin,
-        hint: '   ',
-      );
+      await notifier.submitSetup(pin: testAppLockPin, hint: '   ');
 
       final setup = container.read(appLockEnableSetupProvider);
       expect(setup.step, AppLockEnableSetupStep.hint);
@@ -165,10 +148,7 @@ void main() {
 
       final notifier = container.read(appLockEnableSetupProvider.notifier);
       notifier.begin();
-      notifier.continueToHintStep(
-        pin: testAppLockPin,
-        confirmPin: testAppLockPin,
-      );
+      notifier.continueToHintStep(pin: testAppLockPin);
       notifier.backToPinStep();
 
       final setup = container.read(appLockEnableSetupProvider);

@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 import 'settings_gradient_background.dart';
@@ -19,7 +20,7 @@ class SettingsGradientSliverAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = context.colors;
 
     if (compact) {
       return SliverAppBar(
@@ -42,7 +43,7 @@ class SettingsGradientSliverAppBar extends StatelessWidget {
       centerTitle: true,
       title: Text(
         title,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+        style: context.textTheme.titleLarge?.copyWith(
           color: colorScheme.onSurface,
           fontWeight: FontWeight.w600,
         ),

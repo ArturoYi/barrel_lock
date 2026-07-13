@@ -1,7 +1,6 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:flutter/material.dart';
 
-import '../shared/app_lock_enable_setup_pin_input_field.dart';
 import 'pages/hint/app_lock_enable_setup_portrait_hint_page.dart';
 import 'pages/pin/app_lock_enable_setup_portrait_pin_page.dart';
 
@@ -19,22 +18,14 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
     required this.state,
     required this.pageController,
     required this.pinBuffer,
-    required this.confirmPinBuffer,
-    required this.activePinField,
-    required this.activePinBuffer,
     required this.hintController,
     required this.hintFocusNode,
     required this.onDigitPressed,
     required this.onDeletePressed,
-    required this.onClearPressed,
     required this.onContinueToHint,
     required this.onSubmitSetup,
-    required this.onBackToPinStep,
-    required this.onCancel,
     required this.onBack,
-    required this.onActivePinFieldChanged,
     required this.onToggleObscurePin,
-    required this.onToggleObscureConfirmPin,
   });
 
   /// ViewModel 输出的流程状态。
@@ -43,25 +34,44 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
   /// PageView 控制器，由 Host 持有并与 [AppLockEnableSetupStep] 同步。
   final PageController pageController;
 
+  /// Host 维护的主密码缓冲（自定义键盘写入，非 TextField）。
+  ///
+  /// 长度范围 0–[AppLockPinPolicy.length]；进入提示语步骤后仍保留，
+  /// 以便从提示语回退 PIN 时无需重新输入。
   final String pinBuffer;
-  final String confirmPinBuffer;
-  final AppLockEnableSetupPinInputField activePinField;
-  final String activePinBuffer;
-  final TextEditingController hintController;
-  final FocusNode hintFocusNode;
-  final ValueChanged<int> onDigitPressed;
-  final VoidCallback onDeletePressed;
-  final VoidCallback onClearPressed;
-  final VoidCallback onContinueToHint;
-  final VoidCallback onSubmitSetup;
-  final VoidCallback onBackToPinStep;
-  final VoidCallback onCancel;
 
-  /// AppBar 返回按钮回调：提示语步骤回退 PIN，PIN 步骤取消流程。
+  /// 提示语步骤的文本输入控制器，生命周期由 Host 创建与销毁。
+  final TextEditingController hintController;
+
+  /// 提示语输入框焦点节点；Host 在切换到 hint 步骤后自动请求焦点。
+  final FocusNode hintFocusNode;
+
+  /// 数字键（0–9）按下：向 [pinBuffer] 追加一位数字。
+  ///
+  /// 提交中或已满位时 Host 端会忽略输入。
+  final ValueChanged<int> onDigitPressed;
+
+  /// 退格键按下：删除 [pinBuffer] 末位。
+  ///
+  /// 提交中或缓冲为空时 Host 端会忽略。
+  final VoidCallback onDeletePressed;
+
+  /// 「下一步」或外接键盘 Enter：校验 PIN 并通知 ViewModel 进入提示语步骤。
+  final VoidCallback onContinueToHint;
+
+  /// 提示语步骤提交：校验提示语并落盘 PIN，开启应用保护。
+  final VoidCallback onSubmitSetup;
+
+  /// 导航回退回调，行为随当前步骤变化：
+  ///
+  /// - PIN 步骤（AppBar 返回 / 外接键盘 Esc）：取消整个流程
+  /// - 提示语步骤（AppBar 返回 / 「上一步」）：回退至 PIN 步骤，保留已输入 PIN
+  ///
+  /// 提交中（[AppLockEnableSetupState.isBusy]）时 AppBar 侧会禁用。
   final VoidCallback onBack;
-  final ValueChanged<AppLockEnableSetupPinInputField> onActivePinFieldChanged;
+
+  /// 切换 PIN 展示框的明文/密文显示。
   final VoidCallback onToggleObscurePin;
-  final VoidCallback onToggleObscureConfirmPin;
 
   @override
   Widget build(BuildContext context) {
@@ -94,17 +104,11 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
               AppLockEnableSetupPortraitPinPage(
                 state: state,
                 pinBuffer: pinBuffer,
-                confirmPinBuffer: confirmPinBuffer,
-                activePinField: activePinField,
-                activePinBuffer: activePinBuffer,
                 onDigitPressed: onDigitPressed,
                 onDeletePressed: onDeletePressed,
-                onClearPressed: onClearPressed,
                 onContinueToHint: onContinueToHint,
-                onCancel: onCancel,
-                onActivePinFieldChanged: onActivePinFieldChanged,
+                onBack: onBack,
                 onToggleObscurePin: onToggleObscurePin,
-                onToggleObscureConfirmPin: onToggleObscureConfirmPin,
               ),
               // 第 1 页：提示语设置
               AppLockEnableSetupPortraitHintPage(
@@ -112,7 +116,7 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
                 hintController: hintController,
                 hintFocusNode: hintFocusNode,
                 onSubmit: onSubmitSetup,
-                onBack: onBackToPinStep,
+                onBack: onBack,
               ),
             ],
           ),

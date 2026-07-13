@@ -12,7 +12,7 @@ class ClearDataPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(clearDataViewModelProvider);
     final viewModel = ref.read(clearDataViewModelProvider.notifier);
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = context.colors;
 
     return SettingsSubpageScaffold(
       title: '清除所有内容',
@@ -30,7 +30,7 @@ class ClearDataPage extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               state.stepMessage,
-              style: Theme.of(context).textTheme.titleMedium,
+              style: context.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             const Spacer(),
@@ -56,9 +56,7 @@ class ClearDataPage extends ConsumerWidget {
     return switch (state.step) {
       ClearDataStep.idle => [
         FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+          style: FilledButton.styleFrom(backgroundColor: context.colors.error),
           onPressed: viewModel.onRequestClear,
           child: const Text('开始清除'),
         ),
@@ -73,9 +71,7 @@ class ClearDataPage extends ConsumerWidget {
       ],
       ClearDataStep.confirm2 => [
         FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+          style: FilledButton.styleFrom(backgroundColor: context.colors.error),
           onPressed: viewModel.onConfirmStep2,
           child: const Text('确认永久删除'),
         ),

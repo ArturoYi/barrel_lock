@@ -1,4 +1,5 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 import '../../settings/widgets/settings_list_tile.dart';
@@ -29,8 +30,8 @@ final class AppLockSettingsPortraitBody extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.error,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colors.error,
               ),
             ),
           ),

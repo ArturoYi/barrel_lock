@@ -15,7 +15,7 @@ class ThemeSettingTile extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('主题模式', style: Theme.of(context).textTheme.titleMedium),
+          Text('主题模式', style: context.textTheme.titleMedium),
           const SizedBox(height: 12),
           SegmentedButton<AppThemeMode>(
             segments: const [
@@ -29,7 +29,7 @@ class ThemeSettingTile extends ConsumerWidget {
             },
           ),
           const SizedBox(height: 24),
-          Text('主题色', style: Theme.of(context).textTheme.titleMedium),
+          Text('主题色', style: context.textTheme.titleMedium),
           const SizedBox(height: 12),
           Wrap(
             spacing: 8,
@@ -45,7 +45,7 @@ class ThemeSettingTile extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 24),
-          Text('字体大小', style: Theme.of(context).textTheme.titleMedium),
+          Text('字体大小', style: context.textTheme.titleMedium),
           const SizedBox(height: 12),
           SegmentedButton<AppFontScale>(
             segments: [

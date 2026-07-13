@@ -1,4 +1,5 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 import '../app_lock_pin_prompt_panel.dart';
@@ -90,7 +91,7 @@ final class _LandscapeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
 
     return Card(
       elevation: 8,

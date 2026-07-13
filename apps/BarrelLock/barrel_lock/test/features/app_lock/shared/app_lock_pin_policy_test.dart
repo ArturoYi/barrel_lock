@@ -3,6 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AppLockPinPolicy', () {
+    test('accepts six digit pin', () {
+      expect(AppLockPinPolicy.validatePin('123456'), isNull);
+    });
+
+    test('rejects non six digit pin', () {
+      expect(AppLockPinPolicy.validatePin('12345'), isNotNull);
+    });
+
     test('accepts matching six digit pin', () {
       expect(
         AppLockPinPolicy.validateSetup(pin: '123456', confirmPin: '123456'),

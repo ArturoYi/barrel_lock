@@ -1,4 +1,5 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 /// 竖屏 PageView 第二步：设置忘记密码提示语。
@@ -32,7 +33,7 @@ final class AppLockEnableSetupPortraitHintPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
     final isBusy = state.isBusy;
 
     return LayoutBuilder(

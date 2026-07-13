@@ -48,15 +48,19 @@ void main() {
       tester,
     ) async {
       late ThemeData theme;
+      late TextTheme textTheme;
       late AppTypography typography;
+      late ColorScheme colors;
 
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.light(AppColorScheme.deepPurple),
           home: Builder(
             builder: (context) {
-              theme = Theme.of(context);
+              theme = context.theme;
+              textTheme = context.textTheme;
               typography = context.typography;
+              colors = context.colors;
               return const SizedBox.shrink();
             },
           ),
@@ -64,7 +68,9 @@ void main() {
       );
 
       expect(theme.textTheme.bodyMedium?.fontFamily, AppFonts.notoSansSC);
+      expect(textTheme.bodyMedium?.fontFamily, AppFonts.notoSansSC);
       expect(typography.bodyMedium.fontFamily, AppFonts.notoSansSC);
+      expect(colors, same(theme.colorScheme));
     });
 
     test('disables Material press splash globally', () {
@@ -72,6 +78,16 @@ void main() {
 
       expect(theme.splashFactory, same(NoSplash.splashFactory));
       expect(theme.highlightColor, Colors.transparent);
+    });
+
+    test('textTheme carries onSurface after geometry merge', () {
+      final light = AppTheme.light(AppColorScheme.deepPurple);
+      final dark = AppTheme.dark(AppColorScheme.deepPurple);
+      final typography = light.extension<AppTypography>();
+
+      expect(light.textTheme.bodyLarge?.color, light.colorScheme.onSurface);
+      expect(dark.textTheme.bodyLarge?.color, dark.colorScheme.onSurface);
+      expect(typography?.bodyLarge.color, isNull);
     });
   });
 

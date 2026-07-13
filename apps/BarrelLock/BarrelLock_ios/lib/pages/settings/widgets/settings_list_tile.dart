@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 /// 设置 ListTile 统一样式（间距、圆角、字色）。
@@ -18,9 +19,9 @@ final class SettingsListTileStyle {
     return SettingsListTileStyle(context);
   }
 
-  ColorScheme get colors => Theme.of(context).colorScheme;
+  ColorScheme get colors => context.colors;
 
-  TextTheme get text => Theme.of(context).textTheme;
+  TextTheme get text => context.textTheme;
 
   ShapeBorder get shape =>
       RoundedRectangleBorder(borderRadius: BorderRadius.circular(12));

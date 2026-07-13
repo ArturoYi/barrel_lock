@@ -1,4 +1,5 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 /// 横屏 PageView 第二步：左侧说明、右侧提示语输入。
@@ -31,7 +32,7 @@ final class AppLockEnableSetupLandscapeHintPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
     final isBusy = state.isBusy;
 
     return LayoutBuilder(

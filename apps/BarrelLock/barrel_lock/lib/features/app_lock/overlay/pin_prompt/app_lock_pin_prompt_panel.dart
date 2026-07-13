@@ -154,7 +154,7 @@ final class AppLockPinPromptInputSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -196,8 +196,16 @@ final class AppLockPinPromptInputSection extends StatelessWidget {
         const SizedBox(height: 16),
         AppLockPinKeypad(
           onDigitPressed: onDigitPressed,
-          onDeletePressed: onDeletePressed,
-          onClearPressed: onClearPressed,
+          leadingKey: AppLockPinKeyAction(
+            child: const Icon(Icons.clear),
+            onPressed: onClearPressed,
+            semanticLabel: '清除',
+          ),
+          trailingKey: AppLockPinKeyAction(
+            child: const Icon(Icons.backspace_outlined),
+            onPressed: onDeletePressed,
+            semanticLabel: '删除',
+          ),
           enabled: !isSubmitting,
           isFull: pinBuffer.length >= AppLockPinPolicy.length,
         ),
@@ -234,7 +242,7 @@ final class AppLockPinPromptHeaderSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

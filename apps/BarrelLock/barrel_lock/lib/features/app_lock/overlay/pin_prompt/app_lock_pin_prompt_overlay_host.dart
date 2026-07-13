@@ -81,7 +81,7 @@ class _AppLockPinPromptOverlayHostState
           return const SizedBox.shrink();
         }
 
-        return FocusScope(child: AppLockPinPromptPanel(state: state));
+        return AppLockPinPromptPanel(state: state);
       },
     );
 

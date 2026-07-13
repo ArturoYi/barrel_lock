@@ -1,31 +1,26 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:barrel_lock/features/app_lock/overlay/pin_prompt/app_lock_pin_keypad.dart';
 import 'package:barrel_lock/shared/widgets/numeric_keyboard_listener.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../shared/app_lock_enable_setup_pin_field.dart';
-import '../../../shared/app_lock_enable_setup_pin_input_field.dart';
 
-/// 竖屏 PageView 第一步：设置 PIN 与确认 PIN。
+/// 竖屏 PageView 第一步：设置 PIN。
 ///
-/// 纵向堆叠标题、说明、两个密码展示框、数字键盘与「下一步」按钮。
+/// 纵向堆叠标题、说明、密码展示框、数字键盘与「下一步」按钮。
 /// 外层包裹 [NumericKeyboardListener] 以支持外接键盘输入。
 final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
   const AppLockEnableSetupPortraitPinPage({
     super.key,
     required this.state,
     required this.pinBuffer,
-    required this.confirmPinBuffer,
-    required this.activePinField,
-    required this.activePinBuffer,
     required this.onDigitPressed,
     required this.onDeletePressed,
     required this.onClearPressed,
     required this.onContinueToHint,
     required this.onCancel,
-    required this.onActivePinFieldChanged,
     required this.onToggleObscurePin,
-    required this.onToggleObscureConfirmPin,
   });
 
   /// ViewModel 输出的流程状态（错误信息、遮蔽开关、忙碌态等）。
@@ -33,15 +28,6 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
 
   /// 主密码缓冲，由 Host 维护。
   final String pinBuffer;
-
-  /// 确认密码缓冲，由 Host 维护。
-  final String confirmPinBuffer;
-
-  /// 当前聚焦的输入框。
-  final AppLockEnableSetupPinInputField activePinField;
-
-  /// 当前聚焦框对应的缓冲，用于判断键盘是否已满。
-  final String activePinBuffer;
 
   /// 数字键按下（0–9）。
   final ValueChanged<int> onDigitPressed;
@@ -58,18 +44,12 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
   /// 取消整个开启验证流程。
   final VoidCallback onCancel;
 
-  /// 切换聚焦的密码框。
-  final ValueChanged<AppLockEnableSetupPinInputField> onActivePinFieldChanged;
-
   /// 切换主密码明文/密文。
   final VoidCallback onToggleObscurePin;
 
-  /// 切换确认密码明文/密文。
-  final VoidCallback onToggleObscureConfirmPin;
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
     final isBusy = state.isBusy;
 
     return NumericKeyboardListener(
@@ -90,7 +70,7 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
                   children: [
                     // 步骤说明
                     Text(
-                      '请输入 ${AppLockPinPolicy.length} 位数字密码并再次确认',
+                      '请输入 ${AppLockPinPolicy.length} 位数字密码',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -102,28 +82,10 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
                       label: '密码',
                       buffer: pinBuffer,
                       obscure: state.obscurePin,
-                      isActive:
-                          activePinField == AppLockEnableSetupPinInputField.pin,
+                      isActive: true,
                       isBusy: isBusy,
-                      onTap: () => onActivePinFieldChanged(
-                        AppLockEnableSetupPinInputField.pin,
-                      ),
+                      onTap: () {},
                       onToggleObscure: onToggleObscurePin,
-                    ),
-                    const SizedBox(height: 16),
-                    // 确认密码展示框
-                    AppLockEnableSetupPinField(
-                      label: '确认密码',
-                      buffer: confirmPinBuffer,
-                      obscure: state.obscureConfirmPin,
-                      isActive:
-                          activePinField ==
-                          AppLockEnableSetupPinInputField.confirmPin,
-                      isBusy: isBusy,
-                      onTap: () => onActivePinFieldChanged(
-                        AppLockEnableSetupPinInputField.confirmPin,
-                      ),
-                      onToggleObscure: onToggleObscureConfirmPin,
                     ),
                     // PIN 校验失败时的错误提示
                     if (state.errorMessage case final message?) ...[
@@ -140,10 +102,18 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
                     // 屏幕内数字键盘
                     AppLockPinKeypad(
                       onDigitPressed: onDigitPressed,
-                      onDeletePressed: onDeletePressed,
-                      onClearPressed: onClearPressed,
+                      leadingKey: AppLockPinKeyAction(
+                        child: const Icon(Icons.clear),
+                        onPressed: onClearPressed,
+                        semanticLabel: '清除',
+                      ),
+                      trailingKey: AppLockPinKeyAction(
+                        child: const Icon(Icons.backspace_outlined),
+                        onPressed: onDeletePressed,
+                        semanticLabel: '删除',
+                      ),
                       enabled: !isBusy,
-                      isFull: activePinBuffer.length >= AppLockPinPolicy.length,
+                      isFull: pinBuffer.length >= AppLockPinPolicy.length,
                     ),
                     const SizedBox(height: 24),
                     // 进入提示语步骤

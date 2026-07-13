@@ -1,3 +1,5 @@
+import 'package:barrel_lock/barrel_lock.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 /// 开启验证 PIN 步骤的单行密码展示框（横竖屏共用）。
@@ -22,7 +24,7 @@ final class AppLockEnableSetupPinField extends StatelessWidget {
   /// 当前框内已输入的原始数字字符串（未遮蔽）。
   final String buffer;
 
-  /// 是否以圆点遮蔽显示；由 ViewModel 的 [obscurePin] / [obscureConfirmPin] 驱动。
+  /// 是否以圆点遮蔽显示；由 ViewModel 的 [obscurePin] 驱动。
   final bool obscure;
 
   /// 是否为当前聚焦的输入框；聚焦时边框加粗并使用主题色。
@@ -49,7 +51,7 @@ final class AppLockEnableSetupPinField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
     final display = displayPin(buffer, obscure);
 
     return Column(
@@ -83,12 +85,10 @@ final class AppLockEnableSetupPinField extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      // 空缓冲时保留占位空格，避免容器高度塌陷
-                      display.isEmpty ? ' ' : display,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        letterSpacing: 8,
-                      ),
+                    child: _PinDotRow(
+                      buffer: buffer,
+                      obscure: obscure,
+                      isActive: isActive,
                     ),
                   ),
                 ),
@@ -102,6 +102,76 @@ final class AppLockEnableSetupPinField extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// 6 位 PIN 圆点展示行：已填写与当前活跃位加深，未填写为浅色。
+final class _PinDotRow extends StatelessWidget {
+  const _PinDotRow({
+    required this.buffer,
+    required this.obscure,
+    required this.isActive,
+  });
+
+  final String buffer;
+  final bool obscure;
+  final bool isActive;
+
+  static const _dotSize = 12.0;
+  static const _spacing = 20.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = context.theme;
+    final darkColor = theme.colorScheme.onSurface;
+    final lightColor = theme.colorScheme.outlineVariant;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var i = 0; i < AppLockPinPolicy.length; i++) ...[
+          if (i > 0) const SizedBox(width: _spacing),
+          _buildDot(
+            theme: theme,
+            index: i,
+            darkColor: darkColor,
+            lightColor: lightColor,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildDot({
+    required ThemeData theme,
+    required int index,
+    required Color darkColor,
+    required Color lightColor,
+  }) {
+    final isFilled = index < buffer.length;
+    final isActiveDot = isActive && index == buffer.length;
+    final isHighlighted = isFilled || isActiveDot;
+    final color = isHighlighted ? darkColor : lightColor;
+
+    return SizedBox(
+      width: _dotSize * 2.5,
+      height: _dotSize * 2.5,
+      child: Center(
+        child: !obscure && isFilled
+            ? Text(
+                buffer[index],
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: darkColor,
+                ),
+              )
+            : Container(
+                width: _dotSize,
+                height: _dotSize,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
+      ),
     );
   }
 }

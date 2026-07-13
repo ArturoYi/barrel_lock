@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 /// 3. **颜色与几何分离**：token 仅含字号/字重/行高/字距/baseline，不含 `color`。
 ///    文字色由 [ColorScheme] 角色在消费侧决定（如 `onSurface`、`onPrimary`），
 ///    或由 Material 组件（Button、AppBar 等）通过 `DefaultTextStyle` 注入。
-/// 4. **双通道消费**：业务层用 [AppTypographyX.typography]；Material 组件走
+/// 4. **双通道消费**：业务层用 [AppThemeX.typography]；Material 组件走
 ///    [ThemeData.textTheme]（[toTextTheme] 保持两者一致）。
 ///
 /// ## 与 ThemeData 的对齐关系

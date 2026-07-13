@@ -23,8 +23,8 @@ class DataMigrationPage extends ConsumerWidget {
         children: [
           Text(
             '在设备间安全迁移密码数据。导出文件均经加密处理。',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: context.colors.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 16),

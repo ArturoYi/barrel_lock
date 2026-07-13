@@ -28,7 +28,6 @@ final class AppLockEnableSetupViewModel
       phase: AppLockEnableSetupPhase.active,
       step: AppLockEnableSetupStep.pin,
       obscurePin: true,
-      obscureConfirmPin: true,
     );
   }
 
@@ -59,25 +58,14 @@ final class AppLockEnableSetupViewModel
     state = state.copyWith(obscurePin: !state.obscurePin);
   }
 
-  /// 切换确认 PIN 输入框明文 / 密文显示；提交中不生效。
-  void toggleObscureConfirmPin() {
-    if (state.isBusy) {
-      return;
-    }
-    state = state.copyWith(obscureConfirmPin: !state.obscureConfirmPin);
-  }
-
   /// 校验 PIN 并进入提示语步骤。
-  void continueToHintStep({required String pin, required String confirmPin}) {
+  void continueToHintStep({required String pin}) {
     if (state.phase != AppLockEnableSetupPhase.active ||
         state.step != AppLockEnableSetupStep.pin) {
       return;
     }
 
-    final validationError = AppLockPinPolicy.validateSetup(
-      pin: pin,
-      confirmPin: confirmPin,
-    );
+    final validationError = AppLockPinPolicy.validatePin(pin);
     if (validationError != null) {
       state = state.copyWith(errorMessage: validationError);
       return;
@@ -87,20 +75,13 @@ final class AppLockEnableSetupViewModel
   }
 
   /// 校验提示语并落盘 PIN，成功后开启应用保护。
-  Future<void> submitSetup({
-    required String pin,
-    required String confirmPin,
-    required String hint,
-  }) async {
+  Future<void> submitSetup({required String pin, required String hint}) async {
     if (state.phase != AppLockEnableSetupPhase.active ||
         state.step != AppLockEnableSetupStep.hint) {
       return;
     }
 
-    final pinError = AppLockPinPolicy.validateSetup(
-      pin: pin,
-      confirmPin: confirmPin,
-    );
+    final pinError = AppLockPinPolicy.validatePin(pin);
     if (pinError != null) {
       state = state.copyWith(
         step: AppLockEnableSetupStep.pin,

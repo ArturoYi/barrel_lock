@@ -1,7 +1,6 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:flutter/material.dart';
 
-import '../shared/app_lock_enable_setup_pin_input_field.dart';
 import 'pages/hint/app_lock_enable_setup_portrait_hint_page.dart';
 import 'pages/pin/app_lock_enable_setup_portrait_pin_page.dart';
 
@@ -19,9 +18,6 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
     required this.state,
     required this.pageController,
     required this.pinBuffer,
-    required this.confirmPinBuffer,
-    required this.activePinField,
-    required this.activePinBuffer,
     required this.hintController,
     required this.hintFocusNode,
     required this.onDigitPressed,
@@ -32,9 +28,7 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
     required this.onBackToPinStep,
     required this.onCancel,
     required this.onBack,
-    required this.onActivePinFieldChanged,
     required this.onToggleObscurePin,
-    required this.onToggleObscureConfirmPin,
   });
 
   /// ViewModel 输出的流程状态。
@@ -44,9 +38,6 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
   final PageController pageController;
 
   final String pinBuffer;
-  final String confirmPinBuffer;
-  final AppLockEnableSetupPinInputField activePinField;
-  final String activePinBuffer;
   final TextEditingController hintController;
   final FocusNode hintFocusNode;
   final ValueChanged<int> onDigitPressed;
@@ -59,9 +50,7 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
 
   /// AppBar 返回按钮回调：提示语步骤回退 PIN，PIN 步骤取消流程。
   final VoidCallback onBack;
-  final ValueChanged<AppLockEnableSetupPinInputField> onActivePinFieldChanged;
   final VoidCallback onToggleObscurePin;
-  final VoidCallback onToggleObscureConfirmPin;
 
   @override
   Widget build(BuildContext context) {
@@ -94,17 +83,12 @@ final class AppLockEnableSetupPortraitLayout extends StatelessWidget {
               AppLockEnableSetupPortraitPinPage(
                 state: state,
                 pinBuffer: pinBuffer,
-                confirmPinBuffer: confirmPinBuffer,
-                activePinField: activePinField,
-                activePinBuffer: activePinBuffer,
                 onDigitPressed: onDigitPressed,
                 onDeletePressed: onDeletePressed,
                 onClearPressed: onClearPressed,
                 onContinueToHint: onContinueToHint,
                 onCancel: onCancel,
-                onActivePinFieldChanged: onActivePinFieldChanged,
                 onToggleObscurePin: onToggleObscurePin,
-                onToggleObscureConfirmPin: onToggleObscureConfirmPin,
               ),
               // 第 1 页：提示语设置
               AppLockEnableSetupPortraitHintPage(

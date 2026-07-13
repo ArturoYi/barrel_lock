@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'landscape/app_lock_enable_setup_landscape_layout.dart';
 import 'portrait/app_lock_enable_setup_portrait_layout.dart';
-import 'shared/app_lock_enable_setup_pin_input_field.dart';
 
 /// 开启验证流程的 Host 组件（MVVM-C 的 V 层入口）。
 ///
@@ -43,13 +42,6 @@ class _AppLockEnableSetupHostState
   /// 主密码缓冲（自定义键盘写入，非 TextField）。
   String _pinBuffer = '';
 
-  /// 确认密码缓冲。
-  String _confirmPinBuffer = '';
-
-  /// 当前聚焦的密码框；决定键盘输入目标。
-  AppLockEnableSetupPinInputField _activePinField =
-      AppLockEnableSetupPinInputField.pin;
-
   @override
   void initState() {
     super.initState();
@@ -75,103 +67,56 @@ class _AppLockEnableSetupHostState
     if (_pageController.hasClients) {
       _pageController.jumpToPage(0);
     }
-    _clearPinBuffers();
+    _clearPinBuffer();
   }
 
-  /// 仅清空 PIN 相关缓冲，保留提示语 Controller（步骤回退时 PIN 仍有效）。
-  void _clearPinBuffers() {
+  /// 仅清空 PIN 缓冲，保留提示语 Controller（步骤回退时 PIN 仍有效）。
+  void _clearPinBuffer() {
     setState(() {
       _pinBuffer = '';
-      _confirmPinBuffer = '';
-      _activePinField = AppLockEnableSetupPinInputField.pin;
     });
   }
 
-  /// 当前聚焦框对应的 PIN 缓冲，供键盘满位判断使用。
-  String get _activePinBuffer => switch (_activePinField) {
-    AppLockEnableSetupPinInputField.pin => _pinBuffer,
-    AppLockEnableSetupPinInputField.confirmPin => _confirmPinBuffer,
-  };
-
-  /// 数字键按下：向当前聚焦框追加一位数字。
+  /// 数字键按下：向 PIN 缓冲追加一位数字。
   ///
-  /// 主密码填满 [AppLockPinPolicy.length] 位后自动切换到确认密码框。
-  /// 提交中或当前框已满时忽略输入。
+  /// 提交中或已满位时忽略输入。
   void _onDigitPressed(int digit) {
     final state = ref.read(appLockEnableSetupProvider);
-    if (state.isBusy || _activePinBuffer.length >= AppLockPinPolicy.length) {
+    if (state.isBusy || _pinBuffer.length >= AppLockPinPolicy.length) {
       return;
     }
     setState(() {
-      if (_activePinField == AppLockEnableSetupPinInputField.pin) {
-        _pinBuffer += '$digit';
-        if (_pinBuffer.length >= AppLockPinPolicy.length) {
-          _activePinField = AppLockEnableSetupPinInputField.confirmPin;
-        }
-      } else {
-        _confirmPinBuffer += '$digit';
-      }
+      _pinBuffer += '$digit';
     });
   }
 
-  /// 退格键按下：删除当前聚焦框末位。
-  ///
-  /// 确认密码框为空时，回退到主密码框并删除主密码末位（连贯退格体验）。
+  /// 退格键按下：删除 PIN 缓冲末位。
   void _onDeletePressed() {
     final state = ref.read(appLockEnableSetupProvider);
-    if (state.isBusy) {
+    if (state.isBusy || _pinBuffer.isEmpty) {
       return;
     }
     setState(() {
-      switch (_activePinField) {
-        case AppLockEnableSetupPinInputField.pin:
-          if (_pinBuffer.isEmpty) {
-            return;
-          }
-          _pinBuffer = _pinBuffer.substring(0, _pinBuffer.length - 1);
-        case AppLockEnableSetupPinInputField.confirmPin:
-          if (_confirmPinBuffer.isEmpty) {
-            // 确认框已空 → 回退到主密码框并删主密码末位
-            _activePinField = AppLockEnableSetupPinInputField.pin;
-            if (_pinBuffer.isNotEmpty) {
-              _pinBuffer = _pinBuffer.substring(0, _pinBuffer.length - 1);
-            }
-            return;
-          }
-          _confirmPinBuffer = _confirmPinBuffer.substring(
-            0,
-            _confirmPinBuffer.length - 1,
-          );
-      }
+      _pinBuffer = _pinBuffer.substring(0, _pinBuffer.length - 1);
     });
   }
 
-  /// 清空键按下：清空当前聚焦框的全部内容（不影响另一框）。
+  /// 清空键按下：清空 PIN 缓冲。
   void _onClearPressed() {
     final state = ref.read(appLockEnableSetupProvider);
     if (state.isBusy) {
       return;
     }
     setState(() {
-      switch (_activePinField) {
-        case AppLockEnableSetupPinInputField.pin:
-          _pinBuffer = '';
-        case AppLockEnableSetupPinInputField.confirmPin:
-          _confirmPinBuffer = '';
-      }
+      _pinBuffer = '';
     });
-  }
-
-  /// 用户点击密码展示框时切换聚焦目标。
-  void _onActivePinFieldChanged(AppLockEnableSetupPinInputField field) {
-    setState(() => _activePinField = field);
   }
 
   /// 校验 PIN 并通知 ViewModel 进入提示语步骤。
   void _continueToHint() {
     ref
         .read(appLockEnableSetupProvider.notifier)
-        .continueToHintStep(pin: _pinBuffer, confirmPin: _confirmPinBuffer);
+        .continueToHintStep(pin: _pinBuffer);
   }
 
   /// 提交 PIN + 提示语，由 ViewModel 落盘并开启应用保护。
@@ -179,11 +124,7 @@ class _AppLockEnableSetupHostState
     _hintFocusNode.unfocus();
     ref
         .read(appLockEnableSetupProvider.notifier)
-        .submitSetup(
-          pin: _pinBuffer,
-          confirmPin: _confirmPinBuffer,
-          hint: _hintController.text,
-        );
+        .submitSetup(pin: _pinBuffer, hint: _hintController.text);
   }
 
   /// 从提示语步骤返回 PIN 步骤（ViewModel 切换 step，不清 PIN 缓冲）。
@@ -251,9 +192,6 @@ class _AppLockEnableSetupHostState
       state: state,
       pageController: _pageController,
       pinBuffer: _pinBuffer,
-      confirmPinBuffer: _confirmPinBuffer,
-      activePinField: _activePinField,
-      activePinBuffer: _activePinBuffer,
       hintController: _hintController,
       hintFocusNode: _hintFocusNode,
       onDigitPressed: _onDigitPressed,
@@ -264,13 +202,9 @@ class _AppLockEnableSetupHostState
       onBackToPinStep: _backToPinStep,
       onCancel: _cancel,
       onBack: _onBack,
-      onActivePinFieldChanged: _onActivePinFieldChanged,
       onToggleObscurePin: ref
           .read(appLockEnableSetupProvider.notifier)
           .toggleObscurePin,
-      onToggleObscureConfirmPin: ref
-          .read(appLockEnableSetupProvider.notifier)
-          .toggleObscureConfirmPin,
     );
 
     return OrientationBuilder(
@@ -281,9 +215,6 @@ class _AppLockEnableSetupHostState
             state: layoutProps.state,
             pageController: layoutProps.pageController,
             pinBuffer: layoutProps.pinBuffer,
-            confirmPinBuffer: layoutProps.confirmPinBuffer,
-            activePinField: layoutProps.activePinField,
-            activePinBuffer: layoutProps.activePinBuffer,
             hintController: layoutProps.hintController,
             hintFocusNode: layoutProps.hintFocusNode,
             onDigitPressed: layoutProps.onDigitPressed,
@@ -294,17 +225,12 @@ class _AppLockEnableSetupHostState
             onBackToPinStep: layoutProps.onBackToPinStep,
             onCancel: layoutProps.onCancel,
             onBack: layoutProps.onBack,
-            onActivePinFieldChanged: layoutProps.onActivePinFieldChanged,
             onToggleObscurePin: layoutProps.onToggleObscurePin,
-            onToggleObscureConfirmPin: layoutProps.onToggleObscureConfirmPin,
           ),
           Orientation.landscape => AppLockEnableSetupLandscapeLayout(
             state: layoutProps.state,
             pageController: layoutProps.pageController,
             pinBuffer: layoutProps.pinBuffer,
-            confirmPinBuffer: layoutProps.confirmPinBuffer,
-            activePinField: layoutProps.activePinField,
-            activePinBuffer: layoutProps.activePinBuffer,
             hintController: layoutProps.hintController,
             hintFocusNode: layoutProps.hintFocusNode,
             onDigitPressed: layoutProps.onDigitPressed,
@@ -315,9 +241,7 @@ class _AppLockEnableSetupHostState
             onBackToPinStep: layoutProps.onBackToPinStep,
             onCancel: layoutProps.onCancel,
             onBack: layoutProps.onBack,
-            onActivePinFieldChanged: layoutProps.onActivePinFieldChanged,
             onToggleObscurePin: layoutProps.onToggleObscurePin,
-            onToggleObscureConfirmPin: layoutProps.onToggleObscureConfirmPin,
           ),
         };
       },

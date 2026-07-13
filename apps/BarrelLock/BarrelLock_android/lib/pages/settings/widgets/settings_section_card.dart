@@ -1,3 +1,4 @@
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 /// 卡片内小标题（如「主题模式」「主题色」）。
@@ -8,7 +9,7 @@ class SettingsSubsectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = context.theme;
     return Text(
       title,
       style: theme.textTheme.titleMedium?.copyWith(
@@ -31,8 +32,8 @@ class SettingsSectionHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
+        style: context.textTheme.labelLarge?.copyWith(
+          color: context.colors.primary,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -50,7 +51,7 @@ class SettingsSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final colorScheme = context.colors;
 
     return Material(
       color: colorScheme.surfaceContainerLow,

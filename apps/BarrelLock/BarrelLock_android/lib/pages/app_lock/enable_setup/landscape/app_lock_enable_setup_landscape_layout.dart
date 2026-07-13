@@ -1,7 +1,6 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:flutter/material.dart';
 
-import '../shared/app_lock_enable_setup_pin_input_field.dart';
 import 'pages/hint/app_lock_enable_setup_landscape_hint_page.dart';
 import 'pages/pin/app_lock_enable_setup_landscape_pin_page.dart';
 
@@ -15,9 +14,6 @@ final class AppLockEnableSetupLandscapeLayout extends StatelessWidget {
     required this.state,
     required this.pageController,
     required this.pinBuffer,
-    required this.confirmPinBuffer,
-    required this.activePinField,
-    required this.activePinBuffer,
     required this.hintController,
     required this.hintFocusNode,
     required this.onDigitPressed,
@@ -28,17 +24,12 @@ final class AppLockEnableSetupLandscapeLayout extends StatelessWidget {
     required this.onBackToPinStep,
     required this.onCancel,
     required this.onBack,
-    required this.onActivePinFieldChanged,
     required this.onToggleObscurePin,
-    required this.onToggleObscureConfirmPin,
   });
 
   final AppLockEnableSetupState state;
   final PageController pageController;
   final String pinBuffer;
-  final String confirmPinBuffer;
-  final AppLockEnableSetupPinInputField activePinField;
-  final String activePinBuffer;
   final TextEditingController hintController;
   final FocusNode hintFocusNode;
   final ValueChanged<int> onDigitPressed;
@@ -49,9 +40,7 @@ final class AppLockEnableSetupLandscapeLayout extends StatelessWidget {
   final VoidCallback onBackToPinStep;
   final VoidCallback onCancel;
   final VoidCallback onBack;
-  final ValueChanged<AppLockEnableSetupPinInputField> onActivePinFieldChanged;
   final VoidCallback onToggleObscurePin;
-  final VoidCallback onToggleObscureConfirmPin;
 
   /// PageView 内容区最大宽度（含左右分栏 PIN / 提示语页）。
   static const _inputMaxWidth = 720.0;
@@ -88,17 +77,12 @@ final class AppLockEnableSetupLandscapeLayout extends StatelessWidget {
                   AppLockEnableSetupLandscapePinPage(
                     state: state,
                     pinBuffer: pinBuffer,
-                    confirmPinBuffer: confirmPinBuffer,
-                    activePinField: activePinField,
-                    activePinBuffer: activePinBuffer,
                     onDigitPressed: onDigitPressed,
                     onDeletePressed: onDeletePressed,
                     onClearPressed: onClearPressed,
                     onContinueToHint: onContinueToHint,
                     onCancel: onCancel,
-                    onActivePinFieldChanged: onActivePinFieldChanged,
                     onToggleObscurePin: onToggleObscurePin,
-                    onToggleObscureConfirmPin: onToggleObscureConfirmPin,
                   ),
                   AppLockEnableSetupLandscapeHintPage(
                     state: state,

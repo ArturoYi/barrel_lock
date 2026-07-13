@@ -3,6 +3,14 @@ abstract final class AppLockPinPolicy {
   static const int length = 6;
   static const int hintMaxLength = 30;
 
+  /// 校验 PIN 格式；返回 `null` 表示通过，否则为可展示错误文案。
+  static String? validatePin(String pin) {
+    if (!_isValidPin(pin.trim())) {
+      return '请输入 $length 位数字密码';
+    }
+    return null;
+  }
+
   /// 返回 `null` 表示通过；否则为可展示错误文案。
   static String? validateSetup({
     required String pin,
