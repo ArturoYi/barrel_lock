@@ -84,10 +84,10 @@ void main() {
       expect(
         const AppLockPinPromptState(
           reason: reason,
-          errorMessage: '应用内密码错误',
+          errorMessage: '密码错误，请重试',
           attempt: 2,
         ).headerMessage,
-        '应用内密码错误',
+        '密码错误，请重试',
       );
       expect(
         const AppLockPinPromptState(

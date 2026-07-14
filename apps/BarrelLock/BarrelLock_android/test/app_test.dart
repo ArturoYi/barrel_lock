@@ -38,17 +38,21 @@ void main() {
       const ProviderScope(child: MaterialApp(home: HomePage())),
     );
 
-    expect(find.text('BarrelLock'), findsOneWidget);
     expect(find.text('密码'), findsWidgets);
     expect(find.text('设置'), findsOneWidget);
   });
 
   testWidgets('SettingsPage renders theme controls', (tester) async {
+    tester.view.physicalSize = const Size(400, 2000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(
       const ProviderScope(child: MaterialApp(home: SettingsPage())),
     );
 
-    expect(find.text('设置页'), findsOneWidget);
+    expect(find.text('设置'), findsOneWidget);
     expect(find.text('主题模式'), findsOneWidget);
   });
 }

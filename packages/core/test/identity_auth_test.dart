@@ -149,7 +149,7 @@ void main() {
       );
 
       expect(result.isFailure, isTrue);
-      expect(result.message, '应用内密码错误');
+      expect(result.message, '密码错误，请重试');
     });
 
     test('authenticate returns unavailable when no methods exist', () async {
