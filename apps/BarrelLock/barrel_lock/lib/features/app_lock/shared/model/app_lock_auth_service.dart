@@ -59,7 +59,7 @@ final appLockAuthServiceProvider = Provider<AppLockAuthService>((ref) {
   );
 });
 
-/// 各平台可在 [ProviderScope] 中 override；默认走全局 PIN 遮罩 + Toast。
+/// 各平台可在 [ProviderScope] 中 override；默认走全局 PIN 遮罩。
 final identityAuthUiDelegateProvider = Provider<IdentityAuthUiDelegate>(
   (ref) => BarrelLockIdentityAuthUiDelegate(ref),
 );

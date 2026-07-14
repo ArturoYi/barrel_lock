@@ -158,7 +158,7 @@ final class AppIdentityAuth {
       return IdentityAuthResult.success(method: IdentityAuthMethod.appPin);
     }
 
-    return IdentityAuthResult.failure(message: '应用内密码错误');
+    return IdentityAuthResult.failure(message: '密码错误，请重试');
   }
 
   static Future<void> _waitForBiometricUiDismissal() async {

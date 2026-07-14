@@ -99,7 +99,8 @@ void main() {
       );
 
       final retryPrompt = container.read(appLockPinPromptProvider)!;
-      expect(retryPrompt.errorMessage, isNotNull);
+      expect(retryPrompt.errorMessage, '应用内密码错误');
+      expect(retryPrompt.headerMessage, '应用内密码错误');
 
       container
           .read(appLockPinPromptProvider.notifier)

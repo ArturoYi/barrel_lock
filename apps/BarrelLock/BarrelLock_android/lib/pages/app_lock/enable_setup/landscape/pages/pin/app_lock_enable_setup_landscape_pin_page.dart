@@ -1,10 +1,9 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:barrel_lock/features/app_lock/overlay/pin_prompt/app_lock_pin_keypad.dart';
+import 'package:barrel_lock/shared/widgets/app_lock_pin_field.dart';
 import 'package:barrel_lock/shared/widgets/numeric_keyboard_listener.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-
-import '../../../shared/app_lock_enable_setup_pin_field.dart';
 
 /// 横屏 PageView 第一步：左侧说明、右侧 PIN 输入与键盘。
 ///
@@ -87,14 +86,11 @@ final class AppLockEnableSetupLandscapePinPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            AppLockEnableSetupPinField(
+                            AppLockPinField(
                               label: '密码',
                               buffer: pinBuffer,
                               obscure: state.obscurePin,
                               isActive: true,
-                              isBusy: isBusy,
-                              onTap: () {},
-                              onToggleObscure: onToggleObscurePin,
                             ),
                             if (state.errorMessage case final message?) ...[
                               const SizedBox(height: 8),

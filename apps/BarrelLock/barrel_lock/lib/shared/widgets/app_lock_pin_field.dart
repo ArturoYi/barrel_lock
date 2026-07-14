@@ -2,19 +2,17 @@ import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-/// 开启验证 PIN 步骤的单行密码展示框（横竖屏共用）。
+/// 自定义 PIN 展示框（横竖屏、开启验证与 Overlay 解锁共用）。
 ///
-/// 不使用系统 [TextField]，而是以自定义容器展示 PIN 缓冲内容，
+/// 不使用系统 [TextField]，以圆点行展示 PIN 缓冲内容，
 /// 配合 [AppLockPinKeypad] 完成输入。
-final class AppLockEnableSetupPinField extends StatelessWidget {
-  const AppLockEnableSetupPinField({
+final class AppLockPinField extends StatelessWidget {
+  const AppLockPinField({
     super.key,
     required this.label,
     required this.buffer,
     required this.obscure,
     required this.isActive,
-    required this.isBusy,
-    required this.onToggleObscure,
   });
 
   /// 无障碍与 UI 展示用的字段名称，如「密码」「确认密码」。
@@ -23,17 +21,11 @@ final class AppLockEnableSetupPinField extends StatelessWidget {
   /// 当前框内已输入的原始数字字符串（未遮蔽）。
   final String buffer;
 
-  /// 是否以圆点遮蔽显示；由 ViewModel 的 [obscurePin] 驱动。
+  /// 是否以圆点遮蔽显示。
   final bool obscure;
 
-  /// 是否为当前聚焦的输入框；聚焦时边框加粗并使用主题色。
+  /// 是否为当前聚焦的输入框。
   final bool isActive;
-
-  /// 是否处于提交中；为 true 时禁用切换明文。
-  final bool isBusy;
-
-  /// 点击眼睛图标时切换明文/密文。
-  final VoidCallback onToggleObscure;
 
   /// 将原始 PIN 缓冲转为 UI 展示文本。
   ///
@@ -60,7 +52,7 @@ final class AppLockEnableSetupPinField extends StatelessWidget {
   }
 }
 
-/// 6 位 PIN 圆点展示行：已填写与当前活跃位加深，未填写为浅色。
+/// 6 位 PIN 圆点展示行：已填写位加深，未填写为浅色。
 final class _PinDotRow extends StatelessWidget {
   const _PinDotRow({
     required this.buffer,

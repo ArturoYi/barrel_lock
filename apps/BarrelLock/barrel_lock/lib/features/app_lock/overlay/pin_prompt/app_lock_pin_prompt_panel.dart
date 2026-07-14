@@ -20,6 +20,26 @@ final class AppLockPinPromptPanel extends ConsumerStatefulWidget {
 
 class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
   String _pinBuffer = '';
+  var _biometricRetryAvailable = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricAvailability();
+  }
+
+  Future<void> _loadBiometricAvailability() async {
+    final availability = await ref
+        .read(appLockAuthServiceProvider)
+        .checkBiometricAvailability();
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _biometricRetryAvailable =
+          availability == BiometricAvailability.available;
+    });
+  }
 
   @override
   void didUpdateWidget(covariant AppLockPinPromptPanel oldWidget) {
@@ -29,12 +49,20 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
     }
   }
 
-  void _submitPin() {
+  void _submitPinIfReady() {
+    if (widget.state.isSubmitting ||
+        _pinBuffer.length < AppLockPinPolicy.length) {
+      return;
+    }
     ref.read(appLockPinPromptProvider.notifier).submitPin(_pinBuffer);
   }
 
   void _cancel() {
     ref.read(appLockPinPromptProvider.notifier).cancel();
+  }
+
+  void _retryBiometric() {
+    ref.read(appLockSessionProvider.notifier).retryBiometricFromPinPrompt();
   }
 
   void _toggleObscure() {
@@ -49,6 +77,9 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
     setState(() {
       _pinBuffer += '$digit';
     });
+    if (_pinBuffer.length >= AppLockPinPolicy.length) {
+      _submitPinIfReady();
+    }
   }
 
   void _onDeletePressed() {
@@ -57,15 +88,6 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
     }
     setState(() {
       _pinBuffer = _pinBuffer.substring(0, _pinBuffer.length - 1);
-    });
-  }
-
-  void _onClearPressed() {
-    if (widget.state.isSubmitting || _pinBuffer.isEmpty) {
-      return;
-    }
-    setState(() {
-      _pinBuffer = '';
     });
   }
 
@@ -78,7 +100,7 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
       enabled: !isSubmitting,
       onDigitPressed: _onDigitPressed,
       onDeletePressed: _onDeletePressed,
-      onSubmit: _submitPin,
+      onSubmit: _submitPinIfReady,
       onCancel: _cancel,
       child: Material(
         type: MaterialType.transparency,
@@ -90,23 +112,23 @@ class _AppLockPinPromptPanelState extends ConsumerState<AppLockPinPromptPanel> {
                   state: state,
                   pinBuffer: _pinBuffer,
                   isSubmitting: isSubmitting,
-                  onSubmit: _submitPin,
                   onCancel: _cancel,
                   onToggleObscure: _toggleObscure,
                   onDigitPressed: _onDigitPressed,
                   onDeletePressed: _onDeletePressed,
-                  onClearPressed: _onClearPressed,
+                  onRetryBiometric: _retryBiometric,
+                  showBiometricRetry: _biometricRetryAvailable,
                 ),
                 Orientation.landscape => AppLockPinPromptLandscapeLayout(
                   state: state,
                   pinBuffer: _pinBuffer,
                   isSubmitting: isSubmitting,
-                  onSubmit: _submitPin,
                   onCancel: _cancel,
                   onToggleObscure: _toggleObscure,
                   onDigitPressed: _onDigitPressed,
                   onDeletePressed: _onDeletePressed,
-                  onClearPressed: _onClearPressed,
+                  onRetryBiometric: _retryBiometric,
+                  showBiometricRetry: _biometricRetryAvailable,
                 ),
               };
 
@@ -129,78 +151,38 @@ final class AppLockPinPromptInputSection extends StatelessWidget {
     required this.state,
     required this.pinBuffer,
     required this.isSubmitting,
-    required this.onSubmit,
     required this.onToggleObscure,
     required this.onDigitPressed,
     required this.onDeletePressed,
-    required this.onClearPressed,
+    required this.onRetryBiometric,
+    required this.showBiometricRetry,
   });
 
   final AppLockPinPromptState state;
   final String pinBuffer;
   final bool isSubmitting;
-  final VoidCallback onSubmit;
   final VoidCallback onToggleObscure;
   final ValueChanged<int> onDigitPressed;
   final VoidCallback onDeletePressed;
-  final VoidCallback onClearPressed;
-
-  String get _displayPin {
-    if (state.obscurePin) {
-      return List.filled(pinBuffer.length, '●').join();
-    }
-    return pinBuffer;
-  }
+  final VoidCallback onRetryBiometric;
+  final bool showBiometricRetry;
 
   @override
   Widget build(BuildContext context) {
-    final theme = context.theme;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Semantics(
-                label: '应用内密码',
-                value: _displayPin,
-                child: Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 20,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: theme.colorScheme.outline),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    _displayPin.isEmpty ? ' ' : _displayPin,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      letterSpacing: 8,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            IconButton(
-              onPressed: isSubmitting ? null : onToggleObscure,
-              icon: Icon(
-                state.obscurePin ? Icons.visibility_off : Icons.visibility,
-              ),
-            ),
-          ],
-        ),
         const SizedBox(height: 16),
         AppLockPinKeypad(
           onDigitPressed: onDigitPressed,
-          leadingKey: AppLockPinKeyAction(
-            child: const Icon(Icons.clear),
-            onPressed: onClearPressed,
-            semanticLabel: '清除',
-          ),
+          leadingKey: showBiometricRetry
+              ? AppLockPinKeyAction(
+                  child: const Icon(Icons.fingerprint),
+                  onPressed: onRetryBiometric,
+                  semanticLabel: '生物识别',
+                )
+              : null,
           trailingKey: AppLockPinKeyAction(
             child: const Icon(Icons.backspace_outlined),
             onPressed: onDeletePressed,
@@ -209,26 +191,6 @@ final class AppLockPinPromptInputSection extends StatelessWidget {
           enabled: !isSubmitting,
           isFull: pinBuffer.length >= AppLockPinPolicy.length,
         ),
-        if (state.errorMessage case final message?) ...[
-          const SizedBox(height: 8),
-          Text(
-            message,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.error,
-            ),
-          ),
-        ],
-        const SizedBox(height: 16),
-        FilledButton(
-          onPressed: isSubmitting ? null : onSubmit,
-          child: isSubmitting
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Text('确认'),
-        ),
       ],
     );
   }
@@ -236,27 +198,29 @@ final class AppLockPinPromptInputSection extends StatelessWidget {
 
 /// 竖屏 / 横屏布局共用的标题区骨架。
 final class AppLockPinPromptHeaderSection extends StatelessWidget {
-  const AppLockPinPromptHeaderSection({super.key, required this.state});
+  const AppLockPinPromptHeaderSection({
+    super.key,
+    this.state,
+    this.message,
+    this.isError = false,
+  }) : assert(state != null || message != null);
 
-  final AppLockPinPromptState state;
+  final AppLockPinPromptState? state;
+  final String? message;
+  final bool isError;
+
+  String get _message => message ?? state!.headerMessage;
 
   @override
   Widget build(BuildContext context) {
     final theme = context.theme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text('输入应用内密码', style: theme.textTheme.titleLarge),
-        const SizedBox(height: 8),
-        Text(
-          state.reason.defaultMessage,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
+    return Text(
+      _message,
+      style: theme.textTheme.titleMedium?.copyWith(
+        color: theme.colorScheme.onSurface,
+      ),
+      textAlign: TextAlign.center,
     );
   }
 }

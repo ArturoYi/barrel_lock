@@ -10,6 +10,18 @@ import 'dart:async';
 
 import 'package:core/core.dart';
 
+/// PIN 遮罩标题区展示的认证阶段（由 [AppLockPinPromptState.headerMessage] 映射文案）。
+enum AppLockPinPromptHint {
+  /// 常规 PIN 输入，标题使用 [IdentityAuthReason.defaultMessage]。
+  none,
+
+  /// 生物识别不可用，回退应用内密码。
+  biometricUnavailable,
+
+  /// 生物识别未通过，回退应用内密码。
+  biometricFailed,
+}
+
 /// 全局 PIN 输入遮罩的只读状态（MVVM-C 的 VM 层输出）。
 ///
 /// Provider 值为 `null` 表示遮罩未显示；非 `null` 时 overlay 应渲染 PIN 输入 UI。
@@ -19,6 +31,7 @@ final class AppLockPinPromptState {
     required this.reason,
     required this.errorMessage,
     required this.attempt,
+    this.hint = AppLockPinPromptHint.none,
     this.obscurePin = true,
     this.isSubmitting = false,
   });
@@ -29,6 +42,9 @@ final class AppLockPinPromptState {
   /// 校验失败或空输入时的提示；`null` 表示无错误。
   final String? errorMessage;
 
+  /// 生物识别回退等场景下的标题提示；[errorMessage] 优先于本字段。
+  final AppLockPinPromptHint hint;
+
   /// 每次 [AppLockPinPromptViewModel.requestPin] 递增，供 View 用做 [Key] 重置输入框。
   final int attempt;
 
@@ -38,8 +54,28 @@ final class AppLockPinPromptState {
   /// 用户已提交、等待校验方消费 PIN 时为 `true`；应禁用输入与确认按钮。
   final bool isSubmitting;
 
+  /// 标题区展示文案；替代 Toast 完成认证过程的状态提示。
+  String get headerMessage {
+    if (isSubmitting) {
+      return '正在验证身份…';
+    }
+    if (errorMessage case final message?) {
+      return message;
+    }
+    return switch (hint) {
+      AppLockPinPromptHint.biometricUnavailable => '生物识别不可用，请输入密码',
+      AppLockPinPromptHint.biometricFailed => '生物识别未通过，请输入密码',
+      AppLockPinPromptHint.none => reason.defaultMessage,
+    };
+  }
+
+  /// 标题是否以错误样式展示（密码错误、空输入等）。
+  bool get isHeaderError =>
+      !isSubmitting && errorMessage != null && errorMessage!.isNotEmpty;
+
   AppLockPinPromptState copyWith({
     String? errorMessage,
+    AppLockPinPromptHint? hint,
     bool? obscurePin,
     bool? isSubmitting,
     bool clearError = false,
@@ -47,6 +83,7 @@ final class AppLockPinPromptState {
     return AppLockPinPromptState(
       reason: reason,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      hint: hint ?? this.hint,
       attempt: attempt,
       obscurePin: obscurePin ?? this.obscurePin,
       isSubmitting: isSubmitting ?? this.isSubmitting,
@@ -86,12 +123,14 @@ final class AppLockPinPromptViewModel extends Notifier<AppLockPinPromptState?> {
   Future<String?> requestPin(
     IdentityAuthReason reason, {
     String? errorMessage,
+    AppLockPinPromptHint hint = AppLockPinPromptHint.none,
   }) {
     _completer?.complete(null);
     _completer = Completer<String?>();
     state = AppLockPinPromptState(
       reason: reason,
       errorMessage: errorMessage,
+      hint: hint,
       attempt: (state?.attempt ?? 0) + 1,
     );
     return _completer!.future;
@@ -99,7 +138,7 @@ final class AppLockPinPromptViewModel extends Notifier<AppLockPinPromptState?> {
 
   /// 用户确认 PIN。
   ///
-  /// 空或纯空白输入会写入 [AppLockPinPromptState.errorMessage] 并保持遮罩；
+  /// 空或纯空白输入会在标题区提示并保持遮罩；
   /// 非空则设置 [AppLockPinPromptState.isSubmitting] 并完成 Completer，由调用方校验。
   void submitPin(String pin) {
     if (state?.isSubmitting ?? false) {
@@ -138,7 +177,7 @@ final class AppLockPinPromptViewModel extends Notifier<AppLockPinPromptState?> {
   }
 }
 
-/// 全局 PIN 遮罩状态；挂载于 [AppLockOverlay] 的 overlay 层与各认证 ViewModel。
+/// 全局 PIN 遮罩状态；由 [AppLockOverlay] 渲染为 [AppLockSessionBarrier] 的 child。
 final appLockPinPromptProvider =
     NotifierProvider<AppLockPinPromptViewModel, AppLockPinPromptState?>(
       AppLockPinPromptViewModel.new,

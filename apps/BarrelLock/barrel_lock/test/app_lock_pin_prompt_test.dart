@@ -43,11 +43,61 @@ void main() {
 
       notifier.submitPin('   ');
 
-      expect(container.read(appLockPinPromptProvider)?.errorMessage, '请输入密码');
-      expect(container.read(appLockPinPromptProvider)?.isSubmitting, isFalse);
+      final prompt = container.read(appLockPinPromptProvider)!;
+      expect(prompt.errorMessage, '请输入密码');
+      expect(prompt.headerMessage, '请输入密码');
+      expect(prompt.isSubmitting, isFalse);
 
       notifier.submitPin('5678');
       expect(await future, '5678');
+    });
+
+    test('headerMessage reflects auth phase hints', () {
+      const reason = IdentityAuthReason.unlockOnResume;
+
+      expect(
+        const AppLockPinPromptState(
+          reason: reason,
+          errorMessage: null,
+          attempt: 1,
+        ).headerMessage,
+        reason.defaultMessage,
+      );
+      expect(
+        const AppLockPinPromptState(
+          reason: reason,
+          errorMessage: null,
+          attempt: 1,
+          hint: AppLockPinPromptHint.biometricUnavailable,
+        ).headerMessage,
+        '生物识别不可用，请输入密码',
+      );
+      expect(
+        const AppLockPinPromptState(
+          reason: reason,
+          errorMessage: null,
+          attempt: 1,
+          hint: AppLockPinPromptHint.biometricFailed,
+        ).headerMessage,
+        '生物识别未通过，请输入密码',
+      );
+      expect(
+        const AppLockPinPromptState(
+          reason: reason,
+          errorMessage: '应用内密码错误',
+          attempt: 2,
+        ).headerMessage,
+        '应用内密码错误',
+      );
+      expect(
+        const AppLockPinPromptState(
+          reason: reason,
+          errorMessage: null,
+          attempt: 1,
+          isSubmitting: true,
+        ).headerMessage,
+        '正在验证身份…',
+      );
     });
 
     test('new requestPin cancels previous pending request', () async {

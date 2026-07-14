@@ -13,12 +13,14 @@ final class AppLockSessionState {
     required this.isLocked,
     required this.isAuthenticating,
     required this.showBackgroundShield,
+    this.authStatusMessage,
   });
 
   const AppLockSessionState.idle()
     : isLocked = false,
       isAuthenticating = false,
-      showBackgroundShield = false;
+      showBackgroundShield = false,
+      authStatusMessage = null;
 
   /// 是否应显示锁屏遮罩（验证进行中为 `true`）。
   final bool isLocked;
@@ -29,6 +31,9 @@ final class AppLockSessionState {
   /// 应用处于 inactive / paused 时的隐私遮罩（与 [isLocked] 分离，便于最小粒度刷新）。
   final bool showBackgroundShield;
 
+  /// 生物识别等阶段的全局状态提示；PIN 遮罩显示时由 [AppLockPinPromptState.headerMessage] 接管。
+  final String? authStatusMessage;
+
   /// 是否应在 Overlay 中渲染 [AppLockSessionBarrier]。
   bool get showSessionBarrier => showBackgroundShield;
 
@@ -36,11 +41,16 @@ final class AppLockSessionState {
     bool? isLocked,
     bool? isAuthenticating,
     bool? showBackgroundShield,
+    String? authStatusMessage,
+    bool clearAuthStatusMessage = false,
   }) {
     return AppLockSessionState(
       isLocked: isLocked ?? this.isLocked,
       isAuthenticating: isAuthenticating ?? this.isAuthenticating,
       showBackgroundShield: showBackgroundShield ?? this.showBackgroundShield,
+      authStatusMessage: clearAuthStatusMessage
+          ? null
+          : (authStatusMessage ?? this.authStatusMessage),
     );
   }
 }
@@ -48,7 +58,7 @@ final class AppLockSessionState {
 /// 锁屏会话 ViewModel（MVVM-C 的 VM 层）。
 ///
 /// 职责：
-/// - 冷启动 / 恢复 / 启用：先置 [isLocked] + [isAuthenticating]，由 [AppLockPinPromptOverlayLayer] 延迟后调用 [startAuthentication]
+/// - 冷启动 / 恢复 / 启用：先置 [isLocked] + [isAuthenticating]，由 [AppLockOverlay] 延迟后调用 [startAuthentication]
 /// - 验证循环：生物识别 → PIN 回退 → 失败重试（取消不退出循环，避免遮罩下无入口）
 ///
 /// 生命周期事件由 [AppLockSessionLifecycleBinder] 转发；锁屏 / PIN 遮罩 UI 由各平台 View 实现。
@@ -177,7 +187,15 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
     _requestLock();
   }
 
-  /// 由 [AppLockPinPromptOverlayLayer] 在锁屏遮罩展示后延迟调用，启动实际验证循环。
+  /// 从 PIN 遮罩重新触发生物识别（挂起当前 PIN 等待并回到验证循环入口）。
+  void retryBiometricFromPinPrompt() {
+    if (!state.isLocked || !state.isAuthenticating) {
+      return;
+    }
+    ref.read(appLockPinPromptProvider.notifier).cancel();
+  }
+
+  /// 由 [AppLockOverlay] 在锁屏遮罩展示后延迟调用，启动实际验证循环。
   Future<void> startAuthentication() async {
     if (!state.isLocked || !state.isAuthenticating || _authLoopRunning) {
       return;
@@ -224,20 +242,23 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
 
   Future<void> _runAuthenticationLoop(AppLockPreferences preferences) async {
     while (true) {
+      state = state.copyWith(authStatusMessage: '正在验证身份…');
       var result = await _authService.authenticateForAppLock(
         reason: IdentityAuthReason.unlockOnResume,
       );
       if (!ref.mounted) {
         return;
       }
+      state = state.copyWith(clearAuthStatusMessage: true);
 
       // 生物识别失败或用户取消 PIN 后，进入 PIN 重试循环。
       while (result.isFailure) {
+        final message = result.message ?? '密码错误，请重试';
         final pin = await ref
             .read(appLockPinPromptProvider.notifier)
             .requestPin(
               IdentityAuthReason.unlockOnResume,
-              errorMessage: result.message ?? '密码错误，请重试',
+              errorMessage: message,
             );
         if (!ref.mounted) {
           return;
@@ -252,22 +273,29 @@ final class AppLockSessionViewModel extends Notifier<AppLockSessionState> {
         }
         result = valid
             ? IdentityAuthResult.success(method: IdentityAuthMethod.appPin)
-            : IdentityAuthResult.failure(message: '应用内密码错误');
+            : IdentityAuthResult.failure(message: '应用内密码错误，请重试');
       }
 
       if (result.isSuccess) {
         ref.read(appLockPinPromptProvider.notifier).dismiss();
-        state = state.copyWith(isLocked: false, isAuthenticating: false);
+        state = state.copyWith(
+          isLocked: false,
+          isAuthenticating: false,
+          clearAuthStatusMessage: true,
+        );
         _pendingUnlockOnResume = false;
         return;
       }
 
       if (result.isUnavailable) {
-        FastToast.show(result.message ?? '当前无法验证身份，请重试');
+        state = state.copyWith(
+          authStatusMessage: result.message ?? '当前无法验证身份，请重试',
+        );
         await Future<void>.delayed(const Duration(milliseconds: 300));
         if (!ref.mounted) {
           return;
         }
+        state = state.copyWith(clearAuthStatusMessage: true);
         continue;
       }
 

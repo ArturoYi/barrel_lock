@@ -39,7 +39,7 @@ import 'app_lock_pin_prompt_view_model.dart';
 /// 将 core 身份验证流程中的 UI 回调映射到全局 PIN 遮罩 ViewModel：
 ///
 /// - [promptForAppPin] → 挂起并等待 [AppLockPinPromptViewModel.requestPin]
-/// - [onBiometricUnavailable] → Toast 引导用户使用应用内密码
+/// - [onBiometricUnavailable] → 标记下次 PIN 遮罩标题为「生物识别不可用」
 ///
 /// 注入点：[identityAuthUiDelegateProvider]（定义于 [AppLockAuthService] 旁）。
 /// 各平台可在 [ProviderScope] 中 override 以替换交互方式（如改用全屏路由页）。
@@ -48,15 +48,23 @@ final class BarrelLockIdentityAuthUiDelegate implements IdentityAuthUiDelegate {
 
   final Ref _ref;
 
+  var _biometricUnavailable = false;
+
   @override
   Future<String?> promptForAppPin({required IdentityAuthReason reason}) {
-    return _ref.read(appLockPinPromptProvider.notifier).requestPin(reason);
+    final hint = _biometricUnavailable
+        ? AppLockPinPromptHint.biometricUnavailable
+        : AppLockPinPromptHint.biometricFailed;
+    _biometricUnavailable = false;
+    return _ref
+        .read(appLockPinPromptProvider.notifier)
+        .requestPin(reason, hint: hint);
   }
 
   @override
   Future<void> onBiometricUnavailable({
     required IdentityAuthReason reason,
   }) async {
-    FastToast.show('生物识别不可用，请使用应用内密码');
+    _biometricUnavailable = true;
   }
 }

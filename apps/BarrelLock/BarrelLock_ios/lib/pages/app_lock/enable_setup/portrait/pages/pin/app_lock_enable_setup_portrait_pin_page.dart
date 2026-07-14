@@ -1,10 +1,9 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:barrel_lock/features/app_lock/overlay/pin_prompt/app_lock_pin_keypad.dart';
+import 'package:barrel_lock/shared/widgets/app_lock_pin_field.dart';
 import 'package:barrel_lock/shared/widgets/numeric_keyboard_listener.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-
-import '../../../shared/app_lock_enable_setup_pin_field.dart';
 
 /// 竖屏 PageView 第一步：设置 PIN。
 ///
@@ -74,13 +73,11 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 // 主密码展示框
-                AppLockEnableSetupPinField(
+                AppLockPinField(
                   label: '密码',
                   buffer: pinBuffer,
                   obscure: state.obscurePin,
                   isActive: true,
-                  isBusy: isBusy,
-                  onToggleObscure: onToggleObscurePin,
                 ),
                 const Expanded(flex: 1, child: SizedBox.shrink()),
                 // 屏幕内数字键盘
