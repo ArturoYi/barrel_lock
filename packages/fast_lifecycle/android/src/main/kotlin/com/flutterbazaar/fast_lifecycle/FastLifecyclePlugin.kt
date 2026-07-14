@@ -3,6 +3,8 @@ package com.flutterbazaar.fast_lifecycle
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -38,8 +40,12 @@ class FastLifecyclePlugin :
     private var eventSink: EventChannel.EventSink? = null
 
     private var tracker: AppLifecycleTracker? = null
+    private var pendingActivity: Activity? = null
+    private var listeningRequested = false
     private var listenWindowId: String? = null
     private var listenIsMainWindow: Boolean = true
+
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         applicationContext = binding.applicationContext
@@ -55,7 +61,7 @@ class FastLifecyclePlugin :
         when (call.method) {
             METHOD_START_LISTENING -> {
                 parseListenArguments(call.arguments)
-                startNativeListening()
+                requestNativeListening()
                 result.success(null)
             }
             METHOD_STOP_LISTENING -> {
@@ -69,7 +75,7 @@ class FastLifecyclePlugin :
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
         eventSink = events
         parseListenArguments(arguments)
-        startNativeListening()
+        requestNativeListening()
     }
 
     override fun onCancel(arguments: Any?) {
@@ -87,6 +93,7 @@ class FastLifecyclePlugin :
     // ── ActivityAware：绑定 Flutter Activity 生命周期 ─────────────────
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        pendingActivity = binding.activity
         tracker?.bindActivity(binding.activity)
     }
 
@@ -95,10 +102,12 @@ class FastLifecyclePlugin :
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        pendingActivity = binding.activity
         tracker?.bindActivity(binding.activity)
     }
 
     override fun onDetachedFromActivity() {
+        pendingActivity = null
         tracker?.unbindActivity()
     }
 
@@ -110,23 +119,43 @@ class FastLifecyclePlugin :
         listenIsMainWindow = arguments["isMainWindow"] as? Boolean ?: true
     }
 
-    private fun startNativeListening() {
-        if (tracker != null) return
+    /**
+     * 标记需要监听；仅当 [EventChannel] 已就绪（[eventSink] 非空）时才启动 Tracker，
+     * 避免 MethodChannel 先于 EventChannel 订阅时丢失事件。
+     */
+    private fun requestNativeListening() {
+        listeningRequested = true
+        tryStartNativeListening()
+    }
+
+    private fun tryStartNativeListening() {
+        if (tracker != null || !listeningRequested || eventSink == null) {
+            return
+        }
 
         val app = applicationContext.applicationContext as Application
         tracker = AppLifecycleTracker(
-            onEvent = { payload ->
-                // 必须在主线程推送 EventChannel 事件。
-                val sink = eventSink ?: return@AppLifecycleTracker
-                sink.success(payload)
-            },
+            onEvent = ::emitEvent,
             windowId = listenWindowId,
             isMainWindow = listenIsMainWindow,
         )
         tracker?.start(app)
+        pendingActivity?.let { tracker?.bindActivity(it) }
+    }
+
+    private fun emitEvent(payload: Map<String, Any?>) {
+        val sink = eventSink ?: return
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            sink.success(payload)
+            return
+        }
+        mainHandler.post {
+            eventSink?.success(payload)
+        }
     }
 
     private fun stopNativeListening() {
+        listeningRequested = false
         val app = applicationContext.applicationContext as? Application ?: return
         tracker?.stop(app)
         tracker?.unbindActivity()

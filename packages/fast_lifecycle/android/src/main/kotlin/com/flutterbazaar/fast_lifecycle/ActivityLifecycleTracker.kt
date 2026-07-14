@@ -13,12 +13,13 @@ internal class ActivityLifecycleTracker(
     private val emitter: LifecycleEventEmitter,
 ) : DefaultLifecycleObserver {
 
-    private var boundActivity: Activity? = null
+    private var boundActivity: LifecycleOwner? = null
 
     fun bindActivity(activity: Activity) {
+        val owner = activity as? LifecycleOwner ?: return
         unbindActivity()
-        boundActivity = activity
-        activity.lifecycle.addObserver(this)
+        boundActivity = owner
+        owner.lifecycle.addObserver(this)
     }
 
     fun unbindActivity() {

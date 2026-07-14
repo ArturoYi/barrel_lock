@@ -16,7 +16,7 @@ import 'pin_prompt/app_lock_pin_prompt_panel.dart';
 /// - [appLockPinPromptProvider] → [AppLockPinPromptPanel]（作为 [AppLockSessionBarrier] 的 child）
 ///
 /// 挂载位置：[ThemedApp] 的 [MaterialApp.builder]（覆盖 Loading / Dialog；
-/// 默认 Toast 在其子树内，[ToastOverlayLayer.elevated] Toast 在其同级之上）。
+/// 须在 [MaterialApp] 子树内，锁屏 PIN 等组件依赖 [Material] 祖先）。
 final class AppLockOverlay extends ConsumerStatefulWidget {
   const AppLockOverlay({super.key, required this.child});
 
@@ -26,27 +26,70 @@ final class AppLockOverlay extends ConsumerStatefulWidget {
   ConsumerState<AppLockOverlay> createState() => _AppLockOverlayState();
 }
 
-class _AppLockOverlayState extends ConsumerState<AppLockOverlay> {
+class _AppLockOverlayState extends ConsumerState<AppLockOverlay>
+    with WidgetsBindingObserver {
   static const _authenticationDelay = Duration(milliseconds: 500);
 
   Timer? _authDelayTimer;
   ProviderSubscription<AppLockSessionState>? _sessionSubscription;
 
+  /// 仅在 inactive/paused 窗口内补充显示，resumed 后立即清除（不持有 provider 状态）。
+  var _transientShield = false;
+
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _sessionSubscription = ref.listenManual(
       appLockSessionProvider,
-      _scheduleAuthenticationIfNeeded,
+      _onSessionChanged,
       fireImmediately: true,
     );
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _authDelayTimer?.cancel();
     _sessionSubscription?.close();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+        if (!_transientShield) {
+          setState(() => _transientShield = true);
+        }
+        _scheduleBarrierPaint();
+      case AppLifecycleState.resumed:
+        if (_transientShield) {
+          setState(() => _transientShield = false);
+        }
+        // 兜底：防止 provider 隐私遮罩在乱序生命周期后卡住全屏灰层。
+        ref.read(appLockSessionProvider.notifier).hideBackgroundShield();
+      case AppLifecycleState.detached:
+        break;
+    }
+  }
+
+  void _onSessionChanged(
+    AppLockSessionState? previous,
+    AppLockSessionState next,
+  ) {
+    _scheduleAuthenticationIfNeeded(previous, next);
+    if (next.showSessionBarrier || next.isLocked || next.isAuthenticating) {
+      _scheduleBarrierPaint();
+    }
+  }
+
+  void _scheduleBarrierPaint() {
+    final binding = WidgetsBinding.instance;
+    binding.scheduleForcedFrame();
+    binding.addPostFrameCallback((_) => binding.scheduleForcedFrame());
   }
 
   void _scheduleAuthenticationIfNeeded(
@@ -79,10 +122,8 @@ class _AppLockOverlayState extends ConsumerState<AppLockOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    final showSessionBarrier = ref.watch(
-      appLockSessionProvider.select((session) => session.showSessionBarrier),
-    );
     final session = ref.watch(appLockSessionProvider);
+    final showSessionBarrier = session.showSessionBarrier;
     final showLockSession = session.isLocked || session.isAuthenticating;
     final pinPrompt = ref.watch(appLockPinPromptProvider);
 
@@ -99,25 +140,24 @@ class _AppLockOverlayState extends ConsumerState<AppLockOverlay> {
           )
         : null;
 
+    final showBarrier =
+        showLockSession || showSessionBarrier || _transientShield;
+    final privacyOnly = showBarrier && !showLockSession;
+
     return Stack(
       fit: StackFit.expand,
       children: [
         widget.child,
         Positioned.fill(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 150),
-            layoutBuilder: (currentChild, previousChildren) {
-              return Stack(
-                fit: StackFit.expand,
-                children: [...previousChildren, ?currentChild],
-              );
-            },
-            child: showSessionBarrier || showLockSession
-                ? AppLockSessionBarrier(
-                    key: const ValueKey('visible'),
-                    child: pinChild,
-                  )
-                : const SizedBox.shrink(key: ValueKey('hidden')),
+          child: IgnorePointer(
+            ignoring: !showBarrier,
+            child: Opacity(
+              opacity: showBarrier ? 1 : 0,
+              child: AppLockSessionBarrier(
+                privacyOnly: privacyOnly,
+                child: pinChild,
+              ),
+            ),
           ),
         ),
       ],

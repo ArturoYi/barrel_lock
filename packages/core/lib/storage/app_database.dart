@@ -2,7 +2,10 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
+import 'migration/database_migration_runner.dart';
+import 'migration/database_schema_version.dart';
 import 'storage_config.dart';
+import 'tables/tables.dart';
 
 part 'app_database.g.dart';
 
@@ -13,9 +16,7 @@ part 'app_database.g.dart';
 /// - Stream：生成类提供 `select(table).watch()` 实时监听
 /// - Migration：通过 [schemaVersion] 与 [migration] 处理版本升级
 @DriftDatabase(
-  tables: [
-    // TODO: 实体表接入后在此登记，例如 TodoItems,
-  ],
+  tables: [Vaults, Folders, CipherEntries, CipherAttachments, BackupLogs],
 )
 final class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
@@ -28,16 +29,21 @@ final class AppDatabase extends _$AppDatabase {
   AppDatabase.memory() : super(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => DatabaseSchemaVersion.current;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) async {
+      if (details.wasCreated) {
+        // 新库已在 onCreate 中启用外键；此处确保升级路径同样生效。
+      }
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
     onCreate: (Migrator m) async {
       await m.createAll();
     },
-    onUpgrade: (Migrator m, int from, int to) async {
-      // TODO: 按版本递增编写迁移，例如：
-      // if (from < 2) await m.addColumn(todoItems, todoItems.priority);
+    onUpgrade: (m, from, to) async {
+      await DatabaseMigrationRunner(this).run(m, from: from, to: to);
     },
   );
 }

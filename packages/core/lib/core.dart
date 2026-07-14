@@ -23,7 +23,9 @@ export 'identity_auth/identity_auth_ui_delegate.dart';
 export 'storage/app_database.dart';
 export 'storage/app_storage.dart';
 export 'storage/crud_repository.dart';
+export 'storage/migration/database_schema_version.dart';
 export 'storage/storage_config.dart';
+export 'storage/storage_constants.dart';
 
 export 'preference/app_preference.dart';
 export 'preference/preference_config.dart';

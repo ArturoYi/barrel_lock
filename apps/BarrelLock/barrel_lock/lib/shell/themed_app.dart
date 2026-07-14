@@ -2,17 +2,6 @@ import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
-/// 锁屏会话期间，将 Toast 自动路由到 elevated 层（调用方无需传 [ToastConfig]）。
-void _configureBarrelLockToastOverlayResolver(WidgetRef ref) {
-  FastToast.overlayLayerResolver = (request) {
-    final session = ref.read(appLockSessionProvider);
-    if (session.isLocked || session.isAuthenticating) {
-      return ToastOverlayLayer.elevated;
-    }
-    return null;
-  };
-}
-
 /// BarrelLock 应用主题 + 全局 Overlay 容器。
 class ThemedApp extends ConsumerStatefulWidget {
   const ThemedApp.router({
@@ -36,8 +25,6 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    bootstrapBarrelLockLifecycle();
-    _configureBarrelLockToastOverlayResolver(ref);
     FastToast.loadingPauseCheck = () => FastLoading.isShowing;
     FastLoading.visibilityListenable.addListener(_resumeToastAfterLoading);
   }

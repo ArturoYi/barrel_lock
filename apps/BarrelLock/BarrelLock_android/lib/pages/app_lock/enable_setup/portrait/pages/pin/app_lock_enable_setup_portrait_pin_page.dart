@@ -16,9 +16,8 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
     required this.pinBuffer,
     required this.onDigitPressed,
     required this.onDeletePressed,
-    required this.onClearPressed,
     required this.onContinueToHint,
-    required this.onCancel,
+    required this.onBack,
     required this.onToggleObscurePin,
   });
 
@@ -34,14 +33,11 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
   /// 退格键按下。
   final VoidCallback onDeletePressed;
 
-  /// 清空当前聚焦框。
-  final VoidCallback onClearPressed;
-
   /// 校验 PIN 并进入提示语步骤。
   final VoidCallback onContinueToHint;
 
-  /// 取消整个开启验证流程。
-  final VoidCallback onCancel;
+  /// AppBar 返回或外接键盘 Esc：取消整个开启验证流程。
+  final VoidCallback onBack;
 
   /// 切换主密码明文/密文。
   final VoidCallback onToggleObscurePin;
@@ -50,76 +46,60 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.theme;
     final isBusy = state.isBusy;
+    final isFull = pinBuffer.length >= AppLockPinPolicy.length;
 
     return NumericKeyboardListener(
       enabled: !isBusy,
       onDigitPressed: onDigitPressed,
       onDeletePressed: onDeletePressed,
       onSubmit: onContinueToHint,
-      onCancel: onCancel,
+      onCancel: onBack,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // 步骤说明
-                    Text(
-                      '请输入 ${AppLockPinPolicy.length} 位数字密码',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    // 主密码展示框
-                    AppLockPinField(
-                      label: '密码',
-                      buffer: pinBuffer,
-                      obscure: state.obscurePin,
-                      isActive: true,
-                    ),
-                    // PIN 校验失败时的错误提示
-                    if (state.errorMessage case final message?) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        message,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.error,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                    const SizedBox(height: 32),
-                    // 屏幕内数字键盘
-                    AppLockPinKeypad(
-                      onDigitPressed: onDigitPressed,
-                      leadingKey: AppLockPinKeyAction(
-                        child: const Icon(Icons.clear),
-                        onPressed: onClearPressed,
-                        semanticLabel: '清除',
-                      ),
-                      trailingKey: AppLockPinKeyAction(
-                        child: const Icon(Icons.backspace_outlined),
-                        onPressed: onDeletePressed,
-                        semanticLabel: '删除',
-                      ),
-                      enabled: !isBusy,
-                      isFull: pinBuffer.length >= AppLockPinPolicy.length,
-                    ),
-                    const SizedBox(height: 24),
-                    // 进入提示语步骤
-                    FilledButton(
-                      onPressed: isBusy ? null : onContinueToHint,
-                      child: const Text('下一步'),
-                    ),
-                  ],
+          return ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 步骤说明
+                const SizedBox(height: 24),
+                Text(
+                  '请输入 ${AppLockPinPolicy.length} 位数字密码',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
+                const SizedBox(height: 16),
+                // 主密码展示框
+                AppLockPinField(
+                  label: '密码',
+                  buffer: pinBuffer,
+                  obscure: state.obscurePin,
+                  isActive: true,
+                ),
+                const Expanded(flex: 1, child: SizedBox.shrink()),
+                // 屏幕内数字键盘
+                AppLockPinKeypad(
+                  onDigitPressed: onDigitPressed,
+                  leadingKey: isFull
+                      ? AppLockPinKeyAction(
+                          child: const Icon(Icons.check),
+                          onPressed: onContinueToHint,
+                          semanticLabel: '确认',
+                        )
+                      : null,
+                  trailingKey: AppLockPinKeyAction(
+                    child: const Icon(Icons.backspace_outlined),
+                    onPressed: onDeletePressed,
+                    semanticLabel: '删除',
+                  ),
+                  enabled: !isBusy,
+                  isFull: isFull,
+                ),
+                const Expanded(flex: 1, child: SizedBox.shrink()),
+              ],
             ),
           );
         },

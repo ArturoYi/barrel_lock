@@ -101,17 +101,6 @@ class _AppLockEnableSetupHostState
     });
   }
 
-  /// 清空键按下：清空 PIN 缓冲。
-  void _onClearPressed() {
-    final state = ref.read(appLockEnableSetupProvider);
-    if (state.isBusy) {
-      return;
-    }
-    setState(() {
-      _pinBuffer = '';
-    });
-  }
-
   /// 校验 PIN 并通知 ViewModel 进入提示语步骤。
   void _continueToHint() {
     ref
@@ -196,7 +185,6 @@ class _AppLockEnableSetupHostState
       hintFocusNode: _hintFocusNode,
       onDigitPressed: _onDigitPressed,
       onDeletePressed: _onDeletePressed,
-      onClearPressed: _onClearPressed,
       onContinueToHint: _continueToHint,
       onSubmitSetup: _submitSetup,
       onBackToPinStep: _backToPinStep,
@@ -219,11 +207,8 @@ class _AppLockEnableSetupHostState
             hintFocusNode: layoutProps.hintFocusNode,
             onDigitPressed: layoutProps.onDigitPressed,
             onDeletePressed: layoutProps.onDeletePressed,
-            onClearPressed: layoutProps.onClearPressed,
             onContinueToHint: layoutProps.onContinueToHint,
             onSubmitSetup: layoutProps.onSubmitSetup,
-            onBackToPinStep: layoutProps.onBackToPinStep,
-            onCancel: layoutProps.onCancel,
             onBack: layoutProps.onBack,
             onToggleObscurePin: layoutProps.onToggleObscurePin,
           ),
@@ -235,7 +220,6 @@ class _AppLockEnableSetupHostState
             hintFocusNode: layoutProps.hintFocusNode,
             onDigitPressed: layoutProps.onDigitPressed,
             onDeletePressed: layoutProps.onDeletePressed,
-            onClearPressed: layoutProps.onClearPressed,
             onContinueToHint: layoutProps.onContinueToHint,
             onSubmitSetup: layoutProps.onSubmitSetup,
             onBackToPinStep: layoutProps.onBackToPinStep,

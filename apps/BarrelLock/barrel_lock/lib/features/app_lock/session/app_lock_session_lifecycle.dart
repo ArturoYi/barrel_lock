@@ -7,7 +7,7 @@ import 'app_lock_session_view_model.dart';
 /// 将平台生命周期事件桥接到 [AppLockSessionViewModel]（Shell 层，非页面 View）。
 ///
 /// 仅负责订阅 pause / resume 并调用 ViewModel；**不渲染任何锁屏 UI**。
-/// 各平台或 Shell 应在子树上监听：
+/// 各平台或 Shell 应在子树下监听：
 ///
 /// - [appLockSessionProvider] → `isLocked` 时显示锁屏遮罩
 /// - [appLockPinPromptProvider] → 非 `null` 时显示 PIN 输入 UI
@@ -43,6 +43,9 @@ class _AppLockSessionLifecycleBinderState
     notifier.showBackgroundShield();
     notifier.markPendingUnlockOnPause();
     notifier.onAppPaused();
+    final binding = WidgetsBinding.instance;
+    binding.scheduleForcedFrame();
+    binding.addPostFrameCallback((_) => binding.scheduleForcedFrame());
   }
 
   @override
@@ -53,9 +56,14 @@ class _AppLockSessionLifecycleBinderState
 
   @override
   void onFlatResumed(RawLifeCycleEvent event) {
-    final notifier = ref.read(appLockSessionProvider.notifier);
-    notifier.hideBackgroundShield();
-    notifier.onAppResumed();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      final notifier = ref.read(appLockSessionProvider.notifier);
+      notifier.hideBackgroundShield();
+      notifier.onAppResumed();
+    });
   }
 
   @override

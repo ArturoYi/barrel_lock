@@ -50,5 +50,6 @@ Future<void> runBarrelLockApp({
   );
   await AppDeviceInfo.init();
   configureRouter();
+  await bootstrapBarrelLockLifecycle();
   runApp(scopeBuilder(const BarrelLockApp()));
 }

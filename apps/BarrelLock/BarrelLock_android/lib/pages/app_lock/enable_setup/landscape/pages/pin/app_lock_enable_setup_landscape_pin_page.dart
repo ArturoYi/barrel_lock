@@ -15,7 +15,6 @@ final class AppLockEnableSetupLandscapePinPage extends StatelessWidget {
     required this.pinBuffer,
     required this.onDigitPressed,
     required this.onDeletePressed,
-    required this.onClearPressed,
     required this.onContinueToHint,
     required this.onCancel,
     required this.onToggleObscurePin,
@@ -25,7 +24,6 @@ final class AppLockEnableSetupLandscapePinPage extends StatelessWidget {
   final String pinBuffer;
   final ValueChanged<int> onDigitPressed;
   final VoidCallback onDeletePressed;
-  final VoidCallback onClearPressed;
   final VoidCallback onContinueToHint;
   final VoidCallback onCancel;
   final VoidCallback onToggleObscurePin;
@@ -43,6 +41,7 @@ final class AppLockEnableSetupLandscapePinPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = context.theme;
     final isBusy = state.isBusy;
+    final isFull = pinBuffer.length >= AppLockPinPolicy.length;
 
     return NumericKeyboardListener(
       enabled: !isBusy,
@@ -61,16 +60,28 @@ final class AppLockEnableSetupLandscapePinPage extends StatelessWidget {
                   children: [
                     // 左侧：说明（flex 3，占更大比例）
                     Expanded(
-                      flex: 3,
+                      flex: 2,
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(
                           minWidth: _infoMinWidth,
                         ),
-                        child: Text(
-                          '请输入 ${AppLockPinPolicy.length} 位数字密码',
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '请输入 ${AppLockPinPolicy.length} 位数字密码',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            AppLockPinField(
+                              label: '密码',
+                              buffer: pinBuffer,
+                              obscure: state.obscurePin,
+                              isActive: true,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -82,48 +93,22 @@ final class AppLockEnableSetupLandscapePinPage extends StatelessWidget {
                         constraints: const BoxConstraints(
                           maxWidth: _inputMaxWidth,
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            AppLockPinField(
-                              label: '密码',
-                              buffer: pinBuffer,
-                              obscure: state.obscurePin,
-                              isActive: true,
-                            ),
-                            if (state.errorMessage case final message?) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                message,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.error,
-                                ),
-                              ),
-                            ],
-                            const SizedBox(height: 24),
-                            AppLockPinKeypad(
-                              onDigitPressed: onDigitPressed,
-                              leadingKey: AppLockPinKeyAction(
-                                child: const Icon(Icons.clear),
-                                onPressed: onClearPressed,
-                                semanticLabel: '清除',
-                              ),
-                              trailingKey: AppLockPinKeyAction(
-                                child: const Icon(Icons.backspace_outlined),
-                                onPressed: onDeletePressed,
-                                semanticLabel: '删除',
-                              ),
-                              enabled: !isBusy,
-                              isFull:
-                                  pinBuffer.length >= AppLockPinPolicy.length,
-                            ),
-                            const SizedBox(height: 24),
-                            FilledButton(
-                              onPressed: isBusy ? null : onContinueToHint,
-                              child: const Text('下一步'),
-                            ),
-                          ],
+                        child: AppLockPinKeypad(
+                          onDigitPressed: onDigitPressed,
+                          trailingKey: AppLockPinKeyAction(
+                            child: const Icon(Icons.backspace_outlined),
+                            onPressed: onDeletePressed,
+                            semanticLabel: '删除',
+                          ),
+                          leadingKey: isFull
+                              ? AppLockPinKeyAction(
+                                  child: const Icon(Icons.check),
+                                  onPressed: onContinueToHint,
+                                  semanticLabel: '确认',
+                                )
+                              : null,
+                          enabled: !isBusy,
+                          isFull: isFull,
                         ),
                       ),
                     ),

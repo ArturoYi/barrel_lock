@@ -18,7 +18,7 @@ void main() {
     AppDeviceInfoReader.debugSetSnapshot(
       const AppDeviceInfoSnapshot(
         appName: 'BarrelLock',
-        packageName: 'com.example.barrel_lock',
+        packageName: 'com.hulk.bazaarAndroid',
         version: '1.0.0',
         buildNumber: '1',
         platform: AppDeviceInfoPlatform.android,

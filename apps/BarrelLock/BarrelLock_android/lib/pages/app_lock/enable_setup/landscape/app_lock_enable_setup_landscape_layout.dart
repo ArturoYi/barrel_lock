@@ -18,7 +18,6 @@ final class AppLockEnableSetupLandscapeLayout extends StatelessWidget {
     required this.hintFocusNode,
     required this.onDigitPressed,
     required this.onDeletePressed,
-    required this.onClearPressed,
     required this.onContinueToHint,
     required this.onSubmitSetup,
     required this.onBackToPinStep,
@@ -34,7 +33,6 @@ final class AppLockEnableSetupLandscapeLayout extends StatelessWidget {
   final FocusNode hintFocusNode;
   final ValueChanged<int> onDigitPressed;
   final VoidCallback onDeletePressed;
-  final VoidCallback onClearPressed;
   final VoidCallback onContinueToHint;
   final VoidCallback onSubmitSetup;
   final VoidCallback onBackToPinStep;
@@ -79,7 +77,6 @@ final class AppLockEnableSetupLandscapeLayout extends StatelessWidget {
                     pinBuffer: pinBuffer,
                     onDigitPressed: onDigitPressed,
                     onDeletePressed: onDeletePressed,
-                    onClearPressed: onClearPressed,
                     onContinueToHint: onContinueToHint,
                     onCancel: onCancel,
                     onToggleObscurePin: onToggleObscurePin,
