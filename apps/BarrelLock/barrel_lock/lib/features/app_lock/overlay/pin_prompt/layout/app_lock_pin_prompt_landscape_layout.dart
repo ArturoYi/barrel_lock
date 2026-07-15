@@ -76,49 +76,57 @@ final class _LandscapeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 2,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(minWidth: _infoMinWidth),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppLockPinPromptHeaderSection(state: state),
-                  const SizedBox(height: 24),
-                  AppLockPinField(
-                    label: '应用内密码',
-                    buffer: pinBuffer,
-                    obscure: state.obscurePin,
-                    isActive: true,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: constraints.maxHeight),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: _infoMinWidth),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AppLockPinPromptHeaderSection(state: state),
+                        const SizedBox(height: 24),
+                        AppLockPinField(
+                          label: '应用内密码',
+                          buffer: pinBuffer,
+                          obscure: state.obscurePin,
+                          isActive: true,
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: _columnGap),
+                Expanded(
+                  flex: 2,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: _inputMaxWidth),
+                    child: AppLockPinPromptInputSection(
+                      state: state,
+                      pinBuffer: pinBuffer,
+                      isSubmitting: isSubmitting,
+                      onToggleObscure: onToggleObscure,
+                      onDigitPressed: onDigitPressed,
+                      onDeletePressed: onDeletePressed,
+                      onRetryBiometric: onRetryBiometric,
+                      showBiometricRetry: showBiometricRetry,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: _columnGap),
-          Expanded(
-            flex: 2,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _inputMaxWidth),
-              child: AppLockPinPromptInputSection(
-                state: state,
-                pinBuffer: pinBuffer,
-                isSubmitting: isSubmitting,
-                onToggleObscure: onToggleObscure,
-                onDigitPressed: onDigitPressed,
-                onDeletePressed: onDeletePressed,
-                onRetryBiometric: onRetryBiometric,
-                showBiometricRetry: showBiometricRetry,
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
@@ -40,42 +42,134 @@ final class AppLockPinKeypad extends StatelessWidget {
   final AppLockPinKeyAction? trailingKey;
 
   static const _digits = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  static const _keyWidth = 72.0;
-  static const _keyHeight = 56.0;
+  static const _keyWidth = 82.0;
+  static const _keyHeight = 76.0;
   static const _keyPadding = 6.0;
   static const _cellWidth = _keyWidth + _keyPadding * 2;
   static const _cellHeight = _keyHeight + _keyPadding * 2;
   static const _crossAxisCount = 3;
+  static const _rowCount = 4;
+
+  /// 设计稿最大尺寸；可用空间更大时不放大，更小时按短边等比缩小。
+  static const maxWidth = _cellWidth * _crossAxisCount;
+  static const maxHeight = _cellHeight * _rowCount;
+
+  /// 避免极端小屏下键位过小；正常竖屏不应触发。
+  static const _minScale = 0.82;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final scale = _resolveScale(context, constraints);
+        final renderWidth = maxWidth * scale;
+        final renderHeight = maxHeight * scale;
+
+        return Align(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: renderWidth,
+            height: renderHeight,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: maxWidth,
+                height: maxHeight,
+                child: _KeypadGrid(
+                  onDigitPressed: onDigitPressed,
+                  enabled: enabled,
+                  isFull: isFull,
+                  leadingKey: leadingKey,
+                  trailingKey: trailingKey,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static double _resolveScale(
+    BuildContext context,
+    BoxConstraints constraints,
+  ) {
+    final orientation = MediaQuery.orientationOf(context);
+    final media = MediaQuery.sizeOf(context);
+    final padding = MediaQuery.paddingOf(context);
+
+    var availableWidth = constraints.maxWidth;
+    if (!availableWidth.isFinite) {
+      availableWidth = media.width - padding.horizontal;
+    }
+
+    var availableHeight = constraints.maxHeight;
+    if (!availableHeight.isFinite) {
+      availableHeight = media.height - padding.vertical;
+    }
+
+    final widthScale = availableWidth / maxWidth;
+    final heightScale = availableHeight / maxHeight;
+
+    final double scale;
+    if (orientation == Orientation.portrait) {
+      // 竖屏以宽度为主；仅当按宽度算出的高度超出可用高度时才进一步缩小。
+      scale = math.min(widthScale, 1);
+      final scaledHeight = maxHeight * scale;
+      if (scaledHeight > availableHeight) {
+        return math.max(math.min(scale, heightScale), _minScale);
+      }
+    } else {
+      // 横屏按短边等比适配，防止高度溢出。
+      scale = math.min(math.min(widthScale, heightScale), 1);
+    }
+
+    return math.max(scale, _minScale).clamp(0, 1);
+  }
+}
+
+final class _KeypadGrid extends StatelessWidget {
+  const _KeypadGrid({
+    required this.onDigitPressed,
+    required this.enabled,
+    required this.isFull,
+    required this.leadingKey,
+    required this.trailingKey,
+  });
+
+  final ValueChanged<int> onDigitPressed;
+  final bool enabled;
+  final bool isFull;
+  final AppLockPinKeyAction? leadingKey;
+  final AppLockPinKeyAction? trailingKey;
 
   @override
   Widget build(BuildContext context) {
     final canEnterDigit = enabled && !isFull;
 
-    return Center(
-      child: SizedBox(
-        width: _cellWidth * _crossAxisCount,
-        child: GridView.count(
-          crossAxisCount: _crossAxisCount,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          childAspectRatio: _cellWidth / _cellHeight,
-          children: [
-            for (final digit in _digits)
-              _KeyButton(
-                isDigit: true,
-                onPressed: canEnterDigit ? () => onDigitPressed(digit) : null,
-                child: Text('$digit'),
-              ),
-            _buildSideKey(leadingKey),
-            _KeyButton(
-              isDigit: true,
-              onPressed: canEnterDigit ? () => onDigitPressed(0) : null,
-              child: const Text('0'),
-            ),
-            _buildSideKey(trailingKey),
-          ],
+    return GridView.count(
+      crossAxisCount: AppLockPinKeypad._crossAxisCount,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      childAspectRatio:
+          AppLockPinKeypad._cellWidth / AppLockPinKeypad._cellHeight,
+      children: [
+        for (final digit in AppLockPinKeypad._digits)
+          _KeyButton(
+            isDigit: true,
+            onPressed: canEnterDigit ? () => onDigitPressed(digit) : null,
+            child: Text('$digit'),
+          ),
+        _buildSideKey(leadingKey),
+        _KeyButton(
+          isDigit: true,
+          onPressed: canEnterDigit ? () => onDigitPressed(0) : null,
+          child: const Text('0'),
         ),
-      ),
+        _buildSideKey(trailingKey),
+      ],
     );
   }
 

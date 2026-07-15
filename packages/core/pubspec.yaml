@@ -22,6 +22,7 @@ dependencies:
     path: ../fast_loading
   fast_navigator:
     path: ../fast_navigator
+  fast_package: ^0.0.3
   fast_toast:
     path: ../fast_toast
   flutter:

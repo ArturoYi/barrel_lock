@@ -1,25 +1,9 @@
-/// 基础 CRUD 仓储契约（伪代码骨架，实体接入后由具体 Repository 实现）。
+/// 基础 CRUD 仓储契约。
 ///
-/// 典型实现方式：
-/// ```dart
-/// final class TodoRepository extends CrudRepository<TodoItem, int> {
-///   TodoRepository(this._db);
-///   final AppDatabase _db;
-///
-///   @override
-///   Future<TodoItem?> findById(int id) =>
-///       (_db.select(_db.todoItems)..where((t) => t.id.equals(id)))
-///           .getSingleOrNull();
-///
-///   @override
-///   Stream<List<TodoItem>> watchAll() =>
-///       _db.select(_db.todoItems).watch();
-///
-///   @override
-///   Future<int> insert(TodoItem entity) =>
-///       _db.into(_db.todoItems).insert(entity);
-/// }
-/// ```
+/// 实现约定：
+/// - 数据访问实现放 `storage/repositories/`，组合 [DriftCrudSupport] 实现各表仓储
+/// - 业务层通过 [StorageRepositories] 聚合入口获取各表仓储
+/// - 复杂查询（按 vault 过滤、软删除等）在对应 `XxxRepository` 上扩展，不污染本接口
 abstract interface class CrudRepository<TEntity, TId> {
   Future<TEntity?> findById(TId id);
 

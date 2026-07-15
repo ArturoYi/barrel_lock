@@ -51,69 +51,68 @@ final class AppLockEnableSetupLandscapePinPage extends StatelessWidget {
       onCancel: onCancel,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          return SingleChildScrollView(
+          return Center(
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // 左侧：说明（flex 3，占更大比例）
-                    Expanded(
-                      flex: 2,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: _infoMinWidth,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '请输入 ${AppLockPinPolicy.length} 位数字密码',
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                            AppLockPinField(
-                              label: '密码',
-                              buffer: pinBuffer,
-                              obscure: state.obscurePin,
-                              isActive: true,
-                            ),
-                          ],
-                        ),
+              constraints: BoxConstraints(maxHeight: constraints.maxHeight),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 左侧：说明（flex 3，占更大比例）
+                  Expanded(
+                    flex: 2,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: _infoMinWidth,
                       ),
-                    ),
-                    const SizedBox(width: _columnGap),
-                    // 右侧：密码框、键盘与操作按钮（flex 2，限制最大宽度）
-                    Expanded(
-                      flex: 2,
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          maxWidth: _inputMaxWidth,
-                        ),
-                        child: AppLockPinKeypad(
-                          onDigitPressed: onDigitPressed,
-                          trailingKey: AppLockPinKeyAction(
-                            child: const Icon(Icons.backspace_outlined),
-                            onPressed: onDeletePressed,
-                            semanticLabel: '删除',
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '请输入 ${AppLockPinPolicy.length} 位数字密码',
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                          leadingKey: isFull
-                              ? AppLockPinKeyAction(
-                                  child: const Icon(Icons.check),
-                                  onPressed: onContinueToHint,
-                                  semanticLabel: '确认',
-                                )
-                              : null,
-                          enabled: !isBusy,
-                          isFull: isFull,
-                        ),
+                          const SizedBox(height: 24),
+                          AppLockPinField(
+                            label: '密码',
+                            buffer: pinBuffer,
+                            obscure: state.obscurePin,
+                            isActive: true,
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: _columnGap),
+                  // 右侧：密码框、键盘与操作按钮（flex 2，限制最大宽度）
+                  Expanded(
+                    flex: 2,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: _inputMaxWidth,
+                      ),
+                      child: AppLockPinKeypad(
+                        onDigitPressed: onDigitPressed,
+                        trailingKey: AppLockPinKeyAction(
+                          child: const Icon(Icons.backspace_outlined),
+                          onPressed: onDeletePressed,
+                          semanticLabel: '删除',
+                        ),
+                        leadingKey: isFull
+                            ? AppLockPinKeyAction(
+                                child: const Icon(Icons.check),
+                                onPressed: onContinueToHint,
+                                semanticLabel: '确认',
+                              )
+                            : null,
+                        enabled: !isBusy,
+                        isFull: isFull,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           );

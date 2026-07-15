@@ -80,7 +80,6 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
                   isActive: true,
                 ),
                 const Expanded(flex: 1, child: SizedBox.shrink()),
-                // 屏幕内数字键盘
                 AppLockPinKeypad(
                   onDigitPressed: onDigitPressed,
                   leadingKey: isFull
@@ -98,7 +97,7 @@ final class AppLockEnableSetupPortraitPinPage extends StatelessWidget {
                   enabled: !isBusy,
                   isFull: isFull,
                 ),
-                const Expanded(flex: 1, child: SizedBox.shrink()),
+                const SizedBox(height: 24),
               ],
             ),
           );

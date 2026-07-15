@@ -169,28 +169,32 @@ final class AppLockPinPromptInputSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.orientationOf(context) == Orientation.landscape;
+    final keypad = AppLockPinKeypad(
+      onDigitPressed: onDigitPressed,
+      leadingKey: showBiometricRetry
+          ? AppLockPinKeyAction(
+              child: const Icon(Icons.fingerprint),
+              onPressed: onRetryBiometric,
+              semanticLabel: '生物识别',
+            )
+          : null,
+      trailingKey: AppLockPinKeyAction(
+        child: const Icon(Icons.backspace_outlined),
+        onPressed: onDeletePressed,
+        semanticLabel: '删除',
+      ),
+      enabled: !isSubmitting,
+      isFull: pinBuffer.length >= AppLockPinPolicy.length,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: isLandscape ? MainAxisSize.max : MainAxisSize.min,
       children: [
         const SizedBox(height: 16),
-        AppLockPinKeypad(
-          onDigitPressed: onDigitPressed,
-          leadingKey: showBiometricRetry
-              ? AppLockPinKeyAction(
-                  child: const Icon(Icons.fingerprint),
-                  onPressed: onRetryBiometric,
-                  semanticLabel: '生物识别',
-                )
-              : null,
-          trailingKey: AppLockPinKeyAction(
-            child: const Icon(Icons.backspace_outlined),
-            onPressed: onDeletePressed,
-            semanticLabel: '删除',
-          ),
-          enabled: !isSubmitting,
-          isFull: pinBuffer.length >= AppLockPinPolicy.length,
-        ),
+        if (isLandscape) Expanded(child: keypad) else keypad,
       ],
     );
   }

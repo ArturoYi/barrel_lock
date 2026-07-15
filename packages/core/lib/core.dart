@@ -3,6 +3,7 @@ library;
 export 'package:app_fonts/app_fonts.dart';
 export 'package:fast_dialog/fast_dialog.dart';
 export 'package:fast_loading/fast_loading.dart';
+export 'package:fast_package/fast_package.dart';
 export 'package:fast_toast/fast_toast.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -24,6 +25,7 @@ export 'storage/app_database.dart';
 export 'storage/app_storage.dart';
 export 'storage/crud_repository.dart';
 export 'storage/migration/database_schema_version.dart';
+export 'storage/repositories/repositories.dart';
 export 'storage/storage_config.dart';
 export 'storage/storage_constants.dart';
 

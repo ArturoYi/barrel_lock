@@ -105,7 +105,7 @@ final class _PortraitCard extends StatelessWidget {
             onRetryBiometric: onRetryBiometric,
             showBiometricRetry: showBiometricRetry,
           ),
-          const Expanded(flex: 1, child: SizedBox.shrink()),
+          const SizedBox(height: 24),
         ],
       ),
     );
