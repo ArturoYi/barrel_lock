@@ -5,14 +5,23 @@ import 'drift_crud_support.dart';
 /// [Vaults] 表仓储。
 final class VaultRepository implements CrudRepository<Vault, String> {
   VaultRepository(AppDatabase database)
-    : _crud = DriftCrudSupport<Vault, String>(
+    : _database = database,
+      _crud = DriftCrudSupport<Vault, String>(
         database: database,
         table: database.vaults,
         idEquals: (tbl, id) => (tbl as $VaultsTable).vaultUuid.equals(id),
         idOf: (entity) => entity.vaultUuid,
       );
 
+  final AppDatabase _database;
   final DriftCrudSupport<Vault, String> _crud;
+
+  /// 监听未移入回收站的保险库。
+  Stream<List<Vault>> watchActive() {
+    return (_database.select(
+      _database.vaults,
+    )..where((tbl) => tbl.isTrashed.equals(false))).watch();
+  }
 
   @override
   Future<Vault?> findById(String id) => _crud.findById(id);

@@ -77,7 +77,7 @@
 
 统一存储登录、银行卡、证件、笔记、SSH 密钥；`type` 数字区分条目类型，双层加密隔离列表与完整敏感数据。
 
-> type 枚举：1=网站登录 2=银行卡 3=身份证件 4=安全笔记 5=SSH 密钥
+> type 枚举：1=网站登录 2=银行卡 3=身份证件 4=安全笔记 5=SSH 密钥 6=App 账户密码
 
 | 字段 | 类型 | 约束 | 说明 |
 | ---- | ---- | ---- | ---- |
@@ -178,3 +178,109 @@ vault 保险库
 7. **离线 2FA**：TOTP 种子存放于 `full_data_blob`，本地离线计算验证码，无需服务端；
 8. **解锁体验**：指纹 / PIN 解锁配置走 `AppIdentityAuth` + `SPStorage`，自动锁定等偏好走 `AppPreference`；
 9. **偏好存储**：主题、字体、语言等非密码业务配置使用 SharedPreferences（`AppPreference`），与 SQLite 密码库分离。
+
+---
+
+# cipher BLOB 明文 JSON 约定
+
+> 以下 JSON 在加密前序列化为 UTF-8，再经 `AppCrypto.encrypt` 写入 BLOB。
+> `cipher.type` 与 JSON 内 `type` 字段 MUST 一致。
+
+## overview_blob（列表 / 搜索层，各类型共用结构）
+
+| 字段 | 类型 | 说明 |
+| ---- | ---- | ---- |
+| title | string | 条目显示名（如「GitHub」「招商银行储蓄卡」） |
+| subtitle | string | 列表副标题（用户名、卡号后四位、证件号掩码等） |
+| host | string? | 网站域名 / SSH 主机等，非 URL 类可为空 |
+| hasTotp | bool? | 是否绑定 TOTP，默认 false |
+
+## full_data_blob（详情 / 编辑层，按 type 区分）
+
+### type = 1 网站登录（websiteLogin）
+
+```json
+{
+  "type": 1,
+  "username": "cyr@example.com",
+  "password": "secret",
+  "notes": "备注可选",
+  "totpSecret": "BASE32SECRET可选"
+}
+```
+
+### type = 2 银行卡（bankCard）
+
+```json
+{
+  "type": 2,
+  "cardholderName": "张三",
+  "cardNumber": "6222****1234",
+  "expiryMonth": "12",
+  "expiryYear": "28",
+  "cvv": "123",
+  "pin": "",
+  "notes": ""
+}
+```
+
+### type = 3 身份证件（identityDocument）
+
+```json
+{
+  "type": 3,
+  "documentType": "身份证",
+  "fullName": "张三",
+  "documentNumber": "110***********1234",
+  "issueDate": "2020-01-01",
+  "expiryDate": "2030-01-01",
+  "notes": ""
+}
+```
+
+### type = 4 安全笔记（secureNote）
+
+```json
+{
+  "type": 4,
+  "content": "笔记正文",
+  "notes": ""
+}
+```
+
+### type = 5 SSH 密钥（sshKey）
+
+```json
+{
+  "type": 5,
+  "privateKey": "-----BEGIN OPENSSH PRIVATE KEY-----...",
+  "publicKey": "ssh-ed25519 AAAA...",
+  "passphrase": "",
+  "host": "github.com",
+  "username": "git",
+  "notes": ""
+}
+```
+
+### type = 6 App 账户密码（appAccount）
+
+```json
+{
+  "type": 6,
+  "username": "13800138000",
+  "password": "secret",
+  "packageName": "com.tencent.xin",
+  "notes": ""
+}
+```
+
+## overview 字段映射参考
+
+| type | title 来源 | subtitle 来源 | host 来源 |
+| ---- | ---------- | ------------- | --------- |
+| 1 网站登录 | 用户填「名称」 | 用户名 | 网站 URL 解析 |
+| 2 银行卡 | 银行 / 卡别名 | 卡号后四位 | — |
+| 3 证件 | 证件类型 + 姓名 | 证件号掩码 | — |
+| 4 安全笔记 | 笔记标题 | 内容摘要 | — |
+| 5 SSH | 密钥名称 | user@host | host |
+| 6 App 账户 | 用户填「名称」 | 账号 | 包名 / Bundle ID（可选） |

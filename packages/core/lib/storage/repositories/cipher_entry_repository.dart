@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../app_database.dart';
 import '../crud_repository.dart';
 import 'drift_crud_support.dart';
@@ -6,7 +8,8 @@ import 'drift_crud_support.dart';
 final class CipherEntryRepository
     implements CrudRepository<CipherEntry, String> {
   CipherEntryRepository(AppDatabase database)
-    : _crud = DriftCrudSupport<CipherEntry, String>(
+    : _database = database,
+      _crud = DriftCrudSupport<CipherEntry, String>(
         database: database,
         table: database.cipherEntries,
         idEquals: (tbl, id) =>
@@ -14,7 +17,32 @@ final class CipherEntryRepository
         idOf: (entity) => entity.cipherUuid,
       );
 
+  final AppDatabase _database;
   final DriftCrudSupport<CipherEntry, String> _crud;
+
+  /// 监听指定保险库下未软删除的密码条目。
+  Stream<List<CipherEntry>> watchByVault(String vaultUuid) {
+    return (_database.select(_database.cipherEntries)..where(
+          (tbl) => tbl.vaultUuid.equals(vaultUuid) & tbl.deletedAt.isNull(),
+        ))
+        .watch();
+  }
+
+  /// 更新收藏状态并刷新 [updatedAt]。
+  Future<bool> setFavorite(String cipherUuid, bool isFavorite) async {
+    final now = DateTime.now().toUtc();
+    final count =
+        await (_database.update(
+          _database.cipherEntries,
+        )..where((tbl) => tbl.cipherUuid.equals(cipherUuid))).write(
+          CipherEntriesCompanion(
+            isFavorite: Value(isFavorite),
+            updatedAt: Value(now),
+            localModified: const Value(true),
+          ),
+        );
+    return count > 0;
+  }
 
   @override
   Future<CipherEntry?> findById(String id) => _crud.findById(id);

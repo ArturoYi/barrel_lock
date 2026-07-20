@@ -69,6 +69,11 @@ final class AppRouter {
         builder: builders.detail,
       ),
       FastRoute(
+        name: AppRoutes.cipherAdd.name,
+        path: AppRoutes.cipherAdd.path,
+        builder: builders.cipherAdd,
+      ),
+      FastRoute(
         name: AppRoutes.settings.name,
         path: AppRoutes.settings.path,
         builder: builders.settings,

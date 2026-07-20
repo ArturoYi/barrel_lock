@@ -8,7 +8,12 @@ class PasswordTabPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(passwordTabViewModelProvider);
-    return Center(child: Text(state.title));
+    final asyncState = ref.watch(passwordTabViewModelProvider);
+
+    return asyncState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('加载失败：$error')),
+      data: (state) => Center(child: Text(state.title)),
+    );
   }
 }

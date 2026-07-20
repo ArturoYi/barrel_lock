@@ -15,6 +15,9 @@ class VaultFolderSection extends StatelessWidget {
     required this.onFavoriteToggled,
   });
 
+  static const _animationDuration = Duration(milliseconds: 220);
+  static const _animationCurve = Curves.easeOutCubic;
+
   final VaultFolderGroup group;
   final bool isCollapsed;
   final VoidCallback onCollapseToggled;
@@ -35,11 +38,14 @@ class VaultFolderSection extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
             child: Row(
               children: [
-                Icon(
-                  isCollapsed
-                      ? Icons.chevron_right_rounded
-                      : Icons.expand_more_rounded,
-                  color: colorScheme.primary,
+                AnimatedRotation(
+                  turns: isCollapsed ? 0 : 0.25,
+                  duration: _animationDuration,
+                  curve: _animationCurve,
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    color: colorScheme.primary,
+                  ),
                 ),
                 const SizedBox(width: 4),
                 Expanded(
@@ -61,16 +67,28 @@ class VaultFolderSection extends StatelessWidget {
             ),
           ),
         ),
-        if (!isCollapsed) ...[
-          for (var i = 0; i < group.items.length; i++) ...[
-            VaultCipherCard(
-              item: group.items[i],
-              onTap: () => onCipherTapped(group.items[i].id),
-              onFavoriteToggled: () => onFavoriteToggled(group.items[i].id),
-            ),
-            if (i < group.items.length - 1) const SizedBox(height: 8),
-          ],
-        ],
+        AnimatedSize(
+          duration: _animationDuration,
+          curve: _animationCurve,
+          alignment: Alignment.topCenter,
+          clipBehavior: Clip.hardEdge,
+          child: isCollapsed
+              ? const SizedBox(width: double.infinity)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var i = 0; i < group.items.length; i++) ...[
+                      VaultCipherCard(
+                        item: group.items[i],
+                        onTap: () => onCipherTapped(group.items[i].id),
+                        onFavoriteToggled: () =>
+                            onFavoriteToggled(group.items[i].id),
+                      ),
+                      if (i < group.items.length - 1) const SizedBox(height: 8),
+                    ],
+                  ],
+                ),
+        ),
       ],
     );
   }

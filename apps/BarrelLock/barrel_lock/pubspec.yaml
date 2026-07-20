@@ -24,6 +24,7 @@ dependencies:
 
 dev_dependencies:
   cryptography: ^2.9.0
+  drift: ^2.34.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0

@@ -2,12 +2,13 @@ import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/vault_add_password_button.dart';
 import '../widgets/vault_folder_section.dart';
 import '../widgets/vault_home_gradient_background.dart';
 import '../widgets/vault_home_search_row.dart';
 import '../widgets/vault_quick_filter_row.dart';
 
-/// 密码 Tab 竖屏布局：顶部搜索 + 快捷筛选 + 分组列表。
+/// 密码 Tab 竖屏布局：固定顶栏 + 可滚动分组列表。
 class PasswordTabPortraitView extends StatelessWidget {
   const PasswordTabPortraitView({
     super.key,
@@ -18,6 +19,7 @@ class PasswordTabPortraitView extends StatelessWidget {
     required this.onFolderCollapseToggled,
     required this.onFavoriteToggled,
     required this.onCipherTapped,
+    required this.onAddPasswordTapped,
   });
 
   final PasswordTabViewState state;
@@ -27,53 +29,142 @@ class PasswordTabPortraitView extends StatelessWidget {
   final ValueChanged<String> onFolderCollapseToggled;
   final ValueChanged<String> onFavoriteToggled;
   final ValueChanged<String> onCipherTapped;
+  final VoidCallback onAddPasswordTapped;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colors;
 
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: _VaultHomeHeader(
-            state: state,
-            onSearchChanged: onSearchChanged,
-            onQuickFilterSelected: onQuickFilterSelected,
-            onVaultSelected: onVaultSelected,
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _VaultHomeHeader(
+          state: state,
+          onSearchChanged: onSearchChanged,
+          onQuickFilterSelected: onQuickFilterSelected,
+          onVaultSelected: onVaultSelected,
+          onAddPasswordTapped: onAddPasswordTapped,
         ),
-        if (state.totalItemCount == 0)
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Center(
-              child: Text(
-                '暂无密码条目',
-                style: context.textTheme.bodyLarge?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
+        Expanded(
+          child: !state.hasVaults
+              ? _NoVaultEmptyState(
+                  colorScheme: colorScheme,
+                  onAddPasswordTapped: onAddPasswordTapped,
+                )
+              : state.totalItemCount == 0
+              ? _EmptyPasswordList(
+                  colorScheme: colorScheme,
+                  onAddPasswordTapped: onAddPasswordTapped,
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
+                  itemCount: state.folderGroups.length,
+                  itemBuilder: (context, index) {
+                    final group = state.folderGroups[index];
+                    return VaultFolderSection(
+                      group: group,
+                      isCollapsed: state.isFolderCollapsed(group.id),
+                      onCollapseToggled: () =>
+                          onFolderCollapseToggled(group.id),
+                      onCipherTapped: onCipherTapped,
+                      onFavoriteToggled: onFavoriteToggled,
+                    );
+                  },
                 ),
-              ),
-            ),
-          )
-        else
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => VaultFolderSection(
-                  group: state.folderGroups[index],
-                  isCollapsed: state.isFolderCollapsed(
-                    state.folderGroups[index].id,
-                  ),
-                  onCollapseToggled: () =>
-                      onFolderCollapseToggled(state.folderGroups[index].id),
-                  onCipherTapped: onCipherTapped,
-                  onFavoriteToggled: onFavoriteToggled,
-                ),
-                childCount: state.folderGroups.length,
-              ),
-            ),
-          ),
+        ),
       ],
+    );
+  }
+}
+
+class _NoVaultEmptyState extends StatelessWidget {
+  const _NoVaultEmptyState({
+    required this.colorScheme,
+    required this.onAddPasswordTapped,
+  });
+
+  final ColorScheme colorScheme;
+  final VoidCallback onAddPasswordTapped;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.inventory_2_outlined,
+              size: 48,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '暂无保险库',
+              style: context.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '添加密码时将创建您的第一个保险库',
+              textAlign: TextAlign.center,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.85),
+              ),
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: onAddPasswordTapped,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('添加密码'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyPasswordList extends StatelessWidget {
+  const _EmptyPasswordList({
+    required this.colorScheme,
+    required this.onAddPasswordTapped,
+  });
+
+  final ColorScheme colorScheme;
+  final VoidCallback onAddPasswordTapped;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.lock_open_rounded,
+              size: 48,
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '暂无密码条目',
+              style: context.textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 20),
+            FilledButton.icon(
+              onPressed: onAddPasswordTapped,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('添加密码'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -84,12 +175,14 @@ class _VaultHomeHeader extends StatelessWidget {
     required this.onSearchChanged,
     required this.onQuickFilterSelected,
     required this.onVaultSelected,
+    required this.onAddPasswordTapped,
   });
 
   final PasswordTabViewState state;
   final ValueChanged<String> onSearchChanged;
   final ValueChanged<VaultQuickFilter> onQuickFilterSelected;
   final ValueChanged<String> onVaultSelected;
+  final VoidCallback onAddPasswordTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -110,27 +203,40 @@ class _VaultHomeHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                state.title,
-                textAlign: TextAlign.center,
-                style: context.textTheme.headlineSmall?.copyWith(
-                  color: colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w700,
-                ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    state.title,
+                    textAlign: TextAlign.center,
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.onPrimaryContainer,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: VaultAddPasswordButton(
+                      onPressed: onAddPasswordTapped,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
-              VaultHomeSearchRow(
-                query: state.searchQuery,
-                onChanged: onSearchChanged,
-                vaults: state.vaults,
-                selectedVault: state.selectedVault,
-                onVaultSelected: onVaultSelected,
-              ),
-              const SizedBox(height: 14),
-              VaultQuickFilterRow(
-                selected: state.quickFilter,
-                onSelected: onQuickFilterSelected,
-              ),
+              if (state.hasVaults && state.selectedVault != null) ...[
+                VaultHomeSearchRow(
+                  query: state.searchQuery,
+                  onChanged: onSearchChanged,
+                  vaults: state.vaults,
+                  selectedVault: state.selectedVault!,
+                  onVaultSelected: onVaultSelected,
+                ),
+                const SizedBox(height: 14),
+                VaultQuickFilterRow(
+                  selected: state.quickFilter,
+                  onSelected: onQuickFilterSelected,
+                ),
+              ],
             ],
           ),
         ),

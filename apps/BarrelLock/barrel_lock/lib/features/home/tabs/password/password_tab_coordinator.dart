@@ -10,6 +10,10 @@ final class PasswordTabCoordinator {
   void openCipherDetail(String cipherId) {
     AppRouter.push(AppRoutes.detail(id: cipherId));
   }
+
+  void openAddPassword({String? vaultId}) {
+    AppRouter.push(AppRoutes.cipherAdd(vaultId: vaultId));
+  }
 }
 
 final passwordTabCoordinatorProvider = Provider<PasswordTabCoordinator>(

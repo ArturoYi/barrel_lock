@@ -21,6 +21,8 @@ export 'identity_auth/identity_auth_reason.dart';
 export 'identity_auth/identity_auth_result.dart';
 export 'identity_auth/identity_auth_ui_delegate.dart';
 
+export 'ids/app_ids.dart';
+
 export 'storage/app_database.dart';
 export 'storage/app_storage.dart';
 export 'storage/crud_repository.dart';

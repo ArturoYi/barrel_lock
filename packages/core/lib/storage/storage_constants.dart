@@ -8,4 +8,5 @@ abstract final class CipherType {
   static const int identityDocument = 3;
   static const int secureNote = 4;
   static const int sshKey = 5;
+  static const int appAccount = 6;
 }

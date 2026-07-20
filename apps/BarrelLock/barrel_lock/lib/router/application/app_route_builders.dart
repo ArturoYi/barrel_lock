@@ -10,6 +10,7 @@ final class AppRouteBuilders {
     required this.launchScreen,
     required this.home,
     required this.detail,
+    required this.cipherAdd,
     required this.settings,
     required this.dataMigration,
     required this.appLock,
@@ -20,6 +21,7 @@ final class AppRouteBuilders {
   final AppRouteBuilder launchScreen;
   final AppRouteBuilder home;
   final AppRouteBuilder detail;
+  final AppRouteBuilder cipherAdd;
   final AppRouteBuilder settings;
   final AppRouteBuilder dataMigration;
   final AppRouteBuilder appLock;

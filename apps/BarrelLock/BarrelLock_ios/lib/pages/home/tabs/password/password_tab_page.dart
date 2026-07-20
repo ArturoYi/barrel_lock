@@ -11,31 +11,39 @@ class PasswordTabPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(passwordTabViewModelProvider);
+    final asyncState = ref.watch(passwordTabViewModelProvider);
     final viewModel = ref.read(passwordTabViewModelProvider.notifier);
 
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        return switch (orientation) {
-          Orientation.portrait => PasswordTabPortraitView(
-            state: state,
-            onSearchChanged: viewModel.onSearchChanged,
-            onQuickFilterSelected: viewModel.onQuickFilterSelected,
-            onVaultSelected: viewModel.onVaultSelected,
-            onFolderCollapseToggled: viewModel.onFolderCollapseToggled,
-            onFavoriteToggled: viewModel.onFavoriteToggled,
-            onCipherTapped: viewModel.onCipherTapped,
-          ),
-          Orientation.landscape => PasswordTabLandscapeView(
-            state: state,
-            onSearchChanged: viewModel.onSearchChanged,
-            onQuickFilterSelected: viewModel.onQuickFilterSelected,
-            onVaultSelected: viewModel.onVaultSelected,
-            onFolderCollapseToggled: viewModel.onFolderCollapseToggled,
-            onFavoriteToggled: viewModel.onFavoriteToggled,
-            onCipherTapped: viewModel.onCipherTapped,
-          ),
-        };
+    return asyncState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('加载失败：$error')),
+      data: (state) {
+        return OrientationBuilder(
+          builder: (context, orientation) {
+            return switch (orientation) {
+              Orientation.portrait => PasswordTabPortraitView(
+                state: state,
+                onSearchChanged: viewModel.onSearchChanged,
+                onQuickFilterSelected: viewModel.onQuickFilterSelected,
+                onVaultSelected: viewModel.onVaultSelected,
+                onFolderCollapseToggled: viewModel.onFolderCollapseToggled,
+                onFavoriteToggled: viewModel.onFavoriteToggled,
+                onCipherTapped: viewModel.onCipherTapped,
+                onAddPasswordTapped: viewModel.onAddPasswordTapped,
+              ),
+              Orientation.landscape => PasswordTabLandscapeView(
+                state: state,
+                onSearchChanged: viewModel.onSearchChanged,
+                onQuickFilterSelected: viewModel.onQuickFilterSelected,
+                onVaultSelected: viewModel.onVaultSelected,
+                onFolderCollapseToggled: viewModel.onFolderCollapseToggled,
+                onFavoriteToggled: viewModel.onFavoriteToggled,
+                onCipherTapped: viewModel.onCipherTapped,
+                onAddPasswordTapped: viewModel.onAddPasswordTapped,
+              ),
+            };
+          },
+        );
       },
     );
   }

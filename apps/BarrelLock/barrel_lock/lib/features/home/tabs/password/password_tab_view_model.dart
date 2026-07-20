@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core/core.dart';
 
 import 'password_tab_coordinator.dart';
@@ -23,8 +25,19 @@ final class PasswordTabViewState {
   final List<VaultFolderGroup> folderGroups;
   final Set<String> collapsedFolderIds;
 
-  VaultSummary get selectedVault =>
-      vaults.firstWhere((vault) => vault.id == selectedVaultId);
+  bool get hasVaults => vaults.isNotEmpty;
+
+  VaultSummary? get selectedVault {
+    if (vaults.isEmpty) {
+      return null;
+    }
+    for (final vault in vaults) {
+      if (vault.id == selectedVaultId) {
+        return vault;
+      }
+    }
+    return vaults.first;
+  }
 
   bool isFolderCollapsed(String folderId) =>
       collapsedFolderIds.contains(folderId);
@@ -34,108 +47,135 @@ final class PasswordTabViewState {
 }
 
 /// 首页「密码」Tab 状态与业务编排（MVVM-C 的 VM 层）。
-final class PasswordTabViewModel extends Notifier<PasswordTabViewState> {
-  late final PasswordTabModel _model;
-  late final PasswordTabCoordinator _coordinator;
+final class PasswordTabViewModel extends AsyncNotifier<PasswordTabViewState> {
+  VaultQuickFilter _quickFilter = VaultQuickFilter.all;
+  String _searchQuery = '';
+  Set<String> _collapsedFolderIds = {};
+  String? _selectedVaultId;
+
+  StreamSubscription<void>? _dataSubscription;
+  var _isBuilding = false;
+
+  PasswordTabCoordinator get _coordinator =>
+      ref.read(passwordTabCoordinatorProvider);
 
   @override
-  PasswordTabViewState build() {
-    _model = ref.read(passwordTabModelProvider);
-    _coordinator = ref.read(passwordTabCoordinatorProvider);
-    final selectedVaultId = _model.vaults.first.id;
-    return _buildState(
-      selectedVaultId: selectedVaultId,
-      quickFilter: VaultQuickFilter.all,
-      searchQuery: '',
-      collapsedFolderIds: const {},
-    );
+  Future<PasswordTabViewState> build() async {
+    _isBuilding = true;
+    try {
+      final model = ref.watch(passwordTabModelProvider);
+
+      await _dataSubscription?.cancel();
+      _dataSubscription = model.watchDataChanges(_selectedVaultId).listen((_) {
+        unawaited(_reloadFromDatabase());
+      });
+      ref.onDispose(() => _dataSubscription?.cancel());
+
+      return _composeState(model);
+    } finally {
+      _isBuilding = false;
+    }
   }
 
-  PasswordTabViewState _buildState({
-    required String selectedVaultId,
-    required VaultQuickFilter quickFilter,
-    required String searchQuery,
-    required Set<String> collapsedFolderIds,
-  }) {
+  Future<void> _reloadFromDatabase() async {
+    if (_isBuilding || !ref.mounted) {
+      return;
+    }
+    final model = ref.read(passwordTabModelProvider);
+    final previousVaultId = _selectedVaultId;
+    final nextState = await _composeState(model);
+    if (_selectedVaultId != previousVaultId) {
+      ref.invalidateSelf();
+      return;
+    }
+    state = AsyncData(nextState);
+  }
+
+  Future<PasswordTabViewState> _composeState(PasswordTabModel model) async {
+    final data = await model.loadVaultData(selectedVaultId: _selectedVaultId);
+
+    if (data.vaults.isNotEmpty) {
+      _selectedVaultId ??= data.vaults.first.id;
+      if (!data.vaults.any((vault) => vault.id == _selectedVaultId)) {
+        _selectedVaultId = data.vaults.first.id;
+        _collapsedFolderIds = {};
+      }
+    } else {
+      _selectedVaultId = null;
+    }
+
+    final effectiveVaultId = _selectedVaultId ?? '';
+    final folderGroups = data.vaults.isEmpty
+        ? const <VaultFolderGroup>[]
+        : model.buildFolderGroups(
+            ciphers: data.ciphers,
+            folderNames: data.folderNames,
+            filter: _quickFilter,
+            searchQuery: _searchQuery,
+          );
+
     return PasswordTabViewState(
       title: '密码',
-      vaults: _model.vaults,
-      selectedVaultId: selectedVaultId,
-      quickFilter: quickFilter,
-      searchQuery: searchQuery,
-      folderGroups: _model.buildFolderGroups(
-        vaultId: selectedVaultId,
-        filter: quickFilter,
-        searchQuery: searchQuery,
-      ),
-      collapsedFolderIds: collapsedFolderIds,
+      vaults: data.vaults,
+      selectedVaultId: effectiveVaultId,
+      quickFilter: _quickFilter,
+      searchQuery: _searchQuery,
+      folderGroups: folderGroups,
+      collapsedFolderIds: _collapsedFolderIds,
     );
   }
 
   void onSearchChanged(String query) {
-    state = _buildState(
-      selectedVaultId: state.selectedVaultId,
-      quickFilter: state.quickFilter,
-      searchQuery: query,
-      collapsedFolderIds: state.collapsedFolderIds,
-    );
+    _searchQuery = query;
+    ref.invalidateSelf();
   }
 
   void onQuickFilterSelected(VaultQuickFilter filter) {
-    if (filter == state.quickFilter) {
+    if (filter == _quickFilter) {
       return;
     }
-    state = _buildState(
-      selectedVaultId: state.selectedVaultId,
-      quickFilter: filter,
-      searchQuery: state.searchQuery,
-      collapsedFolderIds: state.collapsedFolderIds,
-    );
+    _quickFilter = filter;
+    ref.invalidateSelf();
   }
 
   void onVaultSelected(String vaultId) {
-    if (vaultId == state.selectedVaultId) {
+    if (vaultId == _selectedVaultId) {
       return;
     }
-    state = _buildState(
-      selectedVaultId: vaultId,
-      quickFilter: state.quickFilter,
-      searchQuery: state.searchQuery,
-      collapsedFolderIds: const {},
-    );
+    _selectedVaultId = vaultId;
+    _collapsedFolderIds = {};
+    ref.invalidateSelf();
   }
 
   void onFolderCollapseToggled(String folderId) {
-    final collapsed = Set<String>.from(state.collapsedFolderIds);
+    final collapsed = Set<String>.from(_collapsedFolderIds);
     if (collapsed.contains(folderId)) {
       collapsed.remove(folderId);
     } else {
       collapsed.add(folderId);
     }
-    state = _buildState(
-      selectedVaultId: state.selectedVaultId,
-      quickFilter: state.quickFilter,
-      searchQuery: state.searchQuery,
-      collapsedFolderIds: collapsed,
-    );
+    _collapsedFolderIds = collapsed;
+    ref.invalidateSelf();
   }
 
-  void onFavoriteToggled(String cipherId) {
-    _model.toggleFavorite(cipherId);
-    state = _buildState(
-      selectedVaultId: state.selectedVaultId,
-      quickFilter: state.quickFilter,
-      searchQuery: state.searchQuery,
-      collapsedFolderIds: state.collapsedFolderIds,
-    );
+  Future<void> onFavoriteToggled(String cipherId) async {
+    final model = ref.read(passwordTabModelProvider);
+    await model.toggleFavorite(cipherId);
   }
 
   void onCipherTapped(String cipherId) {
     _coordinator.openCipherDetail(cipherId);
   }
+
+  void onAddPasswordTapped() {
+    final vaultId = _selectedVaultId;
+    _coordinator.openAddPassword(
+      vaultId: vaultId != null && vaultId.isNotEmpty ? vaultId : null,
+    );
+  }
 }
 
 final passwordTabViewModelProvider =
-    NotifierProvider<PasswordTabViewModel, PasswordTabViewState>(
+    AsyncNotifierProvider<PasswordTabViewModel, PasswordTabViewState>(
       PasswordTabViewModel.new,
     );

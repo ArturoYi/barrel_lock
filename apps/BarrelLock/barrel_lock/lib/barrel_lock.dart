@@ -1,11 +1,23 @@
 /// BarrelLock 共享业务 Feature（MVVM-C 的 Model / ViewModel / Coordinator）。
 library;
 
+export 'crypto/app_account_cipher_payload.dart';
 export 'crypto/barrel_lock_crypto.dart';
 export 'crypto/barrel_lock_encrypted_storage.dart';
 export 'crypto/barrel_lock_master_key.dart';
+export 'crypto/bank_card_cipher_payload.dart';
+export 'crypto/cipher_full_data_codec.dart';
+export 'crypto/cipher_full_data_payload.dart';
+export 'crypto/cipher_overview_codec.dart';
+export 'crypto/cipher_overview_data.dart';
+export 'crypto/encrypted_name_codec.dart';
+export 'crypto/identity_document_cipher_payload.dart';
+export 'crypto/secure_note_cipher_payload.dart';
+export 'crypto/ssh_key_cipher_payload.dart';
+export 'crypto/website_login_cipher_payload.dart';
 export 'features/app_lock/app_lock.dart';
 export 'features/clear_data/clear_data.dart';
+export 'features/cipher_add/cipher_add.dart';
 export 'features/data_migration/data_migration.dart';
 export 'features/detail/detail.dart';
 export 'features/home/home.dart';
@@ -17,3 +29,4 @@ export 'preference/barrel_lock_preference_keys.dart';
 export 'router/router.dart';
 export 'shell/lifecycle_bootstrap.dart';
 export 'shell/themed_app.dart';
+export 'storage/storage_providers.dart';

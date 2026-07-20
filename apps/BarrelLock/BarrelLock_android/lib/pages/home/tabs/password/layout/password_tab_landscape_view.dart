@@ -2,6 +2,7 @@ import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
+import '../widgets/vault_add_password_button.dart';
 import '../widgets/vault_folder_section.dart';
 import '../widgets/vault_quick_filter_row.dart';
 import '../widgets/vault_search_bar.dart';
@@ -18,6 +19,7 @@ class PasswordTabLandscapeView extends StatelessWidget {
     required this.onFolderCollapseToggled,
     required this.onFavoriteToggled,
     required this.onCipherTapped,
+    required this.onAddPasswordTapped,
   });
 
   final PasswordTabViewState state;
@@ -27,10 +29,12 @@ class PasswordTabLandscapeView extends StatelessWidget {
   final ValueChanged<String> onFolderCollapseToggled;
   final ValueChanged<String> onFavoriteToggled;
   final ValueChanged<String> onCipherTapped;
+  final VoidCallback onAddPasswordTapped;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colors;
+    final selectedVault = state.selectedVault;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -63,29 +67,44 @@ class PasswordTabLandscapeView extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    VaultSwitcherButton(
-                      vaults: state.vaults,
-                      selectedVault: state.selectedVault,
-                      onVaultSelected: onVaultSelected,
-                    ),
+                    VaultAddPasswordButton(onPressed: onAddPasswordTapped),
+                    if (selectedVault != null) ...[
+                      const SizedBox(width: 10),
+                      VaultSwitcherButton(
+                        vaults: state.vaults,
+                        selectedVault: selectedVault,
+                        onVaultSelected: onVaultSelected,
+                      ),
+                    ],
                   ],
                 ),
-                const SizedBox(height: 12),
-                VaultSearchBar(
-                  query: state.searchQuery,
-                  onChanged: onSearchChanged,
-                ),
-                const SizedBox(height: 12),
-                VaultQuickFilterRow(
-                  selected: state.quickFilter,
-                  onSelected: onQuickFilterSelected,
-                ),
+                if (state.hasVaults) ...[
+                  const SizedBox(height: 12),
+                  VaultSearchBar(
+                    query: state.searchQuery,
+                    onChanged: onSearchChanged,
+                  ),
+                  const SizedBox(height: 12),
+                  VaultQuickFilterRow(
+                    selected: state.quickFilter,
+                    onSelected: onQuickFilterSelected,
+                  ),
+                ],
               ],
             ),
           ),
         ),
         Expanded(
-          child: state.totalItemCount == 0
+          child: !state.hasVaults
+              ? Center(
+                  child: Text(
+                    '暂无保险库',
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                )
+              : state.totalItemCount == 0
               ? Center(
                   child: Text(
                     '暂无密码条目',

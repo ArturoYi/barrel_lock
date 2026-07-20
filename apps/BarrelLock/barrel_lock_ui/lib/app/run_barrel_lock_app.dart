@@ -41,6 +41,7 @@ Future<void> runBarrelLockApp({
     ],
   );
   await BarrelLockCrypto.init();
+  await AppStorage.init(appNamespace: 'barrel_lock', env: storageEnv);
   AppIdentityAuth.init(
     config: const IdentityAuthConfig(
       pinStorageKey: PreferenceKeys.identityAuthPin,
