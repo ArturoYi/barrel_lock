@@ -13,6 +13,7 @@ class VaultHomeSearchRow extends StatefulWidget {
     required this.vaults,
     required this.selectedVault,
     required this.onVaultSelected,
+    this.onCreateVault,
   });
 
   final String query;
@@ -20,6 +21,7 @@ class VaultHomeSearchRow extends StatefulWidget {
   final List<VaultSummary> vaults;
   final VaultSummary selectedVault;
   final ValueChanged<String> onVaultSelected;
+  final VoidCallback? onCreateVault;
 
   @override
   State<VaultHomeSearchRow> createState() => _VaultHomeSearchRowState();
@@ -58,6 +60,7 @@ class _VaultHomeSearchRowState extends State<VaultHomeSearchRow> {
                           vaults: widget.vaults,
                           selectedVault: widget.selectedVault,
                           onVaultSelected: widget.onVaultSelected,
+                          onCreateVault: widget.onCreateVault,
                         ),
                       ],
                     ),
@@ -78,6 +81,7 @@ class _VaultHomeSearchRowState extends State<VaultHomeSearchRow> {
                       vaults: widget.vaults,
                       selectedVault: widget.selectedVault,
                       onVaultSelected: widget.onVaultSelected,
+                      onCreateVault: widget.onCreateVault,
                     ),
                   ),
                 )

@@ -13,6 +13,7 @@ final class AppRouteBuilders {
     required this.cipherAdd,
     required this.settings,
     required this.dataMigration,
+    required this.bluetoothBackup,
     required this.appLock,
     required this.appLockPinSetup,
     required this.clearData,
@@ -24,6 +25,7 @@ final class AppRouteBuilders {
   final AppRouteBuilder cipherAdd;
   final AppRouteBuilder settings;
   final AppRouteBuilder dataMigration;
+  final AppRouteBuilder bluetoothBackup;
   final AppRouteBuilder appLock;
   final AppRouteBuilder appLockPinSetup;
   final AppRouteBuilder clearData;

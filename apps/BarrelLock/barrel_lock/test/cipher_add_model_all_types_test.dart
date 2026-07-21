@@ -19,7 +19,7 @@ void main() {
 
     db = AppDatabase.memory();
     repos = StorageRepositories(db);
-    model = CipherAddModel(repos);
+    model = CipherAddModel(repos, VaultManageModel(repos));
   });
 
   tearDown(() async {

@@ -8,25 +8,22 @@ import '../../../../crypto/cipher_overview_codec.dart';
 import '../../../../crypto/encrypted_name_codec.dart';
 import '../../../../storage/storage_providers.dart';
 
-/// 快捷筛选：全部 / 收藏 / 最近使用 / TOTP。
+/// 快捷筛选：全部 / 收藏 / 最近使用。
 enum VaultQuickFilter {
   all,
   favorites,
-  recent,
-  totp;
+  recent;
 
   String get label => switch (this) {
     VaultQuickFilter.all => '全部',
     VaultQuickFilter.favorites => '收藏',
     VaultQuickFilter.recent => '最近使用',
-    VaultQuickFilter.totp => 'TOTP 验证码',
   };
 
   IconData get icon => switch (this) {
     VaultQuickFilter.all => Icons.grid_view_rounded,
     VaultQuickFilter.favorites => Icons.star_rounded,
     VaultQuickFilter.recent => Icons.history_rounded,
-    VaultQuickFilter.totp => Icons.pin_rounded,
   };
 }
 
@@ -205,7 +202,6 @@ final class PasswordTabModel {
           });
         return sorted;
       }(),
-      VaultQuickFilter.totp => items.where((item) => item.hasTotp).toList(),
     };
 
     final query = searchQuery.trim().toLowerCase();

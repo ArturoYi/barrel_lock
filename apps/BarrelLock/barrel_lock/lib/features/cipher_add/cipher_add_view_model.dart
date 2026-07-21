@@ -1,6 +1,7 @@
 import 'package:core/core.dart';
 
 import 'cipher_add_coordinator.dart';
+import 'cipher_add_providers.dart';
 import 'cipher_type_catalog.dart';
 import 'form/app_account_form_state.dart';
 import 'form/bank_card_form_state.dart';
@@ -10,21 +11,11 @@ import 'form/identity_document_form_state.dart';
 import 'form/secure_note_form_state.dart';
 import 'form/ssh_key_form_state.dart';
 import 'form/website_login_form_state.dart';
+import 'cipher_add_folder_notifier.dart';
+import 'cipher_add_attachment_notifier.dart';
+import '../attachment_manage/attachment_manage_model.dart';
 import 'cipher_add_model.dart';
 
-/// 由添加页 [ProviderScope] override，传入当前 Tab 选中的 vaultId。
-final cipherAddVaultIdProvider = Provider<String?>(
-  (ref) => null,
-  name: 'cipherAddVaultId',
-);
-
-/// 由添加页 [ProviderScope] override，传入路由 query `type`。
-final cipherAddInitialTypeProvider = Provider<int>(
-  (ref) => CipherType.websiteLogin,
-  name: 'cipherAddInitialType',
-);
-
-/// 添加密码页状态与业务编排（MVVM-C 的 VM 层）。
 final class CipherAddViewModel extends Notifier<CipherAddFormState> {
   CipherAddModel get _model => ref.read(cipherAddModelProvider);
 
@@ -57,6 +48,9 @@ final class CipherAddViewModel extends Notifier<CipherAddFormState> {
       return;
     }
     state = CipherAddFormStateFactory.emptyForType(type);
+    if (!CipherTypeDescriptor.forType(type).supportsAttachments) {
+      ref.read(cipherAddAttachmentNotifierProvider.notifier).clearPending();
+    }
   }
 
   void onTitleChanged(String value) {
@@ -243,6 +237,7 @@ final class CipherAddViewModel extends Notifier<CipherAddFormState> {
     if (state.isSaving) {
       return;
     }
+    ref.read(cipherAddAttachmentNotifierProvider.notifier).clearPending();
     _coordinator.pop();
   }
 
@@ -264,30 +259,44 @@ final class CipherAddViewModel extends Notifier<CipherAddFormState> {
     );
 
     try {
-      await _saveCurrentState();
+      final cipherUuid = await _saveCurrentState();
+      final pending = ref.read(cipherAddAttachmentNotifierProvider).pending;
+      if (pending.isNotEmpty) {
+        await ref
+            .read(attachmentManageModelProvider)
+            .insertAll(cipherUuid: cipherUuid, pending: pending);
+        ref.read(cipherAddAttachmentNotifierProvider.notifier).clearPending();
+      }
       _coordinator.finishAddSuccess();
+    } on AttachmentManageException catch (error) {
+      state = state.copyWithCommon(
+        isSaving: false,
+        errorMessage: error.message,
+      );
     } on Object {
       state = state.copyWithCommon(isSaving: false, errorMessage: '保存失败，请稍后重试');
     }
   }
 
-  Future<void> _saveCurrentState() async {
+  Future<String> _saveCurrentState() async {
     final vaultId = _preferredVaultId;
+    final folderId = ref.read(cipherAddFolderNotifierProvider).selectedFolderId;
     final current = state;
     if (current is WebsiteLoginFormState) {
-      await _model.saveWebsiteLoginCipher(
+      return _model.saveWebsiteLoginCipher(
         preferredVaultId: vaultId,
+        folderUuid: folderId,
         title: current.title,
         username: current.username,
         password: current.password,
         website: current.website,
         notes: current.notes,
       );
-      return;
     }
     if (current is BankCardFormState) {
-      await _model.saveBankCardCipher(
+      return _model.saveBankCardCipher(
         preferredVaultId: vaultId,
+        folderUuid: folderId,
         title: current.title,
         cardholderName: current.cardholderName,
         cardNumber: current.cardNumber,
@@ -297,11 +306,11 @@ final class CipherAddViewModel extends Notifier<CipherAddFormState> {
         pin: current.pin,
         notes: current.notes,
       );
-      return;
     }
     if (current is IdentityDocumentFormState) {
-      await _model.saveIdentityDocumentCipher(
+      return _model.saveIdentityDocumentCipher(
         preferredVaultId: vaultId,
+        folderUuid: folderId,
         title: current.title,
         documentType: current.documentType,
         fullName: current.fullName,
@@ -310,20 +319,20 @@ final class CipherAddViewModel extends Notifier<CipherAddFormState> {
         expiryDate: current.expiryDate,
         notes: current.notes,
       );
-      return;
     }
     if (current is SecureNoteFormState) {
-      await _model.saveSecureNoteCipher(
+      return _model.saveSecureNoteCipher(
         preferredVaultId: vaultId,
+        folderUuid: folderId,
         title: current.title,
         content: current.content,
         notes: current.notes,
       );
-      return;
     }
     if (current is SshKeyFormState) {
-      await _model.saveSshKeyCipher(
+      return _model.saveSshKeyCipher(
         preferredVaultId: vaultId,
+        folderUuid: folderId,
         title: current.title,
         privateKey: current.privateKey,
         publicKey: current.publicKey,
@@ -332,11 +341,11 @@ final class CipherAddViewModel extends Notifier<CipherAddFormState> {
         username: current.username,
         notes: current.notes,
       );
-      return;
     }
     if (current is AppAccountFormState) {
-      await _model.saveAppAccountCipher(
+      return _model.saveAppAccountCipher(
         preferredVaultId: vaultId,
+        folderUuid: folderId,
         title: current.title,
         username: current.username,
         password: current.password,
@@ -344,6 +353,7 @@ final class CipherAddViewModel extends Notifier<CipherAddFormState> {
         notes: current.notes,
       );
     }
+    throw StateError('Unsupported cipher form state: ${current.runtimeType}');
   }
 
   String _validationMessageFor(CipherAddFormState formState) {

@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   late AppDatabase db;
   late StorageRepositories repos;
+  late VaultManageModel vaultManage;
   late CipherAddModel model;
 
   setUp(() async {
@@ -19,7 +20,8 @@ void main() {
 
     db = AppDatabase.memory();
     repos = StorageRepositories(db);
-    model = CipherAddModel(repos);
+    vaultManage = VaultManageModel(repos);
+    model = CipherAddModel(repos, vaultManage);
   });
 
   tearDown(() async {
@@ -115,6 +117,28 @@ void main() {
       expect(payload.username, 'alice');
       expect(payload.password, 'pw');
       expect(payload.notes, 'note text');
+    });
+
+    test('save with folderUuid persists association', () async {
+      await seedVault(vaultUuid: 'vault-a', name: 'A');
+      final folderManage = FolderManageModel(repos);
+      final folderId = await folderManage.createFolder(
+        vaultUuid: 'vault-a',
+        name: '工作',
+      );
+
+      await model.saveWebsiteLoginCipher(
+        preferredVaultId: 'vault-a',
+        folderUuid: folderId,
+        title: 'GitLab',
+        username: 'dev',
+        password: 'pw',
+        website: 'gitlab.com',
+        notes: '',
+      );
+
+      final cipher = (await repos.cipherEntries.findAll()).single;
+      expect(cipher.folderUuid, folderId);
     });
 
     test('parseWebsiteHost handles bare domain and invalid URL', () {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'layout/password_tab_landscape_view.dart';
 import 'layout/password_tab_portrait_view.dart';
+import 'widgets/vault_create_sheet.dart';
 
 /// 首页「密码」Tab（Vault Home，MVVM-C 的 V 层）。
 class PasswordTabPage extends ConsumerWidget {
@@ -13,6 +14,14 @@ class PasswordTabPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncState = ref.watch(passwordTabViewModelProvider);
     final viewModel = ref.read(passwordTabViewModelProvider.notifier);
+
+    Future<void> handleCreateVault() async {
+      final name = await showCreateVaultSheet(context);
+      if (name == null || !context.mounted) {
+        return;
+      }
+      await viewModel.createVault(name);
+    }
 
     return asyncState.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -30,6 +39,7 @@ class PasswordTabPage extends ConsumerWidget {
                 onFavoriteToggled: viewModel.onFavoriteToggled,
                 onCipherTapped: viewModel.onCipherTapped,
                 onAddPasswordTapped: viewModel.onAddPasswordTapped,
+                onCreateVaultTapped: handleCreateVault,
               ),
               Orientation.landscape => PasswordTabLandscapeView(
                 state: state,
@@ -40,6 +50,7 @@ class PasswordTabPage extends ConsumerWidget {
                 onFavoriteToggled: viewModel.onFavoriteToggled,
                 onCipherTapped: viewModel.onCipherTapped,
                 onAddPasswordTapped: viewModel.onAddPasswordTapped,
+                onCreateVaultTapped: handleCreateVault,
               ),
             };
           },

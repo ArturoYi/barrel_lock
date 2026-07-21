@@ -7,6 +7,13 @@ export 'package:fast_package/fast_package.dart';
 export 'package:fast_toast/fast_toast.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 
+export 'package:crypto/crypto.dart';
+export 'package:cryptography/cryptography.dart'
+    show SecretBoxAuthenticationError;
+export 'package:file_picker/file_picker.dart';
+export 'package:path_provider/path_provider.dart';
+export 'package:share_plus/share_plus.dart';
+
 export 'app_device_info/app_device_info.dart';
 export 'app_device_info/app_device_info_reader.dart';
 

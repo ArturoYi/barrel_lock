@@ -1,7 +1,8 @@
-import 'package:barrel_lock/barrel_lock.dart';
+import 'package:barrel_lock/barrel_lock.dart' hide BluetoothBackupPage;
 
 import '../pages/app_lock/app_lock_pin_manage_page.dart';
 import '../pages/app_lock/app_lock_settings_page.dart';
+import '../pages/settings/pages/bluetooth_backup_page.dart';
 import '../pages/settings/pages/clear_data_page.dart';
 import '../pages/settings/pages/data_migration_page.dart';
 import '../pages/cipher_add/cipher_add_page.dart';
@@ -23,6 +24,15 @@ void configureBarrelLockRouter() {
       ),
       settings: (_, _) => const SettingsPage(),
       dataMigration: (_, _) => const DataMigrationPage(),
+      bluetoothBackup: (_, match) {
+        final session = AppRoutes.bluetoothBackup.sessionFromQuery(
+          match.parameters.queryParams,
+        );
+        return BluetoothBackupPage(
+          role: session.role,
+          transportMode: session.transportMode,
+        );
+      },
       appLock: (_, _) => const AppLockSettingsPage(),
       appLockPinSetup: (_, _) => const AppLockPinSetupPage(),
       clearData: (_, _) => const ClearDataPage(),

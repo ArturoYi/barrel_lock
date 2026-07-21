@@ -1,0 +1,3 @@
+schema: spec-driven
+created: 2026-07-21
+goal: 接入 VaultManageModel、FolderManageModel，并在添加密码页支持选文件夹

@@ -20,6 +20,15 @@ void configureBarrelLockRouter() {
           CipherAddPage(vaultId: match.parameters.queryParams['vaultId']),
       settings: (_, _) => const SettingsPage(),
       dataMigration: (_, _) => const DataMigrationPage(),
+      bluetoothBackup: (_, match) {
+        final session = AppRoutes.bluetoothBackup.sessionFromQuery(
+          match.parameters.queryParams,
+        );
+        return BluetoothBackupPage(
+          role: session.role,
+          transportMode: session.transportMode,
+        );
+      },
       appLock: (_, _) => const AppLockSettingsPage(),
       appLockPinSetup: (_, _) => const AppLockPinSetupPage(),
       clearData: (_, _) => const ClearDataPage(),

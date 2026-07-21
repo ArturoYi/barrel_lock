@@ -20,6 +20,7 @@ class PasswordTabPortraitView extends StatelessWidget {
     required this.onFavoriteToggled,
     required this.onCipherTapped,
     required this.onAddPasswordTapped,
+    required this.onCreateVaultTapped,
   });
 
   final PasswordTabViewState state;
@@ -30,6 +31,7 @@ class PasswordTabPortraitView extends StatelessWidget {
   final ValueChanged<String> onFavoriteToggled;
   final ValueChanged<String> onCipherTapped;
   final VoidCallback onAddPasswordTapped;
+  final VoidCallback onCreateVaultTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +46,13 @@ class PasswordTabPortraitView extends StatelessWidget {
           onQuickFilterSelected: onQuickFilterSelected,
           onVaultSelected: onVaultSelected,
           onAddPasswordTapped: onAddPasswordTapped,
+          onCreateVaultTapped: onCreateVaultTapped,
         ),
         Expanded(
           child: !state.hasVaults
               ? _NoVaultEmptyState(
                   colorScheme: colorScheme,
+                  onCreateVaultTapped: onCreateVaultTapped,
                   onAddPasswordTapped: onAddPasswordTapped,
                 )
               : state.totalItemCount == 0
@@ -80,10 +84,12 @@ class PasswordTabPortraitView extends StatelessWidget {
 class _NoVaultEmptyState extends StatelessWidget {
   const _NoVaultEmptyState({
     required this.colorScheme,
+    required this.onCreateVaultTapped,
     required this.onAddPasswordTapped,
   });
 
   final ColorScheme colorScheme;
+  final VoidCallback onCreateVaultTapped;
   final VoidCallback onAddPasswordTapped;
 
   @override
@@ -108,7 +114,7 @@ class _NoVaultEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              '添加密码时将创建您的第一个保险库',
+              '创建保险库以开始管理密码',
               textAlign: TextAlign.center,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.85),
@@ -116,6 +122,12 @@ class _NoVaultEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
+              onPressed: onCreateVaultTapped,
+              icon: const Icon(Icons.create_new_folder_outlined),
+              label: const Text('创建保险库'),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
               onPressed: onAddPasswordTapped,
               icon: const Icon(Icons.add_rounded),
               label: const Text('添加密码'),
@@ -176,6 +188,7 @@ class _VaultHomeHeader extends StatelessWidget {
     required this.onQuickFilterSelected,
     required this.onVaultSelected,
     required this.onAddPasswordTapped,
+    required this.onCreateVaultTapped,
   });
 
   final PasswordTabViewState state;
@@ -183,6 +196,7 @@ class _VaultHomeHeader extends StatelessWidget {
   final ValueChanged<VaultQuickFilter> onQuickFilterSelected;
   final ValueChanged<String> onVaultSelected;
   final VoidCallback onAddPasswordTapped;
+  final VoidCallback onCreateVaultTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -230,6 +244,7 @@ class _VaultHomeHeader extends StatelessWidget {
                   vaults: state.vaults,
                   selectedVault: state.selectedVault!,
                   onVaultSelected: onVaultSelected,
+                  onCreateVault: onCreateVaultTapped,
                 ),
                 const SizedBox(height: 14),
                 VaultQuickFilterRow(

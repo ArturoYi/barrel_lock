@@ -33,6 +33,16 @@ class ClearDataPage extends ConsumerWidget {
               style: context.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
+            if (state.lastError case final error?) ...[
+              const SizedBox(height: 12),
+              Text(
+                error,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.error,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
             const Spacer(),
             ..._buildActions(context, state, viewModel),
           ],

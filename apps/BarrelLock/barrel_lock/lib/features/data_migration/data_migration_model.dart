@@ -36,7 +36,7 @@ final class DataMigrationModel {
     DataMigrationAction(
       id: 'bluetooth_share',
       title: '蓝牙共享',
-      subtitle: '与附近设备传输备份',
+      subtitle: '同系统附近连接或跨平台 BLE 传输',
       icon: Icons.bluetooth_outlined,
     ),
     DataMigrationAction(

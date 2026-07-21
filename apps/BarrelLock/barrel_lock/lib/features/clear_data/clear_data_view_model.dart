@@ -5,10 +5,28 @@ import 'clear_data_model.dart';
 
 /// 清除数据页展示状态。
 final class ClearDataViewState {
-  const ClearDataViewState({required this.step, required this.isBusy});
+  const ClearDataViewState({
+    required this.step,
+    required this.isBusy,
+    this.lastError,
+  });
 
   final ClearDataStep step;
   final bool isBusy;
+  final String? lastError;
+
+  ClearDataViewState copyWith({
+    ClearDataStep? step,
+    bool? isBusy,
+    String? lastError,
+    bool clearError = false,
+  }) {
+    return ClearDataViewState(
+      step: step ?? this.step,
+      isBusy: isBusy ?? this.isBusy,
+      lastError: clearError ? null : (lastError ?? this.lastError),
+    );
+  }
 
   String get stepMessage {
     return switch (step) {
@@ -44,17 +62,15 @@ final class ClearDataViewModel extends Notifier<ClearDataViewState> {
     if (state.isBusy) {
       return;
     }
-    state = const ClearDataViewState(
+    state = state.copyWith(
       step: ClearDataStep.confirm1,
       isBusy: false,
+      clearError: true,
     );
   }
 
   void onConfirmStep1() {
-    state = const ClearDataViewState(
-      step: ClearDataStep.confirm2,
-      isBusy: false,
-    );
+    state = state.copyWith(step: ClearDataStep.confirm2, clearError: true);
   }
 
   void onCancel() {
@@ -65,12 +81,21 @@ final class ClearDataViewModel extends Notifier<ClearDataViewState> {
   }
 
   Future<void> onConfirmStep2() async {
-    state = const ClearDataViewState(
+    state = state.copyWith(
       step: ClearDataStep.clearing,
       isBusy: true,
+      clearError: true,
     );
-    await _model.wipeAllPasswords();
-    state = const ClearDataViewState(step: ClearDataStep.done, isBusy: false);
+    try {
+      await _model.wipeAllPasswords();
+      state = state.copyWith(step: ClearDataStep.done, isBusy: false);
+    } on Object catch (error) {
+      state = state.copyWith(
+        step: ClearDataStep.confirm2,
+        isBusy: false,
+        lastError: '$error',
+      );
+    }
   }
 
   void onDoneAcknowledged() => _coordinator.popToHome();

@@ -7,6 +7,7 @@ final class CipherTypeDescriptor {
     required this.label,
     required this.iconName,
     required this.isFormEnabled,
+    required this.supportsAttachments,
   });
 
   final int type;
@@ -17,6 +18,9 @@ final class CipherTypeDescriptor {
 
   /// 是否已交付完整添加表单 UI；false 时 selector 可展示但提示「即将推出」。
   final bool isFormEnabled;
+
+  /// 添加页是否展示图片附件区。
+  final bool supportsAttachments;
 
   static CipherTypeDescriptor forType(int type) {
     for (final item in CipherTypeCatalog.all) {
@@ -36,30 +40,35 @@ abstract final class CipherTypeCatalog {
       label: '网站登录',
       iconName: 'language',
       isFormEnabled: true,
+      supportsAttachments: false,
     ),
     CipherTypeDescriptor(
       type: CipherType.bankCard,
       label: '银行卡',
       iconName: 'credit_card',
       isFormEnabled: true,
+      supportsAttachments: true,
     ),
     CipherTypeDescriptor(
       type: CipherType.identityDocument,
       label: '身份证件',
       iconName: 'badge',
       isFormEnabled: true,
+      supportsAttachments: true,
     ),
     CipherTypeDescriptor(
       type: CipherType.secureNote,
       label: '安全笔记',
       iconName: 'sticky_note_2',
       isFormEnabled: true,
+      supportsAttachments: false,
     ),
     CipherTypeDescriptor(
       type: CipherType.appAccount,
       label: 'App 账户密码',
       iconName: 'smartphone',
       isFormEnabled: true,
+      supportsAttachments: false,
     ),
   ];
 

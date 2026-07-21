@@ -4,6 +4,7 @@ import 'package:core/core.dart';
 
 import 'password_tab_coordinator.dart';
 import 'password_tab_model.dart';
+import '../../../vault_manage/vault_manage_model.dart';
 
 /// 首页「密码」Tab 展示状态。
 final class PasswordTabViewState {
@@ -172,6 +173,19 @@ final class PasswordTabViewModel extends AsyncNotifier<PasswordTabViewState> {
     _coordinator.openAddPassword(
       vaultId: vaultId != null && vaultId.isNotEmpty ? vaultId : null,
     );
+  }
+
+  Future<String?> createVault(String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      return null;
+    }
+    final vaultManage = ref.read(vaultManageModelProvider);
+    final vaultId = await vaultManage.createVault(name: trimmed);
+    _selectedVaultId = vaultId;
+    _collapsedFolderIds = {};
+    ref.invalidateSelf();
+    return vaultId;
   }
 }
 

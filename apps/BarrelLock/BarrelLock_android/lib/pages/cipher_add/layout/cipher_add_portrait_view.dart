@@ -3,6 +3,8 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/cipher_type_selector.dart';
+import '../widgets/cipher_folder_selector.dart';
+import '../widgets/cipher_attachment_section.dart';
 import 'app_account_form_section.dart';
 import 'bank_card_form_section.dart';
 import 'identity_document_form_section.dart';
@@ -38,11 +40,20 @@ final class CipherAddPortraitView extends StatelessWidget {
     required this.onPublicKeyChanged,
     required this.onPassphraseChanged,
     required this.onHostChanged,
+    required this.folderState,
+    required this.attachmentState,
+    required this.onFolderSelected,
+    required this.onCreateFolder,
+    required this.onAddAttachmentTapped,
+    required this.onRemoveAttachment,
+    required this.onPreviewAttachment,
     required this.onCancel,
     required this.onSave,
   });
 
   final CipherAddFormState state;
+  final CipherAddFolderState folderState;
+  final CipherAddAttachmentState attachmentState;
   final ValueChanged<int> onCipherTypeSelected;
   final ValueChanged<String> onTitleChanged;
   final ValueChanged<String> onUsernameChanged;
@@ -66,6 +77,11 @@ final class CipherAddPortraitView extends StatelessWidget {
   final ValueChanged<String> onPublicKeyChanged;
   final ValueChanged<String> onPassphraseChanged;
   final ValueChanged<String> onHostChanged;
+  final ValueChanged<String?> onFolderSelected;
+  final Future<void> Function() onCreateFolder;
+  final VoidCallback onAddAttachmentTapped;
+  final ValueChanged<String> onRemoveAttachment;
+  final ValueChanged<PendingAttachment> onPreviewAttachment;
   final VoidCallback onCancel;
   final VoidCallback onSave;
 
@@ -121,8 +137,14 @@ final class CipherAddPortraitView extends StatelessWidget {
                         ),
                       ),
                     ),
+                  CipherFolderSelector(
+                    folderState: folderState,
+                    onFolderSelected: onFolderSelected,
+                    onCreateFolder: onCreateFolder,
+                  ),
                   _FormSection(
                     state: state,
+                    attachmentState: attachmentState,
                     onTitleChanged: onTitleChanged,
                     onUsernameChanged: onUsernameChanged,
                     onPasswordChanged: onPasswordChanged,
@@ -145,6 +167,9 @@ final class CipherAddPortraitView extends StatelessWidget {
                     onPublicKeyChanged: onPublicKeyChanged,
                     onPassphraseChanged: onPassphraseChanged,
                     onHostChanged: onHostChanged,
+                    onAddAttachmentTapped: onAddAttachmentTapped,
+                    onRemoveAttachment: onRemoveAttachment,
+                    onPreviewAttachment: onPreviewAttachment,
                     onSave: onSave,
                   ),
                 ],
@@ -160,6 +185,7 @@ final class CipherAddPortraitView extends StatelessWidget {
 final class _FormSection extends StatelessWidget {
   const _FormSection({
     required this.state,
+    required this.attachmentState,
     required this.onTitleChanged,
     required this.onUsernameChanged,
     required this.onPasswordChanged,
@@ -182,10 +208,14 @@ final class _FormSection extends StatelessWidget {
     required this.onPublicKeyChanged,
     required this.onPassphraseChanged,
     required this.onHostChanged,
+    required this.onAddAttachmentTapped,
+    required this.onRemoveAttachment,
+    required this.onPreviewAttachment,
     required this.onSave,
   });
 
   final CipherAddFormState state;
+  final CipherAddAttachmentState attachmentState;
   final ValueChanged<String> onTitleChanged;
   final ValueChanged<String> onUsernameChanged;
   final ValueChanged<String> onPasswordChanged;
@@ -208,6 +238,9 @@ final class _FormSection extends StatelessWidget {
   final ValueChanged<String> onPublicKeyChanged;
   final ValueChanged<String> onPassphraseChanged;
   final ValueChanged<String> onHostChanged;
+  final VoidCallback onAddAttachmentTapped;
+  final ValueChanged<String> onRemoveAttachment;
+  final ValueChanged<PendingAttachment> onPreviewAttachment;
   final VoidCallback onSave;
 
   @override
@@ -223,30 +256,56 @@ final class _FormSection extends StatelessWidget {
         onNotesChanged: onNotesChanged,
         onSave: onSave,
       ),
-      BankCardFormState s => BankCardFormSection(
-        key: const ValueKey('bank-card-form'),
-        state: s,
-        onTitleChanged: onTitleChanged,
-        onCardholderNameChanged: onCardholderNameChanged,
-        onCardNumberChanged: onCardNumberChanged,
-        onExpiryMonthChanged: onExpiryMonthChanged,
-        onExpiryYearChanged: onExpiryYearChanged,
-        onCvvChanged: onCvvChanged,
-        onPinChanged: onPinChanged,
-        onNotesChanged: onNotesChanged,
-        onSave: onSave,
+      BankCardFormState s => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          BankCardFormSection(
+            key: const ValueKey('bank-card-form'),
+            state: s,
+            onTitleChanged: onTitleChanged,
+            onCardholderNameChanged: onCardholderNameChanged,
+            onCardNumberChanged: onCardNumberChanged,
+            onExpiryMonthChanged: onExpiryMonthChanged,
+            onExpiryYearChanged: onExpiryYearChanged,
+            onCvvChanged: onCvvChanged,
+            onPinChanged: onPinChanged,
+            onNotesChanged: onNotesChanged,
+            onSave: onSave,
+          ),
+          const SizedBox(height: 16),
+          CipherAttachmentSection(
+            attachmentState: attachmentState,
+            enabled: !s.isSaving,
+            onAddTapped: onAddAttachmentTapped,
+            onRemovePending: onRemoveAttachment,
+            onPreviewPending: onPreviewAttachment,
+          ),
+        ],
       ),
-      IdentityDocumentFormState s => IdentityDocumentFormSection(
-        key: const ValueKey('identity-document-form'),
-        state: s,
-        onTitleChanged: onTitleChanged,
-        onDocumentTypeChanged: onDocumentTypeChanged,
-        onFullNameChanged: onFullNameChanged,
-        onDocumentNumberChanged: onDocumentNumberChanged,
-        onIssueDateChanged: onIssueDateChanged,
-        onExpiryDateChanged: onExpiryDateChanged,
-        onNotesChanged: onNotesChanged,
-        onSave: onSave,
+      IdentityDocumentFormState s => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          IdentityDocumentFormSection(
+            key: const ValueKey('identity-document-form'),
+            state: s,
+            onTitleChanged: onTitleChanged,
+            onDocumentTypeChanged: onDocumentTypeChanged,
+            onFullNameChanged: onFullNameChanged,
+            onDocumentNumberChanged: onDocumentNumberChanged,
+            onIssueDateChanged: onIssueDateChanged,
+            onExpiryDateChanged: onExpiryDateChanged,
+            onNotesChanged: onNotesChanged,
+            onSave: onSave,
+          ),
+          const SizedBox(height: 16),
+          CipherAttachmentSection(
+            attachmentState: attachmentState,
+            enabled: !s.isSaving,
+            onAddTapped: onAddAttachmentTapped,
+            onRemovePending: onRemoveAttachment,
+            onPreviewPending: onPreviewAttachment,
+          ),
+        ],
       ),
       SecureNoteFormState s => SecureNoteFormSection(
         key: const ValueKey('secure-note-form'),

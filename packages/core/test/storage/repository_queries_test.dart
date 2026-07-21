@@ -192,4 +192,81 @@ void main() {
       expect(folders.map((f) => f.folderUuid), ['folder-active']);
     });
   });
+
+  group('CipherAttachmentRepository', () {
+    test(
+      'findByCipher and watchByCipher return rows for cipher only',
+      () async {
+        const vaultId = 'vault-1';
+        const cipherA = 'cipher-a';
+        const cipherB = 'cipher-b';
+        final now = DateTime.utc(2026, 1, 1);
+
+        await db
+            .into(db.vaults)
+            .insert(
+              VaultsCompanion.insert(
+                vaultUuid: vaultId,
+                name: Uint8List.fromList([1]),
+                syncRevision: now,
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+
+        for (final cipherId in [cipherA, cipherB]) {
+          await db
+              .into(db.cipherEntries)
+              .insert(
+                CipherEntriesCompanion.insert(
+                  cipherUuid: cipherId,
+                  vaultUuid: vaultId,
+                  type: 3,
+                  overviewBlob: Uint8List.fromList([10]),
+                  fullDataBlob: Uint8List.fromList([20]),
+                  syncRevision: now,
+                  createdAt: now,
+                  updatedAt: now,
+                ),
+              );
+        }
+
+        await db
+            .into(db.cipherAttachments)
+            .insert(
+              CipherAttachmentsCompanion.insert(
+                attachUuid: 'attach-a1',
+                cipherUuid: cipherA,
+                fileName: Uint8List.fromList([1]),
+                encryptedFile: Uint8List.fromList([2]),
+                fileSize: 100,
+                syncRevision: now,
+                createdAt: now,
+              ),
+            );
+
+        await db
+            .into(db.cipherAttachments)
+            .insert(
+              CipherAttachmentsCompanion.insert(
+                attachUuid: 'attach-b1',
+                cipherUuid: cipherB,
+                fileName: Uint8List.fromList([3]),
+                encryptedFile: Uint8List.fromList([4]),
+                fileSize: 200,
+                syncRevision: now,
+                createdAt: now,
+              ),
+            );
+
+        final rows = await repos.cipherAttachments.findByCipher(cipherA);
+        expect(rows.map((r) => r.attachUuid), ['attach-a1']);
+
+        final watched = await repos.cipherAttachments
+            .watchByCipher(cipherA)
+            .first;
+        expect(watched.map((r) => r.attachUuid), ['attach-a1']);
+      },
+    );
+  });
 }

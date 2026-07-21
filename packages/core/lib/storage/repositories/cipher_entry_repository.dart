@@ -28,6 +28,47 @@ final class CipherEntryRepository
         .watch();
   }
 
+  /// 监听单条密码条目（含已软删除行，由调用方过滤）。
+  Stream<CipherEntry?> watchById(String cipherUuid) {
+    return (_database.select(
+      _database.cipherEntries,
+    )..where((tbl) => tbl.cipherUuid.equals(cipherUuid))).watchSingleOrNull();
+  }
+
+  /// 软删除密码条目。
+  Future<bool> softDelete(String cipherUuid) async {
+    final now = DateTime.now().toUtc();
+    final count =
+        await (_database.update(
+          _database.cipherEntries,
+        )..where((tbl) => tbl.cipherUuid.equals(cipherUuid))).write(
+          CipherEntriesCompanion(
+            deletedAt: Value(now),
+            updatedAt: Value(now),
+            localModified: const Value(true),
+          ),
+        );
+    return count > 0;
+  }
+
+  /// 更新所属文件夹（NULL 表示未分组）。
+  Future<bool> updateFolderUuid(String cipherUuid, String? folderUuid) async {
+    final now = DateTime.now().toUtc();
+    final count =
+        await (_database.update(
+          _database.cipherEntries,
+        )..where((tbl) => tbl.cipherUuid.equals(cipherUuid))).write(
+          CipherEntriesCompanion(
+            folderUuid: folderUuid == null
+                ? const Value(null)
+                : Value(folderUuid),
+            updatedAt: Value(now),
+            localModified: const Value(true),
+          ),
+        );
+    return count > 0;
+  }
+
   /// 更新收藏状态并刷新 [updatedAt]。
   Future<bool> setFavorite(String cipherUuid, bool isFavorite) async {
     final now = DateTime.now().toUtc();

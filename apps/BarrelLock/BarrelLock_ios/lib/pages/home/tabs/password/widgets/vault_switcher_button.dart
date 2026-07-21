@@ -9,11 +9,15 @@ class VaultSwitcherButton extends StatelessWidget {
     required this.vaults,
     required this.selectedVault,
     required this.onVaultSelected,
+    this.onCreateVault,
   });
+
+  static const createVaultSentinel = '__create_vault__';
 
   final List<VaultSummary> vaults;
   final VaultSummary selectedVault;
   final ValueChanged<String> onVaultSelected;
+  final VoidCallback? onCreateVault;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,13 @@ class VaultSwitcherButton extends StatelessWidget {
       tooltip: '切换保险库',
       offset: const Offset(0, 44),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      onSelected: onVaultSelected,
+      onSelected: (value) {
+        if (value == createVaultSentinel) {
+          onCreateVault?.call();
+          return;
+        }
+        onVaultSelected(value);
+      },
       itemBuilder: (context) {
         return [
           for (final vault in vaults)
@@ -55,6 +65,19 @@ class VaultSwitcherButton extends StatelessWidget {
                 ],
               ),
             ),
+          if (onCreateVault != null) ...[
+            const PopupMenuDivider(),
+            PopupMenuItem<String>(
+              value: createVaultSentinel,
+              child: Row(
+                children: [
+                  Icon(Icons.add_rounded, size: 20, color: colorScheme.primary),
+                  const SizedBox(width: 10),
+                  const Text('新建保险库'),
+                ],
+              ),
+            ),
+          ],
         ];
       },
       child: DecoratedBox(

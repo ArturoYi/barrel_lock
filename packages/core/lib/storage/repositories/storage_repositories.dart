@@ -21,7 +21,7 @@ import 'vault_repository.dart';
 /// final repos = StorageRepositories(db);
 /// ```
 final class StorageRepositories {
-  StorageRepositories(AppDatabase database)
+  StorageRepositories(this.database)
     : vaults = VaultRepository(database),
       folders = FolderRepository(database),
       cipherEntries = CipherEntryRepository(database),
@@ -31,9 +31,16 @@ final class StorageRepositories {
   /// 使用 [AppStorage.database] 的便捷构造，供 App 运行时默认装配。
   StorageRepositories.defaults() : this(AppStorage.database);
 
+  final AppDatabase database;
+
   final VaultRepository vaults;
   final FolderRepository folders;
   final CipherEntryRepository cipherEntries;
   final CipherAttachmentRepository cipherAttachments;
   final BackupLogRepository backupLogs;
+
+  /// 在单事务中执行备份恢复等批量写操作。
+  Future<T> runInTransaction<T>(Future<T> Function() action) {
+    return database.transaction(action);
+  }
 }

@@ -28,6 +28,19 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>用于验证身份以解锁应用保护</string>
+	<key>NSCameraUsageDescription</key>
+	<string>用于拍摄证件照片</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>用于选择证件照片</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>用于在附近设备间传输加密备份</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>用于发现附近设备并传输加密备份</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_blbackup._tcp</string>
+		<string>_blbackup._udp</string>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

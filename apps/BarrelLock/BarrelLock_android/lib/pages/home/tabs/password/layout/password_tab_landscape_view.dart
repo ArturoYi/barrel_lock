@@ -20,6 +20,7 @@ class PasswordTabLandscapeView extends StatelessWidget {
     required this.onFavoriteToggled,
     required this.onCipherTapped,
     required this.onAddPasswordTapped,
+    required this.onCreateVaultTapped,
   });
 
   final PasswordTabViewState state;
@@ -30,6 +31,7 @@ class PasswordTabLandscapeView extends StatelessWidget {
   final ValueChanged<String> onFavoriteToggled;
   final ValueChanged<String> onCipherTapped;
   final VoidCallback onAddPasswordTapped;
+  final VoidCallback onCreateVaultTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +76,7 @@ class PasswordTabLandscapeView extends StatelessWidget {
                         vaults: state.vaults,
                         selectedVault: selectedVault,
                         onVaultSelected: onVaultSelected,
+                        onCreateVault: onCreateVaultTapped,
                       ),
                     ],
                   ],
@@ -97,11 +100,10 @@ class PasswordTabLandscapeView extends StatelessWidget {
         Expanded(
           child: !state.hasVaults
               ? Center(
-                  child: Text(
-                    '暂无保险库',
-                    style: context.textTheme.bodyLarge?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                  child: FilledButton.icon(
+                    onPressed: onCreateVaultTapped,
+                    icon: const Icon(Icons.create_new_folder_outlined),
+                    label: const Text('创建保险库'),
                   ),
                 )
               : state.totalItemCount == 0

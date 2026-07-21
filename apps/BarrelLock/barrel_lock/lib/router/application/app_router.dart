@@ -84,6 +84,11 @@ final class AppRouter {
         builder: builders.dataMigration,
       ),
       FastRoute(
+        name: AppRoutes.bluetoothBackup.name,
+        path: AppRoutes.bluetoothBackup.path,
+        builder: builders.bluetoothBackup,
+      ),
+      FastRoute(
         name: AppRoutes.appLock.name,
         path: AppRoutes.appLock.path,
         builder: builders.appLock,

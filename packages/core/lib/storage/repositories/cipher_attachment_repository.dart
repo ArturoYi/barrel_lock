@@ -6,7 +6,8 @@ import 'drift_crud_support.dart';
 final class CipherAttachmentRepository
     implements CrudRepository<CipherAttachment, String> {
   CipherAttachmentRepository(AppDatabase database)
-    : _crud = DriftCrudSupport<CipherAttachment, String>(
+    : _database = database,
+      _crud = DriftCrudSupport<CipherAttachment, String>(
         database: database,
         table: database.cipherAttachments,
         idEquals: (tbl, id) =>
@@ -14,7 +15,22 @@ final class CipherAttachmentRepository
         idOf: (entity) => entity.attachUuid,
       );
 
+  final AppDatabase _database;
   final DriftCrudSupport<CipherAttachment, String> _crud;
+
+  /// 监听指定 cipher 下的全部附件。
+  Stream<List<CipherAttachment>> watchByCipher(String cipherUuid) {
+    return (_database.select(
+      _database.cipherAttachments,
+    )..where((tbl) => tbl.cipherUuid.equals(cipherUuid))).watch();
+  }
+
+  /// 一次性查询指定 cipher 下的全部附件。
+  Future<List<CipherAttachment>> findByCipher(String cipherUuid) {
+    return (_database.select(
+      _database.cipherAttachments,
+    )..where((tbl) => tbl.cipherUuid.equals(cipherUuid))).get();
+  }
 
   @override
   Future<CipherAttachment?> findById(String id) => _crud.findById(id);

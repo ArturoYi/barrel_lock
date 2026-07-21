@@ -1,4 +1,5 @@
 import 'app_simple_route.dart';
+import 'bluetooth_backup_route.dart';
 import 'cipher_add_route.dart';
 import 'detail_route.dart';
 
@@ -21,6 +22,8 @@ abstract final class AppRoutes {
     name: 'dataMigration',
     path: '/settings/data-migration',
   );
+
+  static const bluetoothBackup = BluetoothBackupRoute();
 
   static const appLock = AppSimpleRoute(
     name: 'appLock',
