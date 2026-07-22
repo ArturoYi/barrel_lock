@@ -6,7 +6,7 @@ alwaysApply: false
 
 # 路由约定
 
-- **路由表 SSOT**：`apps/BarrelLock/barrel_lock/lib/router/`（AppRoutes、AppRouter、AppRouteBuilders）
+- **路由表 SSOT**：`apps/barrel_lock/lib/router/`（AppRoutes、AppRouter、AppRouteBuilders）
 - **View 装配**：各平台 `lib/router/app_router_config.dart`
 - **页面跳转**：`AppRouter.push` / `pushNamed` / `go`，不用 Navigator 1.0
 - **路由地址**：无参 `.name` / `.path` 属性；带参 `AppRoutes.detail(id: '42')` 方法式调用

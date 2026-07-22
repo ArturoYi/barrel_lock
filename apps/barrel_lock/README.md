@@ -1,6 +1,6 @@
 # barrel_lock
 
-BarrelLock 产品包（位于 `apps/BarrelLock/barrel_lock/`）：**MVVM-C 的 M/VM/C、路由、应用壳**；View 在各平台 `lib/pages/`。
+BarrelLock 产品包（位于 `apps/barrel_lock/`）：**MVVM-C 的 M/VM/C、路由、应用壳**；View 在各平台 `lib/pages/`。
 
 ## 与 core 的分工
 

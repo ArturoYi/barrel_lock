@@ -1,6 +1,6 @@
 # fast_toast
 
-基于 Flutter **Overlay + OverlayEntry** 自研的全局 Toast 框架，对标 fluttertoast / oktoast 的调用体验，**零第三方依赖**，面向 Flutter Bazaar monorepo 跨平台（Mobile / Web / Desktop）场景。
+基于 Flutter **Overlay + OverlayEntry** 自研的全局 Toast 框架，对标 fluttertoast / oktoast 的调用体验，**零第三方依赖**，面向 BarrelLock monorepo 跨平台（Mobile / Web / Desktop）场景。
 
 > **当前状态**：架构设计阶段，API 尚未实现。本文档为实现规格说明（SSOT）。
 
@@ -284,4 +284,4 @@ final class ToastStyle {
 
 ## License
 
-Private — Flutter Bazaar monorepo.
+Private — BarrelLock monorepo.

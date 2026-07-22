@@ -1,6 +1,6 @@
 # fast_loading
 
-基于 Flutter **Overlay + OverlayEntry** 自研的全局 Loading 遮罩框架，对标 easy_loading / flutter_easyloading 的调用体验，**零第三方依赖**，面向 Flutter Bazaar monorepo 跨平台（Mobile / Web / Desktop）场景。
+基于 Flutter **Overlay + OverlayEntry** 自研的全局 Loading 遮罩框架，对标 easy_loading / flutter_easyloading 的调用体验，**零第三方依赖**，面向 BarrelLock monorepo 跨平台（Mobile / Web / Desktop）场景。
 
 > **当前状态**：v0.1 — ref count + 根 Overlay 遮罩已实现。
 
@@ -298,4 +298,4 @@ final class LoadingStyle {
 
 ## License
 
-Private — Flutter Bazaar monorepo.
+Private — BarrelLock monorepo.

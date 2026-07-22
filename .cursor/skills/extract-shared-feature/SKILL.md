@@ -34,9 +34,9 @@ Task Progress:
 对比以下路径的文件差异：
 
 ```
-apps/BarrelLock/BarrelLock_android/lib/
-apps/BarrelLock/BarrelLock_ios/lib/
-apps/BarrelLock/BarrelLock_macos/lib/
+apps/android/lib/
+apps/ios/lib/
+apps/macos/lib/
 ...
 ```
 
@@ -47,7 +47,7 @@ apps/BarrelLock/BarrelLock_macos/lib/
 按 `add-workspace-package` skill 创建，推荐命名：
 
 ```
-apps/BarrelLock/barrel_lock/     # 共享 M / VM / C
+apps/barrel_lock/     # 共享 M / VM / C
 各平台 app/lib/pages/            # 各平台 View
 ```
 
@@ -62,7 +62,7 @@ barrel_lock_ui → core, barrel_lock（可选）
 ### Step 3: 迁移结构
 
 ```
-apps/BarrelLock/barrel_lock_ui/
+apps/barrel_lock_ui/
 ├── lib/
 │   ├── barrel_lock_ui.dart
 │   └── pages/
@@ -107,7 +107,7 @@ class BazaarApp extends StatelessWidget {
 若某平台需要特殊行为：
 
 ```dart
-// apps/BarrelLock/barrel_lock_ui 中
+// apps/barrel_lock_ui 中
 typedef PlatformInitializer = Future<void> Function();
 
 // 平台 app main.dart 注入

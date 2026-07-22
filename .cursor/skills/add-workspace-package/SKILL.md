@@ -29,9 +29,9 @@ Task Progress:
 
 | 类型 | 路径 | 示例 |
 |------|------|------|
-| 共享库（跨产品） | `packages/<name>/` | `packages/core`, `packages/fast_navigator` |
-| 产品共享层 | `apps/<App>/<name>/` | `apps/BarrelLock/barrel_lock` |
-| 平台 App | `apps/<App>/<App>_<platform>/` | `apps/BarrelLock/BarrelLock_android`（含 `lib/pages/`） |
+| 共享库 | `packages/<name>/` | `packages/core`, `packages/fast_navigator` |
+| App 业务共享层 | `apps/<name>/` | `apps/barrel_lock`, `apps/barrel_lock_ui` |
+| 平台 App | `apps/<platform>/` | `apps/android`（含 `lib/pages/`） |
 
 ### Step 2: pubspec.yaml 模板
 
@@ -39,7 +39,7 @@ Task Progress:
 
 ```yaml
 name: my_feature
-description: Shared feature module for Flutter Bazaar.
+description: Shared feature module for BarrelLock.
 version: 0.0.1
 publish_to: none
 resolution: workspace
@@ -77,7 +77,7 @@ workspace:
 ### Step 4: 安装依赖
 
 ```bash
-cd /path/to/flutter_bazaar
+cd /path/to/barrel_lock
 dart pub get
 ```
 

@@ -13,13 +13,13 @@ dependencies:
     sdk: flutter
   core:
   fast_dialog:
-    path: ../../../packages/fast_dialog
+    path: ../../packages/fast_dialog
   fast_navigator:
-    path: ../../../packages/fast_navigator
+    path: ../../packages/fast_navigator
   fast_lifecycle:
-    path: ../../../packages/fast_lifecycle
+    path: ../../packages/fast_lifecycle
   fast_toast:
-    path: ../../../packages/fast_toast
+    path: ../../packages/fast_toast
   url_launcher: ^6.3.2
 
 dev_dependencies:

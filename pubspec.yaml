@@ -1,5 +1,5 @@
-name: flutter_bazaar
-description: Flutter Bazaar monorepo managed by Melos.
+name: barrel_lock_workspace
+description: BarrelLock monorepo managed by Melos.
 publish_to: none
 
 environment:
@@ -7,14 +7,14 @@ environment:
   flutter: ">=3.27.0"
 
 workspace:
-  - apps/BarrelLock/barrel_lock
-  - apps/BarrelLock/barrel_lock_ui
-  - apps/BarrelLock/BarrelLock_android
-  - apps/BarrelLock/BarrelLock_ios
-  - apps/BarrelLock/BarrelLock_windows
-  - apps/BarrelLock/BarrelLock_linux
-  - apps/BarrelLock/BarrelLock_web
-  - apps/BarrelLock/BarrelLock_macos
+  - apps/barrel_lock
+  - apps/barrel_lock_ui
+  - apps/android
+  - apps/ios
+  - apps/windows
+  - apps/linux
+  - apps/web
+  - apps/macos
   - packages/app_fonts
   - packages/core
   - packages/fast_loading

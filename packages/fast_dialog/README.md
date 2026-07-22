@@ -64,4 +64,4 @@ final class LogoutConfirmDialog extends BaseDialog<bool> {
 
 ## License
 
-Private — Flutter Bazaar monorepo.
+Private — BarrelLock monorepo.

@@ -1,6 +1,6 @@
 # core
 
-Flutter Bazaar monorepo **跨产品基础设施**（不含具体 App 业务）。
+BarrelLock monorepo **基础设施**（主题/偏好/存储等，不含页面 View）。
 
 ## 职责
 
@@ -49,6 +49,6 @@ final plain = await AppCrypto.decryptString(cipher);
 
 ## 产品层请使用
 
-- 路由 / 壳：`apps/BarrelLock/barrel_lock/`
-- 启动入口：`apps/BarrelLock/barrel_lock_ui/`
+- 路由 / 壳：`apps/barrel_lock/`
+- 启动入口：`apps/barrel_lock_ui/`
 - 页面 View：各平台 `lib/pages/`

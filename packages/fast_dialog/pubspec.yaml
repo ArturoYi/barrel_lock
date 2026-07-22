@@ -1,5 +1,5 @@
 name: fast_dialog
-description: Global overlay dialog stack manager for Flutter Bazaar.
+description: Global overlay dialog stack manager for BarrelLock.
 version: 0.0.1
 publish_to: none
 resolution: workspace

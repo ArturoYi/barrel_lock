@@ -3,7 +3,7 @@ alwaysApply: true
 ---
 
 ---
-description: Flutter Bazaar monorepo 全局上下文
+description: BarrelLock monorepo 全局上下文
 alwaysApply: true
 ---
 
@@ -15,5 +15,5 @@ alwaysApply: true
 - 状态管理：Riverpod 3.x，通过 `package:core/core.dart` 引入
 - Flutter 版本：FVM 锁定 3.44.2，命令优先 `fvm flutter` / `melos run`
 - 质量门禁：`melos run ci`（format:check → analyze → test）
-- 跨产品共享库放 `packages/`（如 `core`、`fast_*`）；单产品多平台共享层放 `apps/<App>/`（如 `barrel_lock`、`barrel_lock_ui`）
+- 共享基础设施放 `packages/`（如 `core`、`fast_*`）；App 业务与 UI 共享层放 `apps/`（如 `barrel_lock`、`barrel_lock_ui`）；平台工程放 `apps/android` 等
 - 注释与文档可用中文；代码标识符用英文

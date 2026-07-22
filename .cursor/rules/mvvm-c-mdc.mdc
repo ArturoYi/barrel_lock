@@ -11,7 +11,7 @@ alwaysApply: false
 | 层 | 位置 | 包 |
 |---|---|---|
 | **V** View | 各平台 `lib/pages/<feature>/` | 各平台 app |
-| **VM** ViewModel | `apps/BarrelLock/barrel_lock/lib/features/<feature>/` | `barrel_lock` |
+| **VM** ViewModel | `apps/barrel_lock/lib/features/<feature>/` | `barrel_lock` |
 | **M** Model | 同上 | `barrel_lock` |
 | **C** Coordinator | 同上 | `barrel_lock` |
 

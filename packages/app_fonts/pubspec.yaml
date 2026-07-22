@@ -1,5 +1,5 @@
 name: app_fonts
-description: Shared font assets and family constants for Flutter Bazaar.
+description: Shared font assets and family constants for BarrelLock.
 version: 0.0.1
 publish_to: none
 resolution: workspace

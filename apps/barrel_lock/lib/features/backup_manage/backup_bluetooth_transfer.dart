@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:core/core.dart';
-
 import 'backup_bluetooth_delegate.dart';
 
 /// P2P 传输分片协议（纯 Dart，供各平台 delegate 复用）。

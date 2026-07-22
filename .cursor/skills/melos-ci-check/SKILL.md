@@ -1,6 +1,6 @@
 ---
 name: melos-ci-check
-description: Runs the Flutter Bazaar quality gate (format, analyze, test) via Melos scripts. Use when fixing CI failures, checking merge readiness, running analyze/format/test, or before creating a PR.
+description: Runs the BarrelLock quality gate (format, analyze, test) via Melos scripts. Use when fixing CI failures, checking merge readiness, running analyze/format/test, or before creating a PR.
 ---
 
 # Melos CI 质量门禁

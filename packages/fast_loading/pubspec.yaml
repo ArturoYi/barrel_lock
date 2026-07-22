@@ -1,5 +1,5 @@
 name: fast_loading
-description: Global overlay loading mask for Flutter Bazaar.
+description: Global overlay loading mask for BarrelLock.
 version: 0.0.1
 publish_to: none
 resolution: workspace

@@ -1,5 +1,5 @@
 name: fast_toast
-description: Global overlay toast with queue management for Flutter Bazaar.
+description: Global overlay toast with queue management for BarrelLock.
 version: 0.0.1
 publish_to: none
 resolution: workspace

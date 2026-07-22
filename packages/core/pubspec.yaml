@@ -1,5 +1,5 @@
 name: core
-description: Shared core library for Flutter Bazaar.
+description: Shared core library for BarrelLock.
 version: 0.0.1
 publish_to: none
 resolution: workspace
