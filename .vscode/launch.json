@@ -2,38 +2,38 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "BarrelLock_android (Android)",
-      "cwd": "apps/BarrelLock/BarrelLock_android",
+      "name": "BarrelLock (Android)",
+      "cwd": "apps/android",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "BarrelLock_ios (iOS)",
-      "cwd": "apps/BarrelLock/BarrelLock_ios",
+      "name": "BarrelLock (iOS)",
+      "cwd": "apps/ios",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "BarrelLock_windows (Windows)",
-      "cwd": "apps/BarrelLock/BarrelLock_windows",
+      "name": "BarrelLock (macOS)",
+      "cwd": "apps/macos",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "BarrelLock_linux (Linux)",
-      "cwd": "apps/BarrelLock/BarrelLock_linux",
+      "name": "BarrelLock (Windows)",
+      "cwd": "apps/windows",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "BarrelLock_web (Chrome)",
-      "cwd": "apps/BarrelLock/BarrelLock_web",
+      "name": "BarrelLock (Linux)",
+      "cwd": "apps/linux",
       "request": "launch",
       "type": "dart"
     },
     {
-      "name": "BarrelLock_macos (macOS)",
-      "cwd": "apps/BarrelLock/BarrelLock_macos",
+      "name": "BarrelLock (Chrome)",
+      "cwd": "apps/web",
       "request": "launch",
       "type": "dart"
     }

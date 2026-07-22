@@ -17,6 +17,8 @@ final class AppRouteBuilders {
     required this.appLock,
     required this.appLockPinSetup,
     required this.clearData,
+    required this.supportDocument,
+    required this.supportFeedback,
   });
 
   final AppRouteBuilder launchScreen;
@@ -29,4 +31,6 @@ final class AppRouteBuilders {
   final AppRouteBuilder appLock;
   final AppRouteBuilder appLockPinSetup;
   final AppRouteBuilder clearData;
+  final AppRouteBuilder supportDocument;
+  final AppRouteBuilder supportFeedback;
 }

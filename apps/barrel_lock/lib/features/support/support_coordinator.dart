@@ -1,19 +1,24 @@
 import 'package:core/core.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import 'support_urls.dart';
+import '../../router/application/app_router.dart';
+import '../../router/domain/app_routes.dart';
 
-/// 服务支持导航（打开外链 / 邮件）。
+/// 服务支持导航（应用内文档页 / 反馈页）。
 final class SupportCoordinator {
   const SupportCoordinator();
 
-  Future<bool> openItem(String itemId) async {
-    final url = SupportUrls.urlForItem(itemId);
-    if (url == null) {
-      return false;
+  void openItem(String itemId) {
+    switch (itemId) {
+      case 'feedback':
+        AppRouter.push(AppRoutes.supportFeedback.path);
+      case 'help_doc':
+      case 'user_agreement':
+      case 'privacy_policy':
+      case 'encryption_doc':
+        AppRouter.push(AppRoutes.supportDocument(docId: itemId));
+      default:
+        FastToast.show('暂不支持该入口');
     }
-    final uri = Uri.parse(url);
-    return launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 }
 

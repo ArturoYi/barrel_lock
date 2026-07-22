@@ -3,7 +3,6 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/backup_restore_sheet.dart';
-import '../widgets/bluetooth_backup_sheet.dart';
 import '../widgets/settings_list_tile.dart';
 import '../widgets/settings_section_card.dart';
 import '../widgets/settings_subpage_scaffold.dart';

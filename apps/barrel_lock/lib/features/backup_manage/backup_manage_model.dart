@@ -48,10 +48,9 @@ final class BackupManageException implements Exception {
 final class BackupManageModel {
   BackupManageModel(
     this._repos, {
-    Directory? backupRootOverride,
-    int maxLocalBackups = 5,
-  }) : _backupRootOverride = backupRootOverride,
-       _maxLocalBackups = maxLocalBackups;
+    this._backupRootOverride,
+    this._maxLocalBackups = 5,
+  });
 
   final StorageRepositories _repos;
   final Directory? _backupRootOverride;

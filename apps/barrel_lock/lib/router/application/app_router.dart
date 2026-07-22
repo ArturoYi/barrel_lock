@@ -103,6 +103,16 @@ final class AppRouter {
         path: AppRoutes.clearData.path,
         builder: builders.clearData,
       ),
+      FastRoute(
+        name: AppRoutes.supportDocument.name,
+        path: AppRoutes.supportDocument.path,
+        builder: builders.supportDocument,
+      ),
+      FastRoute(
+        name: AppRoutes.supportFeedback.name,
+        path: AppRoutes.supportFeedback.path,
+        builder: builders.supportFeedback,
+      ),
     ];
   }
 

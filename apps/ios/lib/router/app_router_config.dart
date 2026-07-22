@@ -36,6 +36,12 @@ void configureBarrelLockRouter() {
       appLock: (_, _) => const AppLockSettingsPage(),
       appLockPinSetup: (_, _) => const AppLockPinSetupPage(),
       clearData: (_, _) => const ClearDataPage(),
+      supportDocument: (_, match) => SupportDocumentPage(
+        docId: AppRoutes.supportDocument.docIdFromQuery(
+          match.parameters.queryParams,
+        ),
+      ),
+      supportFeedback: (_, _) => const SupportFeedbackPage(),
     ),
   );
 }

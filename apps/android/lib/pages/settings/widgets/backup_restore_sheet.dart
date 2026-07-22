@@ -72,22 +72,23 @@ final class _BackupRestoreSheetState extends State<_BackupRestoreSheet> {
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.sizeOf(context).height * 0.35,
               ),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: widget.backups.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final backup = widget.backups[index];
-                  final subtitle = _formatBackupTime(backup.backupTime);
-                  return RadioListTile<String>(
-                    value: backup.logId,
-                    groupValue: _selectedLogId,
-                    onChanged: (value) =>
-                        setState(() => _selectedLogId = value),
-                    title: Text(backup.note ?? '本地备份'),
-                    subtitle: Text(subtitle),
-                  );
-                },
+              child: RadioGroup<String>(
+                groupValue: _selectedLogId,
+                onChanged: (value) => setState(() => _selectedLogId = value),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: widget.backups.length,
+                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final backup = widget.backups[index];
+                    final subtitle = _formatBackupTime(backup.backupTime);
+                    return RadioListTile<String>(
+                      value: backup.logId,
+                      title: Text(backup.note ?? '本地备份'),
+                      subtitle: Text(subtitle),
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 8),

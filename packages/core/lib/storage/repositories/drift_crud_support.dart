@@ -8,14 +8,11 @@ import '../app_database.dart';
 /// 避免 Drift 生成类型在泛型继承链上的约束冲突。
 final class DriftCrudSupport<TEntity extends DataClass, TId extends Object> {
   const DriftCrudSupport({
-    required AppDatabase database,
-    required TableInfo table,
-    required Expression<bool> Function(dynamic tbl, TId id) idEquals,
-    required TId Function(TEntity entity) idOf,
-  }) : _database = database,
-       _table = table,
-       _idEquals = idEquals,
-       _idOf = idOf;
+    required this._database,
+    required this._table,
+    required this._idEquals,
+    required this._idOf,
+  });
 
   final AppDatabase _database;
   final TableInfo _table;

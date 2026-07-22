@@ -22,25 +22,14 @@ final class AndroidBackupFileDelegate extends BackupFileDelegate {
 
   @override
   Future<Uint8List?> pickBackupFile() async {
-    final result = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: [BackupArchiveCodec.fileExtension],
-      allowMultiple: false,
-      withData: true,
     );
-    if (result == null || result.files.isEmpty) {
+    if (file == null) {
       return null;
     }
-    final file = result.files.single;
-    final bytes = file.bytes;
-    if (bytes != null) {
-      return bytes;
-    }
-    final path = file.path;
-    if (path == null) {
-      return null;
-    }
-    return File(path).readAsBytes();
+    return file.readAsBytes();
   }
 
   @override
@@ -53,6 +42,8 @@ final class AndroidBackupFileDelegate extends BackupFileDelegate {
     );
     final file = File('${directory.path}/$suggestedName');
     await file.writeAsBytes(bytes, flush: true);
-    await Share.shareXFiles([XFile(file.path)], text: 'BarrelLock 备份');
+    await SharePlus.instance.share(
+      ShareParams(files: [XFile(file.path)], text: 'BarrelLock 备份'),
+    );
   }
 }

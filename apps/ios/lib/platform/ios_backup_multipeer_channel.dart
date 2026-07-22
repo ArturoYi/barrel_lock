@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:flutter/services.dart';
 

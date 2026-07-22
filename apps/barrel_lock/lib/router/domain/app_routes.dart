@@ -2,6 +2,8 @@ import 'app_simple_route.dart';
 import 'bluetooth_backup_route.dart';
 import 'cipher_add_route.dart';
 import 'detail_route.dart';
+import 'support_document_route.dart';
+import 'support_feedback_route.dart';
 
 /// BarrelLock 应用路由表（SSOT）。
 abstract final class AppRoutes {
@@ -39,4 +41,8 @@ abstract final class AppRoutes {
     name: 'clearData',
     path: '/settings/clear-data',
   );
+
+  static const supportDocument = SupportDocumentRoute();
+
+  static const supportFeedback = SupportFeedbackRoute();
 }

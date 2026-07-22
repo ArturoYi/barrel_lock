@@ -16,8 +16,7 @@ final class SettingsTabCoordinator {
 
   void openClearData() => AppRouter.push(AppRoutes.clearData.path);
 
-  Future<void> openSupportItem(String itemId) =>
-      _supportCoordinator.openItem(itemId);
+  void openSupportItem(String itemId) => _supportCoordinator.openItem(itemId);
 
   void openThemeSettings() {}
 }
