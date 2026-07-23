@@ -1,6 +1,27 @@
 # BarrelLock
 
-使用 [Melos](https://melos.invertase.dev/) + [Dart pub workspaces](https://dart.dev/tools/pub/workspaces) 管理的 BarrelLock 单 App monorepo，按平台拆分为独立应用。
+<p align="center">
+  <img src="apps/barrel_lock_ui/assets/app_icon.png" alt="BarrelLock App Icon" width="128" height="128" />
+</p>
+
+**BarrelLock** 是一款本地优先的跨平台密码与敏感信息管理应用。名字取自「桶锁」——像把珍贵的东西锁进一只坚固的桶里；应用图标中的贝壳与钥匙孔，也寓意「外壳保护、内核加密」。
+
+## 项目初衷
+
+在依赖云端同步的密码管理器之外，我们希望做一款**数据留在本机、密钥由用户掌控**的工具：不绑定特定云服务，换机与备份由用户自行决定，减少第三方托管带来的隐私与可用性风险。
+
+BarrelLock 的目标不是功能堆砌，而是把「存得安全、用得顺手」做扎实：
+
+- **本地加密保险库** — 密码、网站登录、银行卡、安全笔记、附件等统一存入 SQLite，敏感字段经 ChaCha20-Poly1305 加密
+- **应用级二次防护** — 支持 PIN / 生物识别解锁，离开应用时可自动上锁
+- **真正跨平台** — Android、iOS、macOS、Windows、Linux、Web 共用一套业务逻辑（MVVM-C），各平台独立适配界面
+- **可迁移、可备份** — 加密备份包、本地快照、文件导入导出等能力持续演进，方便换机与灾备
+
+本仓库是 BarrelLock 的**单 App monorepo**：共享 Feature 与基础设施集中维护，按平台拆分为独立 Flutter 工程，便于分别构建与发布。
+
+---
+
+使用 [Melos](https://melos.invertase.dev/) + [Dart pub workspaces](https://dart.dev/tools/pub/workspaces) 管理上述 monorepo。
 
 ## 项目结构
 
