@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:core/core.dart';
 
+import '../../l10n/overlay_l10n.dart';
 import '../backup_manage/backup_manage.dart';
 import 'bluetooth_backup_coordinator.dart';
 import 'bluetooth_backup_session.dart';
@@ -116,7 +117,7 @@ final class DataMigrationViewModel extends Notifier<DataMigrationViewState> {
     state = state.copyWith(isBusy: true, clearError: true);
     try {
       await _backupManage.restoreFromLocalBackup(logId, mode: mode);
-      FastToast.show('恢复完成');
+      OverlayL10n.showToast((l) => l.migration_toastRestoreDone);
     } on BackupManageException catch (error) {
       state = state.copyWith(isBusy: false, lastError: error.message);
       FastToast.show(error.message);
@@ -127,7 +128,7 @@ final class DataMigrationViewModel extends Notifier<DataMigrationViewState> {
       return;
     } catch (error) {
       state = state.copyWith(isBusy: false, lastError: '$error');
-      FastToast.show('恢复失败');
+      OverlayL10n.errorToast((l) => l.migration_toastRestoreFailed);
       return;
     }
 
@@ -148,7 +149,7 @@ final class DataMigrationViewModel extends Notifier<DataMigrationViewState> {
         await _backupManage.createLocalBackup(note: '导入前自动快照');
       }
       await _backupManage.restoreFromBytes(bytes, mode: mode);
-      FastToast.show('导入完成');
+      OverlayL10n.showToast((l) => l.migration_toastImportDone);
     } on BackupManageException catch (error) {
       state = state.copyWith(isBusy: false, lastError: error.message);
       FastToast.show(error.message);
@@ -159,7 +160,7 @@ final class DataMigrationViewModel extends Notifier<DataMigrationViewState> {
       return;
     } catch (error) {
       state = state.copyWith(isBusy: false, lastError: '$error');
-      FastToast.show('导入失败');
+      OverlayL10n.errorToast((l) => l.migration_toastImportFailed);
       return;
     }
 
@@ -170,14 +171,14 @@ final class DataMigrationViewModel extends Notifier<DataMigrationViewState> {
     state = state.copyWith(isBusy: true, clearError: true);
     try {
       await _backupManage.createLocalBackup();
-      FastToast.show('本地备份已创建');
+      OverlayL10n.showToast((l) => l.migration_toastBackupCreated);
     } on BackupManageException catch (error) {
       state = state.copyWith(isBusy: false, lastError: error.message);
       FastToast.show(error.message);
       return;
     } catch (error) {
       state = state.copyWith(isBusy: false, lastError: '$error');
-      FastToast.show('备份失败');
+      OverlayL10n.errorToast((l) => l.migration_toastBackupFailed);
       return;
     }
     state = state.copyWith(isBusy: false, clearError: true);
@@ -186,7 +187,7 @@ final class DataMigrationViewModel extends Notifier<DataMigrationViewState> {
   Future<void> _requestRestorePicker() async {
     final backups = await _backupManage.watchRecentBackups().first;
     if (backups.isEmpty) {
-      FastToast.show('暂无本地备份');
+      OverlayL10n.showToast((l) => l.migration_toastNoLocalBackup);
       return;
     }
     state = state.copyWith(uiRequest: RestoreBackupPickerRequest(backups));
@@ -208,7 +209,7 @@ final class DataMigrationViewModel extends Notifier<DataMigrationViewState> {
           bytes: bytes,
         );
       } else {
-        FastToast.show('已导出备份');
+        OverlayL10n.showToast((l) => l.migration_toastExportDone);
       }
     } on BackupManageException catch (error) {
       state = state.copyWith(isBusy: false, lastError: error.message);
@@ -216,7 +217,7 @@ final class DataMigrationViewModel extends Notifier<DataMigrationViewState> {
       return;
     } catch (error) {
       state = state.copyWith(isBusy: false, lastError: '$error');
-      FastToast.show('导出失败');
+      OverlayL10n.errorToast((l) => l.migration_toastExportFailed);
       return;
     }
     state = state.copyWith(isBusy: false, clearError: true);

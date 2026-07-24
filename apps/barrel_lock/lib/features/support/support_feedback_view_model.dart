@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../l10n/overlay_l10n.dart';
 import 'support_feedback_coordinator.dart';
 import 'support_feedback_model.dart';
 
@@ -36,7 +37,8 @@ final class SupportFeedbackViewState {
 }
 
 /// 客服反馈页 ViewModel。
-final class SupportFeedbackViewModel extends Notifier<SupportFeedbackViewState> {
+final class SupportFeedbackViewModel
+    extends Notifier<SupportFeedbackViewState> {
   late final SupportFeedbackCoordinator _coordinator;
 
   @override
@@ -66,16 +68,14 @@ final class SupportFeedbackViewModel extends Notifier<SupportFeedbackViewState> 
     state = state.copyWith(isSubmitting: false);
 
     if (launched) {
-      FastToast.show('已打开邮件应用，请确认收件人后发送');
+      OverlayL10n.successToast((l) => l.overlay_success);
       return;
     }
 
     await Clipboard.setData(
-      ClipboardData(
-        text: '收件人：${SupportFeedbackModel.feedbackEmail}\n\n$body',
-      ),
+      ClipboardData(text: '收件人：${SupportFeedbackModel.feedbackEmail}\n\n$body'),
     );
-    FastToast.show('无法打开邮件应用，已复制反馈内容');
+    OverlayL10n.showToast((l) => l.overlay_error);
   }
 
   String _buildFeedbackBody() {

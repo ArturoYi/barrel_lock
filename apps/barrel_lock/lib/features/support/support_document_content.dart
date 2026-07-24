@@ -1,9 +1,6 @@
 /// 应用内服务支持文档（可直接商用的用户-facing 文案）。
 final class SupportDocumentContent {
-  const SupportDocumentContent({
-    required this.title,
-    required this.paragraphs,
-  });
+  const SupportDocumentContent({required this.title, required this.paragraphs});
 
   final String title;
   final List<String> paragraphs;

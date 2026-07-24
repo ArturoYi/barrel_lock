@@ -7,9 +7,6 @@ import '../widgets/settings_list_tile.dart';
 import 'settings_section_detail.dart';
 
 /// 横屏：Master-Detail 分栏。
-///
-/// **Master（左栏）** 仅展示 [SettingsSectionKind] 一级分组，点击切换右侧 Detail。
-/// 具体设置项只在 Detail 中呈现并响应 [onNavItemTap]，避免与竖屏「一步直达」行为不一致。
 class SettingsLandscapeSplitView extends StatelessWidget {
   const SettingsLandscapeSplitView({
     super.key,
@@ -27,6 +24,7 @@ class SettingsLandscapeSplitView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final selected = state.sectionOf(state.selectedSection);
 
     return LayoutBuilder(
@@ -39,7 +37,7 @@ class SettingsLandscapeSplitView extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SettingsCompactHeaderBar(title: state.title),
+            SettingsCompactHeaderBar(title: l10n.settings_title),
             Expanded(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -55,8 +53,12 @@ class SettingsLandscapeSplitView extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 4),
                               child: SettingsNavTile(
-                                title: section.title,
-                                subtitle: _sectionSubtitle(section),
+                                title: l10n.settingsSectionTitle(section.kind),
+                                subtitle: _sectionSubtitle(
+                                  context,
+                                  section,
+                                  state,
+                                ),
                                 icon: section.items.first.icon,
                                 selected: state.selectedSection == section.kind,
                                 onTap: () => onSectionSelected(section.kind),
@@ -74,12 +76,12 @@ class SettingsLandscapeSplitView extends StatelessWidget {
                         padding: const EdgeInsets.all(24),
                         children: [
                           Text(
-                            selected.title,
+                            l10n.settingsSectionTitle(selected.kind),
                             style: context.textTheme.headlineSmall,
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            _detailHint(selected.kind),
+                            l10n.settingsSectionHint(selected.kind),
                             style: context.textTheme.bodyMedium?.copyWith(
                               color: context.colors.onSurfaceVariant,
                             ),
@@ -91,6 +93,7 @@ class SettingsLandscapeSplitView extends StatelessWidget {
                               key: ValueKey(selected.kind),
                               section: selected,
                               versionLabel: state.versionLabel,
+                              localePreference: state.localePreference,
                               onNavItemTap: onNavItemTap,
                             ),
                           ),
@@ -107,21 +110,18 @@ class SettingsLandscapeSplitView extends StatelessWidget {
     );
   }
 
-  /// Master 行副标题：单项分组用 item 副标题，多项分组显示条目数。
-  static String? _sectionSubtitle(SettingsSectionDescriptor section) {
+  static String? _sectionSubtitle(
+    BuildContext context,
+    SettingsSectionDescriptor section,
+    SettingsTabViewState state,
+  ) {
+    final l10n = context.l10n;
     if (section.items.length == 1) {
-      return section.items.first.subtitle;
+      return l10n.settingsNavItemSubtitle(
+        section.items.first.id,
+        localePreference: state.localePreference,
+      );
     }
-    return '${section.items.length} 项';
-  }
-
-  static String _detailHint(SettingsSectionKind kind) {
-    return switch (kind) {
-      SettingsSectionKind.theme => '调整应用外观与可读性。',
-      SettingsSectionKind.data => '导入导出与备份相关操作将在此展开。',
-      SettingsSectionKind.security => '锁屏保护与危险操作需二次确认。',
-      SettingsSectionKind.support => '帮助文档与法律条款外链入口。',
-      SettingsSectionKind.about => '应用版本与构建信息。',
-    };
+    return l10n.settings_sectionItemCount(section.items.length);
   }
 }

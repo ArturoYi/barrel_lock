@@ -19,6 +19,7 @@ final class AppRouteBuilders {
     required this.clearData,
     required this.supportDocument,
     required this.supportFeedback,
+    required this.languageSettings,
   });
 
   final AppRouteBuilder launchScreen;
@@ -33,4 +34,5 @@ final class AppRouteBuilders {
   final AppRouteBuilder clearData;
   final AppRouteBuilder supportDocument;
   final AppRouteBuilder supportFeedback;
+  final AppRouteBuilder languageSettings;
 }

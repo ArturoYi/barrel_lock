@@ -1,8 +1,7 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:barrel_lock_ui/barrel_lock_ui.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-
-import 'settings/theme_setting_tile.dart';
 
 /// 设置页（MVVM-C 的 V 层）。
 class SettingsPage extends ConsumerWidget {
@@ -17,7 +16,7 @@ class SettingsPage extends ConsumerWidget {
       body: ListView(
         children: [
           const SizedBox(height: 24),
-          const ThemeSettingTile(),
+          const ThemeSettingSection(),
           const SizedBox(height: 32),
           Center(
             child: FilledButton(

@@ -45,4 +45,9 @@ abstract final class AppRoutes {
   static const supportDocument = SupportDocumentRoute();
 
   static const supportFeedback = SupportFeedbackRoute();
+
+  static const languageSettings = AppSimpleRoute(
+    name: 'languageSettings',
+    path: '/settings/language',
+  );
 }

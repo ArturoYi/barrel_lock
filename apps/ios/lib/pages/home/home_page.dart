@@ -39,7 +39,7 @@ class HomePage extends ConsumerWidget {
                     for (final tab in state.tabs)
                       NavigationRailDestination(
                         icon: Icon(_iconForTab(tab.tab)),
-                        label: Text(tab.label),
+                        label: Text(context.l10n.homeTabLabel(tab.tab)),
                       ),
                   ],
                 ),
@@ -64,7 +64,7 @@ class HomePage extends ConsumerWidget {
               for (final tab in state.tabs)
                 NavigationDestination(
                   icon: Icon(_iconForTab(tab.tab)),
-                  label: tab.label,
+                  label: context.l10n.homeTabLabel(tab.tab),
                 ),
             ],
           ),

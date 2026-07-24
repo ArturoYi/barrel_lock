@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  app_l10n:
+    path: ../../packages/app_l10n
   core:
   fast_dialog:
     path: ../../packages/fast_dialog
@@ -20,6 +22,8 @@ dependencies:
     path: ../../packages/fast_lifecycle
   fast_toast:
     path: ../../packages/fast_toast
+  fast_loading:
+    path: ../../packages/fast_loading
   url_launcher: ^6.3.2
 
 dev_dependencies:

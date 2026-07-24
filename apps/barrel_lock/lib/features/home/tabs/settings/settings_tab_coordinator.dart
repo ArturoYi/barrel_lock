@@ -16,6 +16,9 @@ final class SettingsTabCoordinator {
 
   void openClearData() => AppRouter.push(AppRoutes.clearData.path);
 
+  void openLanguageSettings() =>
+      AppRouter.push(AppRoutes.languageSettings.path);
+
   void openSupportItem(String itemId) => _supportCoordinator.openItem(itemId);
 
   void openThemeSettings() {}

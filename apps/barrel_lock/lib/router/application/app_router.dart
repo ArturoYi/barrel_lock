@@ -113,6 +113,11 @@ final class AppRouter {
         path: AppRoutes.supportFeedback.path,
         builder: builders.supportFeedback,
       ),
+      FastRoute(
+        name: AppRoutes.languageSettings.name,
+        path: AppRoutes.languageSettings.path,
+        builder: builders.languageSettings,
+      ),
     ];
   }
 

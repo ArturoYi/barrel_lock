@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 
 /// 设置页模块标识，横屏 Master-Detail 与竖屏分组共用。
-enum SettingsSectionKind { theme, data, security, support, about }
+enum SettingsSectionKind { general, theme, data, security, support, about }
 
 /// 设置页分组描述（Hub VM 下发，View 只负责渲染）。
 final class SettingsSectionDescriptor {
-  const SettingsSectionDescriptor({
-    required this.kind,
-    required this.title,
-    required this.items,
-  });
+  const SettingsSectionDescriptor({required this.kind, required this.items});
 
   final SettingsSectionKind kind;
-  final String title;
   final List<SettingsNavItemDescriptor> items;
 }
 
@@ -20,16 +15,12 @@ final class SettingsSectionDescriptor {
 final class SettingsNavItemDescriptor {
   const SettingsNavItemDescriptor({
     required this.id,
-    required this.title,
-    this.subtitle,
     required this.icon,
     this.isDanger = false,
     this.isReadOnly = false,
   });
 
   final String id;
-  final String title;
-  final String? subtitle;
   final IconData icon;
 
   /// 危险操作（如清除数据），UI 以 error 色强调。

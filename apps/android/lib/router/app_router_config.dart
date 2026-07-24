@@ -4,6 +4,7 @@ import '../pages/app_lock/app_lock_pin_manage_page.dart';
 import '../pages/app_lock/app_lock_settings_page.dart';
 import '../pages/settings/pages/clear_data_page.dart';
 import '../pages/settings/pages/data_migration_page.dart';
+import '../pages/settings/pages/language_settings_page.dart';
 import '../pages/cipher_add/cipher_add_page.dart';
 import '../pages/detail_page.dart';
 import '../pages/home/home_page.dart';
@@ -41,6 +42,7 @@ void configureBarrelLockRouter() {
         ),
       ),
       supportFeedback: (_, _) => const SupportFeedbackPage(),
+      languageSettings: (_, _) => const LanguageSettingsPage(),
     ),
   );
 }

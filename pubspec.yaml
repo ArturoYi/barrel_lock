@@ -16,6 +16,7 @@ workspace:
   - apps/web
   - apps/macos
   - packages/app_fonts
+  - packages/app_l10n
   - packages/core
   - packages/fast_loading
   - packages/fast_dialog

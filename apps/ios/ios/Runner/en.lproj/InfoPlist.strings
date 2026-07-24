@@ -1,0 +1,6 @@
+"CFBundleDisplayName" = "BarrelLock";
+"NSFaceIDUsageDescription" = "Used to verify your identity to unlock app protection";
+"NSCameraUsageDescription" = "Used to take ID document photos";
+"NSPhotoLibraryUsageDescription" = "Used to select ID document photos";
+"NSBluetoothAlwaysUsageDescription" = "Used to transfer encrypted backups between nearby devices";
+"NSLocalNetworkUsageDescription" = "Used to discover nearby devices and transfer encrypted backups";

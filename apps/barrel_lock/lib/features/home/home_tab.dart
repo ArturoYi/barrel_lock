@@ -3,8 +3,7 @@ enum HomeTab { password, settings }
 
 /// Tab 展示元数据（M 层输出，V 层渲染）。
 final class HomeTabDescriptor {
-  const HomeTabDescriptor({required this.tab, required this.label});
+  const HomeTabDescriptor({required this.tab});
 
   final HomeTab tab;
-  final String label;
 }

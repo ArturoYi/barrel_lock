@@ -1,8 +1,7 @@
 import 'package:barrel_lock/barrel_lock.dart';
+import 'package:barrel_lock_ui/barrel_lock_ui.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-
-import 'settings/theme_setting_tile.dart';
 
 /// 设置页（MVVM-C 的 V 层）。
 class SettingsPage extends ConsumerWidget {
@@ -11,18 +10,22 @@ class SettingsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewModel = ref.read(settingsViewModelProvider.notifier);
+    final l10n = context.l10n;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('设置页')),
+      appBar: AppBar(title: Text(l10n.settings_title)),
       body: ListView(
         children: [
           const SizedBox(height: 24),
-          const ThemeSettingTile(),
+          LanguageSettingsEntryTile(
+            onTap: () => AppRouter.push(AppRoutes.languageSettings.path),
+          ),
+          const ThemeSettingSection(),
           const SizedBox(height: 32),
           Center(
             child: FilledButton(
               onPressed: viewModel.onPop,
-              child: const Text('返回'),
+              child: Text(l10n.common_back),
             ),
           ),
         ],

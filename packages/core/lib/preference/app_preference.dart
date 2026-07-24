@@ -25,6 +25,12 @@ final class AppPreference {
   static String? getFontScale() =>
       SPStorage.getString(PreferenceKeys.fontScale);
 
+  static Future<void> setLocalePreference(String preference) =>
+      SPStorage.setString(PreferenceKeys.localePreference, preference);
+
+  static String getLocalePreference() =>
+      SPStorage.getString(PreferenceKeys.localePreference) ?? 'system';
+
   static Future<void> clearAllPreference() => SPStorage.clearAll();
 
   static Future<void> removeByKey(String rawKey) => SPStorage.remove(rawKey);

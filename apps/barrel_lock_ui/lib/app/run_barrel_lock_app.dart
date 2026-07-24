@@ -1,5 +1,6 @@
 import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
+import 'package:core/locale/data/locale_repository_impl.dart';
 import 'package:flutter/material.dart';
 
 import 'barrel_lock_app.dart';
@@ -52,5 +53,11 @@ Future<void> runBarrelLockApp({
   await AppDeviceInfo.init();
   configureRouter();
   await bootstrapBarrelLockLifecycle();
+  AppL10nHolder.update(
+    AppL10n.resolveActiveLocale(
+      fixedLocale: LocaleRepositoryImpl().load().preference.fixedLocale,
+      deviceLocale: WidgetsBinding.instance.platformDispatcher.locale,
+    ),
+  );
   runApp(scopeBuilder(const BarrelLockApp()));
 }

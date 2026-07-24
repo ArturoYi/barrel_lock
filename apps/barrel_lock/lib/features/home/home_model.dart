@@ -9,8 +9,8 @@ final class HomeModel {
   String get appName => 'BarrelLock';
 
   List<HomeTabDescriptor> get tabs => const [
-    HomeTabDescriptor(tab: HomeTab.password, label: '密码'),
-    HomeTabDescriptor(tab: HomeTab.settings, label: '设置'),
+    HomeTabDescriptor(tab: HomeTab.password),
+    HomeTabDescriptor(tab: HomeTab.settings),
   ];
 }
 

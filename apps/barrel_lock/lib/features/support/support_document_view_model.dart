@@ -17,7 +17,8 @@ final class SupportDocumentViewState {
 }
 
 /// 服务支持文档页 ViewModel（family：文档 id）。
-final class SupportDocumentViewModel extends Notifier<SupportDocumentViewState> {
+final class SupportDocumentViewModel
+    extends Notifier<SupportDocumentViewState> {
   SupportDocumentViewModel(this._docId);
 
   final String _docId;

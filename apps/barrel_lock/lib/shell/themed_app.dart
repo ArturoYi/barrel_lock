@@ -2,6 +2,13 @@ import 'package:barrel_lock/barrel_lock.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
+Locale _resolvedLocale(LocaleSettings localeSettings) {
+  return AppL10n.resolveActiveLocale(
+    fixedLocale: localeSettings.preference.fixedLocale,
+    deviceLocale: WidgetsBinding.instance.platformDispatcher.locale,
+  );
+}
+
 /// BarrelLock 应用主题 + 全局 Overlay 容器。
 class ThemedApp extends ConsumerStatefulWidget {
   const ThemedApp.router({
@@ -55,9 +62,23 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
   @override
   Widget build(BuildContext context) {
     final settings = ref.watch(themeSettingsProvider);
+    final localeSettings = ref.watch(localeSettingsProvider);
+    final resolvedLocale = _resolvedLocale(localeSettings);
+    AppL10nHolder.update(resolvedLocale);
     final lightTheme = AppTheme.light(settings.colorScheme);
     final darkTheme = AppTheme.dark(settings.colorScheme);
     final routerConfig = widget._routerConfig;
+
+    Widget wrapBuilder(BuildContext context, Widget? child) {
+      final locale = Localizations.maybeLocaleOf(context) ?? resolvedLocale;
+      final direction = locale.languageCode == 'ar'
+          ? TextDirection.rtl
+          : TextDirection.ltr;
+      return Directionality(
+        textDirection: direction,
+        child: _contentOverlayBuilder(context, child, settings.fontScale),
+      );
+    }
 
     final Widget app;
     if (routerConfig != null) {
@@ -66,9 +87,12 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: settings.mode.toFlutter,
+        locale: localeSettings.preference.fixedLocale,
+        localizationsDelegates: AppL10n.localizationsDelegates,
+        supportedLocales: AppL10n.supportedLocales,
+        localeResolutionCallback: AppL10n.resolveLocale,
         routerConfig: withLoadingRouteGuard(routerConfig),
-        builder: (context, child) =>
-            _contentOverlayBuilder(context, child, settings.fontScale),
+        builder: wrapBuilder,
       );
     } else {
       app = MaterialApp(
@@ -76,9 +100,12 @@ class _ThemedAppState extends ConsumerState<ThemedApp>
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: settings.mode.toFlutter,
+        locale: localeSettings.preference.fixedLocale,
+        localizationsDelegates: AppL10n.localizationsDelegates,
+        supportedLocales: AppL10n.supportedLocales,
+        localeResolutionCallback: AppL10n.resolveLocale,
         home: widget._home,
-        builder: (context, child) =>
-            _contentOverlayBuilder(context, child, settings.fontScale),
+        builder: wrapBuilder,
       );
     }
 

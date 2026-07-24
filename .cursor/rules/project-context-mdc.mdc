@@ -15,5 +15,6 @@ alwaysApply: true
 - 状态管理：Riverpod 3.x，通过 `package:core/core.dart` 引入
 - Flutter 版本：FVM 锁定 3.44.2，命令优先 `fvm flutter` / `melos run`
 - 质量门禁：`melos run ci`（format:check → analyze → test）
-- 共享基础设施放 `packages/`（如 `core`、`fast_*`）；App 业务与 UI 共享层放 `apps/`（如 `barrel_lock`、`barrel_lock_ui`）；平台工程放 `apps/android` 等
+- 共享基础设施放 `packages/`（如 `core`、`app_l10n`、`fast_*`）；App 业务与 UI 共享层放 `apps/`（如 `barrel_lock`、`barrel_lock_ui`）；平台工程放 `apps/android` 等
+- 多语言：`packages/app_l10n` 维护 ARB（zh / zh_TW / en / ar）；Widget 用 `context.l10n`；无 Context 用 `AppL10n.current`；Toast/Loading 用 `OverlayL10n`（`barrel_lock`）；禁止硬编码用户可见文案
 - 注释与文档可用中文；代码标识符用英文

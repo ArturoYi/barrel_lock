@@ -1,0 +1,385 @@
+{
+  "@@locale": "zh_TW",
+  "common_cancel": "取消",
+  "common_save": "儲存",
+  "common_confirm": "確認",
+  "common_error": "出錯了",
+  "common_back": "返回",
+  "common_delete": "刪除",
+  "common_edit": "編輯",
+  "common_loading": "載入中…",
+  "common_retry": "重试",
+  "common_done": "完成",
+  "common_create": "建立",
+  "common_add": "新增",
+  "common_show": "顯示",
+  "common_hide": "隱藏",
+  "common_showPassword": "顯示密碼",
+  "common_hidePassword": "隱藏密碼",
+  "common_copy": "複製",
+  "common_favorite": "收藏",
+  "common_unfavorite": "取消收藏",
+  "common_notSet": "未設定",
+  "common_set": "已設定",
+  "common_ungrouped": "未分組",
+  "common_other": "其他",
+  "common_unnamedVault": "未命名保險庫",
+  "common_loadingFolders": "載入資料夾…",
+  "common_newFolderEllipsis": "新建資料夾…",
+  "common_loadFailed": "載入失敗：{error}",
+  "@common_loadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "locale_follow_system": "跟隨系統",
+  "settings_language": "語言",
+  "settings_language_follow_system": "跟隨系統語言",
+  "settings_language_summary_system": "跟隨系統",
+  "settings_language_summary_zh_hans": "简体中文",
+  "settings_language_summary_zh_hant": "繁體中文",
+  "settings_language_summary_en": "English",
+  "settings_language_summary_ar": "العربية",
+  "settings_title": "設定",
+  "settings_section_data": "資料",
+  "settings_section_security": "安全",
+  "settings_section_support": "服務支援",
+  "settings_section_appearance": "外觀",
+  "settings_section_about": "关于",
+  "settings_dataMigration": "資料遷移",
+  "settings_dataMigrationSubtitle": "匯出、匯入、藍牙共享、備份恢復",
+  "settings_appLock": "鎖屏保護",
+  "settings_appLockSubtitle": "后台生物驗證與备用密碼",
+  "settings_clearData": "清除所有內容",
+  "settings_clearDataSubtitle": "刪除全部密碼，不可恢復",
+  "settings_helpDoc": "安全說明文件",
+  "settings_feedback": "客服回饋",
+  "settings_userAgreement": "用户協議",
+  "settings_privacyPolicy": "隱私政策",
+  "settings_encryptionDoc": "加密說明",
+  "settings_themeDisplay": "主題與顯示",
+  "settings_themeDisplaySubtitle": "深色模式、主題色、字體大小",
+  "settings_versionInfo": "版本資訊",
+  "settings_themeMode": "主題模式",
+  "settings_themeFollowSystem": "跟隨系統",
+  "settings_themeLight": "淺色",
+  "settings_themeDark": "深色",
+  "settings_accentColor": "主題色",
+  "settings_fontSize": "字體大小",
+  "settings_fontScale_small": "小",
+  "settings_fontScale_standard": "標準",
+  "settings_fontScale_large": "大",
+  "settings_fontScale_extraLarge": "特大",
+  "settings_colorScheme_deepPurple": "紫色",
+  "settings_colorScheme_blue": "藍色",
+  "settings_colorScheme_green": "綠色",
+  "settings_colorScheme_orange": "橙色",
+  "settings_colorScheme_teal": "青色",
+  "settings_sectionItemCount": "{count} 项",
+  "@settings_sectionItemCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settings_sectionHint_theme": "调整應用外觀與可读性。",
+  "settings_sectionHint_data": "匯入匯出與備份相关操作将在此展开。",
+  "settings_sectionHint_security": "鎖屏保護與危险操作需二次確認。",
+  "settings_sectionHint_support": "說明文件與法律条款外链入口。",
+  "settings_sectionHint_about": "應用版本與构建資訊。",
+  "settings_clearData_stepIdle": "此操作将永久刪除所有密碼，且無法恢復。",
+  "settings_clearData_stepConfirm1": "請再次確認：确定要清除所有內容吗？",
+  "settings_clearData_stepConfirm2": "最后一次確認：刪除后無法撤销。",
+  "settings_clearData_stepClearing": "正在清除…",
+  "settings_clearData_stepDone": "所有密碼已清除。",
+  "settings_clearData_start": "开始清除",
+  "settings_clearData_understandRisk": "我了解風險，繼續",
+  "settings_clearData_confirmDelete": "確認永久刪除",
+  "tab_password": "密碼",
+  "tab_settings": "設定",
+  "tab_filterAll": "全部",
+  "tab_filterFavorites": "收藏",
+  "tab_filterRecent": "最近使用",
+  "tab_searchHint": "搜尋密碼、網站、使用者名稱",
+  "tab_switchVault": "切換保險庫",
+  "tab_newVault": "新建保險庫",
+  "tab_createVault": "建立保險庫",
+  "tab_createVaultHint": "例如：工作、家庭",
+  "tab_vaultNameLabel": "保險庫名稱",
+  "tab_newFolder": "新建資料夾",
+  "tab_folderNameLabel": "資料夾名稱",
+  "tab_folderNameHint": "例如：社交、銀行卡",
+  "tab_emptyNoVaultTitle": "暫無保險庫",
+  "tab_emptyNoVaultSubtitle": "建立保險庫以开始管理密碼",
+  "tab_emptyNoItemsTitle": "暫無密碼項目",
+  "tab_addPassword": "新增密碼",
+  "tab_nameRequired": "請输入名稱",
+  "error_page_not_found": "404 — 頁面未找到",
+  "cipher_addTitle": "新增密碼",
+  "cipher_addedToast": "已新增",
+  "cipher_saveFailed": "儲存失敗，請稍後重试",
+  "cipher_typeWebsiteLogin": "網站登入",
+  "cipher_typeBankCard": "銀行卡",
+  "cipher_typeIdentityDocument": "身分證件",
+  "cipher_typeSecureNote": "安全筆記",
+  "cipher_typeAppAccount": "App 帳戶密碼",
+  "cipher_typeSshKey": "SSH 密钥",
+  "cipher_formComingSoon": "{type}表單即將推出",
+  "@cipher_formComingSoon": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "cipher_defaultVaultName": "我的保險庫",
+  "cipher_field_name": "名稱",
+  "cipher_field_username": "使用者名稱",
+  "cipher_field_password": "密碼",
+  "cipher_field_website": "網站",
+  "cipher_field_notes": "備註",
+  "cipher_field_folder": "資料夾",
+  "cipher_field_cardholder": "持卡人",
+  "cipher_field_cardNumber": "卡号",
+  "cipher_field_expMonth": "月 MM",
+  "cipher_field_expYear": "年 YY",
+  "cipher_field_cardPinOptional": "PIN（可選）",
+  "cipher_field_docType": "證件類型",
+  "cipher_field_fullName": "姓名",
+  "cipher_field_docNumber": "證件號碼",
+  "cipher_field_issueDate": "簽發日期",
+  "cipher_field_expiryDate": "有效期",
+  "cipher_field_title": "標題",
+  "cipher_field_content": "內容",
+  "cipher_field_privateKey": "私鑰",
+  "cipher_field_publicKeyOptional": "公鑰（可選）",
+  "cipher_field_passphraseOptional": "口令（可選）",
+  "cipher_field_host": "主機",
+  "cipher_field_account": "帳號",
+  "cipher_field_bundleIdOptional": "套件名 / Bundle ID（可選）",
+  "cipher_descWebsiteLogin": "儲存第三方網站或服务的登入憑證，與 App 解鎖密碼無關。",
+  "cipher_descBankCard": "儲存銀行卡資訊；清單仅展示卡号後四位。",
+  "cipher_descIdentityDocument": "儲存身分证、護照等證件資訊；清單仅展示證件類型與姓名摘要。",
+  "cipher_descSecureNote": "儲存加密筆記內容；清單展示標題摘要。",
+  "cipher_descSshKey": "儲存 SSH 私鑰與連線資訊；清單展示主機與用户摘要。",
+  "cipher_descAppAccount": "儲存本機 App 的登入帳號與密碼，與 App 解鎖密碼無關。",
+  "cipher_validationWebsiteLogin": "請填寫名稱、使用者名稱和密碼",
+  "cipher_validationBankCard": "請填寫名稱、持卡人、卡号、有效期和 CVV",
+  "cipher_validationIdentityDocument": "請填寫名稱、證件類型、姓名和證件號碼",
+  "cipher_validationSecureNote": "請填寫標題和筆記內容",
+  "cipher_validationSshKey": "請填寫名稱和私鑰",
+  "cipher_validationAppAccount": "請填寫名稱、帳號和密碼",
+  "cipher_validationRequired": "請完善必填项",
+  "cipher_attachmentOptional": "附件（可選）",
+  "cipher_attachmentHint": "可新增身分证正反面等照片",
+  "cipher_attachmentTakePhoto": "拍照",
+  "cipher_attachmentFromGallery": "从相簿選擇",
+  "app_lock_title": "應用保護",
+  "app_lock_enableTitle": "启用應用保護",
+  "app_lock_enableSubtitle": "冷启动與回到前台时需要驗證身分",
+  "app_lock_manageFallbackPin": "管理备用密碼",
+  "app_lock_fallbackPinTitle": "备用密碼",
+  "app_lock_enabledToast": "應用保護已開啟",
+  "app_lock_setupPinTitle": "設定备用密碼",
+  "app_lock_setupHintTitle": "設定提示語",
+  "app_lock_enterPinDigits": "請输入 {length} 位数字密碼",
+  "@app_lock_enterPinDigits": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "app_lock_pinLabel": "密碼",
+  "app_lock_hintDescription": "設定一句提示語，忘记密碼时可說明你回忆备用密碼。",
+  "app_lock_hintLabel": "忘记密碼提示語",
+  "app_lock_confirmEnable": "確認開啟",
+  "app_lock_previousStep": "上一步",
+  "app_lock_enableFailed": "開啟失敗，請重试",
+  "app_lock_invalidPinFormat": "密碼格式无效",
+  "app_lock_error_enterPinDigits": "請输入 {length} 位数字密碼",
+  "@app_lock_error_enterPinDigits": {
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
+  "app_lock_error_pinMismatch": "两次输入不一致",
+  "app_lock_error_enterHint": "請输入提示語",
+  "app_lock_error_hintTooLong": "提示語不能超过 {max} 个字符",
+  "@app_lock_error_hintTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "app_lock_error_sameAsCurrent": "新密碼不能與当前密碼相同",
+  "app_lock_error_enterCurrentPin": "請输入当前密碼",
+  "app_lock_error_wrongCurrentPin": "当前密碼错误",
+  "app_lock_authenticating": "正在驗證身分…",
+  "app_lock_error_wrongPinRetry": "密碼错误，請重试",
+  "app_lock_error_wrongAppPinRetry": "應用内密碼错误，請重试",
+  "app_lock_error_authUnavailable": "当前無法驗證身分，請重试",
+  "app_lock_error_enterPin": "請输入密碼",
+  "app_lock_biometricUnavailable": "生物辨識不可用，請输入密碼",
+  "app_lock_biometricFailed": "生物辨識未通过，請输入密碼",
+  "app_lock_inAppPinLabel": "應用内密碼",
+  "app_lock_semantic_biometric": "生物辨識",
+  "app_lock_semantic_delete": "刪除",
+  "app_lock_cannotClearPinReason": "鎖屏保護已開啟且无其他解鎖方式，請先关闭鎖屏保護或启用生物辨識",
+  "app_lock_reason_unlockOnResume": "請驗證身分以繼續",
+  "app_lock_reason_confirmSensitive": "請驗證身分以繼續操作",
+  "app_lock_reason_setupAppPin": "請驗證身分以設定應用密碼",
+  "migration_title": "資料遷移",
+  "migration_intro": "在裝置间安全遷移密碼資料。匯出文件均经加密处理。",
+  "migration_exportFile": "匯出到文件",
+  "migration_exportFileSubtitle": "加密打包后儲存到本機",
+  "migration_importFile": "从文件匯入",
+  "migration_importFileSubtitle": "合併或覆寫现有資料",
+  "migration_bluetoothShare": "藍牙共享",
+  "migration_bluetoothShareSubtitle": "同系統附近連線或跨平台 BLE 傳輸",
+  "migration_localBackup": "本機備份",
+  "migration_localBackupSubtitle": "在應用内保留一份快照",
+  "migration_restoreBackup": "恢復備份",
+  "migration_restoreBackupSubtitle": "从最近備份还原",
+  "migration_toastRestoreDone": "恢復完成",
+  "migration_toastRestoreFailed": "恢復失敗",
+  "migration_toastImportDone": "匯入完成",
+  "migration_toastImportFailed": "匯入失敗",
+  "migration_toastBackupCreated": "本機備份已建立",
+  "migration_toastBackupFailed": "備份失敗",
+  "migration_toastNoLocalBackup": "暫無本機備份",
+  "migration_toastExportDone": "已匯出備份",
+  "migration_toastExportFailed": "匯出失敗",
+  "migration_restoreTitle": "恢復備份",
+  "migration_localBackupDefaultNote": "本機備份",
+  "migration_modeMerge": "合併",
+  "migration_modeReplace": "覆寫",
+  "migration_replaceWarning": "覆寫将刪除当前全部密碼資料，且不可撤销。",
+  "migration_startRestore": "开始恢復",
+  "migration_importModeTitle": "選擇匯入方式",
+  "migration_importModeDescription": "合併会保留本機独有項目；覆寫会用備份替换全部密碼資料。",
+  "migration_importMerge": "合併匯入",
+  "migration_importReplace": "覆寫匯入",
+  "migration_importReplaceDanger": "覆寫匯入（危险）",
+  "migration_importModeHint": "合併会保留本機已有資料；覆寫会先清空再匯入，請謹慎選擇。",
+  "migration_btSheetTitle": "藍牙共享",
+  "migration_btSheetDescription": "傳輸完整加密備份。同系統使用附近連線；跨系统（iOS↔Android）使用 BLE，請保持两台裝置在前台。",
+  "migration_btSameOsTitle": "同系統附近連線",
+  "migration_btSameOsSubtitle": "Android↔Android 或 iOS↔iOS",
+  "migration_btSameOsSend": "同系統 · 傳送",
+  "migration_btSameOsReceive": "同系統 · 接收",
+  "migration_btCrossPlatformTitle": "跨平台 BLE",
+  "migration_btCrossPlatformSubtitle": "iOS 與 Android 互传；大備份可能需数分钟",
+  "migration_btCrossPlatformSend": "跨平台 · 傳送",
+  "migration_btCrossPlatformReceive": "跨平台 · 接收",
+  "migration_btCrossPlatformSendTitle": "跨平台傳送",
+  "migration_btCrossPlatformReceiveTitle": "跨平台接收",
+  "migration_btNearbySendTitle": "傳送到附近裝置",
+  "migration_btNearbyReceiveTitle": "从附近裝置接收",
+  "migration_btConnectingPeer": "正在連線 {name}…",
+  "@migration_btConnectingPeer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "migration_btConnectionFailed": "連線失敗：{error}",
+  "@migration_btConnectionFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "migration_btCancelled": "已取消",
+  "migration_btTransferFailed": "傳輸失敗：{error}",
+  "@migration_btTransferFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "migration_btTransferProgress": "傳輸進度 {percent}%",
+  "@migration_btTransferProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "migration_btTransferringBle": "正在通过 BLE 傳輸加密備份… {percent}%",
+  "@migration_btTransferringBle": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "migration_btTransferring": "正在傳輸加密備份… {percent}%",
+  "@migration_btTransferring": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "migration_btScanningCrossPlatformReceiver": "正在掃描跨平台接收端…",
+  "migration_btWaitingCrossPlatformSender": "等待跨平台傳送端連線…",
+  "migration_btSearchingNearby": "正在搜尋附近裝置…",
+  "migration_btWaitingSender": "等待傳送端連線…",
+  "migration_btConnecting": "正在連線…",
+  "migration_btCompleted": "傳輸完成",
+  "migration_btSendDoneCrossPlatform": "備份已傳送到跨平台裝置",
+  "migration_btSendDoneNearby": "備份已傳送到附近裝置",
+  "migration_btSendDoneToast": "傳送完成",
+  "migration_btReceivedChooseImport": "已收到備份，請選擇匯入方式",
+  "migration_btRemainingTime": "剩餘連線时间 {time}",
+  "@migration_btRemainingTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "migration_btInstructionCrossPlatformReceive": "請在對端選擇「跨平台 · 接收」并保持前台",
+  "migration_btInstructionCrossPlatformSend": "請在對端選擇「跨平台 · 傳送」并保持前台",
+  "migration_btInstructionSameOsReceive": "請在對端選擇「同系統 · 接收」",
+  "migration_btInstructionSameOsSend": "請在對端選擇「同系統 · 傳送」",
+  "migration_btUnknownDevice": "未知裝置",
+  "support_feedbackTitle": "客服回饋",
+  "support_feedbackIntro": "請描述你遇到的问题或建议。点击「傳送邮件回饋」将開啟系统邮件應用，收件人已預設为 {email}，請確認內容后点击傳送。",
+  "@support_feedbackIntro": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "support_contactEmailOptional": "聯絡電子郵件（选填）",
+  "support_feedbackContent": "回饋內容",
+  "support_sendFeedbackEmail": "傳送邮件回饋",
+  "support_toastMailOpened": "已開啟邮件應用，請確認收件人后傳送",
+  "support_toastMailUnavailableCopied": "無法開啟邮件應用，已複製回饋內容",
+  "support_emailSubject": "BarrelLock 用户回饋",
+  "support_docNotFoundTitle": "內容不存在",
+  "support_docNotFoundBody": "该文件暂未提供，請返回后重试。",
+  "support_entryNotSupported": "暂不支援該入口",
+  "support_docSecurityHelp": "安全說明文件",
+  "support_docEncryption": "加密說明",
+  "support_docTerms": "用户協議",
+  "support_docPrivacy": "隱私政策",
+  "overlay_loading": "載入中…",
+  "overlay_success": "操作成功",
+  "overlay_error": "操作失敗",
+  "overlay_please_wait": "請稍候",
+  "settings_section_general": "通用",
+  "settings_sectionHint_general": "語言與區域偏好。"
+}

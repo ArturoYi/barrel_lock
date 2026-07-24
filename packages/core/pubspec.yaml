@@ -11,6 +11,8 @@ environment:
 dependencies:
   app_fonts:
     path: ../app_fonts
+  app_l10n:
+    path: ../app_l10n
   cryptography: ^2.9.0
   cryptography_flutter: ^2.3.4
   crypto: ^3.0.7

@@ -1,5 +1,6 @@
 import 'package:core/core.dart';
 
+import '../../l10n/overlay_l10n.dart';
 import '../../router/application/app_router.dart';
 
 /// 添加密码页导航网关（MVVM-C 的 C 层契约）。
@@ -18,7 +19,7 @@ final class CipherAddCoordinator implements CipherAddCoordinatorGateway {
 
   @override
   void finishAddSuccess() {
-    FastToast.show('已添加');
+    OverlayL10n.successToast((l) => l.cipher_addedToast);
     AppRouter.pop();
   }
 }

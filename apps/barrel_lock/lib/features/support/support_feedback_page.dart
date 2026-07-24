@@ -33,19 +33,19 @@ class _SupportFeedbackPageState extends ConsumerState<SupportFeedbackPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(supportFeedbackViewModelProvider);
     final viewModel = ref.read(supportFeedbackViewModelProvider.notifier);
+    final l10n = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(onPressed: viewModel.onPop),
-        title: const Text('客服反馈'),
+        title: Text(l10n.support_feedbackTitle),
       ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             Text(
-              '请描述你遇到的问题或建议。点击「发送邮件反馈」将打开系统邮件应用，'
-              '收件人已预设为 ${SupportFeedbackModel.feedbackEmail}，请确认内容后点击发送。',
+              l10n.support_feedbackIntro(SupportFeedbackModel.feedbackEmail),
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.colors.onSurfaceVariant,
               ),
@@ -54,9 +54,9 @@ class _SupportFeedbackPageState extends ConsumerState<SupportFeedbackPage> {
             TextField(
               controller: _contactController,
               enabled: !state.isSubmitting,
-              decoration: const InputDecoration(
-                labelText: '联系邮箱（选填）',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.support_contactEmailOptional,
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
@@ -67,7 +67,7 @@ class _SupportFeedbackPageState extends ConsumerState<SupportFeedbackPage> {
               controller: _messageController,
               enabled: !state.isSubmitting,
               decoration: InputDecoration(
-                labelText: '反馈内容',
+                labelText: l10n.support_feedbackContent,
                 alignLabelWithHint: true,
                 border: const OutlineInputBorder(),
                 counterText:
@@ -88,7 +88,7 @@ class _SupportFeedbackPageState extends ConsumerState<SupportFeedbackPage> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('发送邮件反馈'),
+                  : Text(l10n.support_sendFeedbackEmail),
             ),
           ],
         ),

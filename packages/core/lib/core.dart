@@ -53,3 +53,9 @@ export 'theme/presentation/app_theme.dart';
 export 'theme/presentation/app_typography.dart';
 export 'theme/presentation/app_theme_x.dart';
 export 'theme/presentation/theme_notifier.dart';
+
+export 'locale/domain/app_locale_preference.dart';
+export 'locale/domain/locale_settings.dart';
+export 'locale/presentation/locale_notifier.dart';
+
+export 'package:app_l10n/app_l10n.dart';

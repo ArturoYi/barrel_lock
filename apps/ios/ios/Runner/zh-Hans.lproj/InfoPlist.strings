@@ -1,0 +1,6 @@
+"CFBundleDisplayName" = "BarrelLock";
+"NSFaceIDUsageDescription" = "用于验证身份以解锁应用保护";
+"NSCameraUsageDescription" = "用于拍摄证件照片";
+"NSPhotoLibraryUsageDescription" = "用于选择证件照片";
+"NSBluetoothAlwaysUsageDescription" = "用于在附近设备间传输加密备份";
+"NSLocalNetworkUsageDescription" = "用于发现附近设备并传输加密备份";

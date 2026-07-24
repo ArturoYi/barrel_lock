@@ -5,6 +5,7 @@ final class PreferenceKeys {
   static const String themeMode = 'theme_mode';
   static const String colorScheme = 'color_scheme';
   static const String fontScale = 'font_scale';
+  static const String localePreference = 'locale_preference';
 
   /// 应用内身份验证 PIN 哈希（[AppIdentityAuth]）。
   static const String identityAuthPin = 'identity_auth_pin';
@@ -14,6 +15,7 @@ final class PreferenceKeys {
     themeMode,
     colorScheme,
     fontScale,
+    localePreference,
     identityAuthPin,
   ];
 }

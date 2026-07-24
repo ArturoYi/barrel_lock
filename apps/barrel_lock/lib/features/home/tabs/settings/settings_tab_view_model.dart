@@ -7,18 +7,19 @@ import 'settings_tab_model.dart';
 /// 首页「设置」Tab 展示状态。
 final class SettingsTabViewState {
   const SettingsTabViewState({
-    required this.title,
     required this.versionLabel,
     required this.sections,
     required this.selectedSection,
+    required this.localePreference,
   });
 
-  final String title;
   final String versionLabel;
   final List<SettingsSectionDescriptor> sections;
 
   /// 横屏 Master-Detail 当前选中分组。
   final SettingsSectionKind selectedSection;
+
+  final AppLocalePreference localePreference;
 
   SettingsSectionDescriptor sectionOf(SettingsSectionKind kind) {
     return sections.firstWhere((section) => section.kind == kind);
@@ -27,32 +28,38 @@ final class SettingsTabViewState {
 
 /// 首页「设置」Tab 状态与业务编排（MVVM-C 的 VM 层）。
 final class SettingsTabViewModel extends Notifier<SettingsTabViewState> {
-  late final SettingsTabModel _model;
-  late final SettingsTabCoordinator _coordinator;
+  /// 横屏选中分组；需在 [build] 重入（如语言切换）时保留。
+  SettingsSectionKind _selectedSection = SettingsSectionKind.general;
+
+  SettingsTabCoordinator get _coordinator =>
+      ref.read(settingsTabCoordinatorProvider);
 
   @override
   SettingsTabViewState build() {
-    _model = ref.read(settingsTabModelProvider);
-    _coordinator = ref.read(settingsTabCoordinatorProvider);
+    final model = ref.read(settingsTabModelProvider);
+    final localePreference = ref.watch(localeSettingsProvider).preference;
     return SettingsTabViewState(
-      title: _model.title,
-      versionLabel: _model.versionLabel,
-      sections: _model.sections,
-      selectedSection: SettingsSectionKind.data,
+      versionLabel: model.versionLabel,
+      sections: model.sections,
+      selectedSection: _selectedSection,
+      localePreference: localePreference,
     );
   }
 
   void onSectionSelected(SettingsSectionKind kind) {
+    _selectedSection = kind;
     state = SettingsTabViewState(
-      title: state.title,
       versionLabel: state.versionLabel,
       sections: state.sections,
       selectedSection: kind,
+      localePreference: state.localePreference,
     );
   }
 
   void onNavItemTap(String itemId) {
     switch (itemId) {
+      case 'language':
+        _coordinator.openLanguageSettings();
       case 'theme':
         onSectionSelected(SettingsSectionKind.theme);
       case 'data_migration':
